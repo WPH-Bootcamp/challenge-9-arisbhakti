@@ -61,7 +61,7 @@ const Home = () => {
 
       <main className="relative w-full z-20 px-4 md:px-30 flex flex-col">
         <section id="category" className="py-6 md:py-12">
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-x-5 gap-y-5 md:gap-x-10 md:gap-y-0">
+          <div className="grid grid-cols-3  gap-x-5 gap-y-5 md:flex md:flex-row md:justify-between">
             <div className="flex flex-col gap-1 md:gap-1.5">
               <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
                 <img
@@ -83,7 +83,7 @@ const Home = () => {
                 />
               </div>
               <p className="text-neutral-900 font-bold text-[14px] md:text-[18px] md:leading-8 leading-7 -tracking-[0.02em] md:-tracking-[0.03em] text-center">
-                All Restaurant
+                Nearby
               </p>
             </div>
             <div className="flex flex-col gap-1 md:gap-1.5">
@@ -95,7 +95,7 @@ const Home = () => {
                 />
               </div>
               <p className="text-neutral-900 font-bold text-[14px] md:text-[18px] md:leading-8 leading-7 -tracking-[0.02em] md:-tracking-[0.03em] text-center">
-                All Restaurant
+                Discount
               </p>
             </div>
             <div className="flex flex-col gap-1 md:gap-1.5">
@@ -107,7 +107,7 @@ const Home = () => {
                 />
               </div>
               <p className="text-neutral-900 font-bold text-[14px] md:text-[18px] md:leading-8 leading-7 -tracking-[0.02em] md:-tracking-[0.03em] text-center">
-                All Restaurant
+                Best Seller
               </p>
             </div>
             <div className="flex flex-col gap-1 md:gap-1.5">
@@ -119,7 +119,7 @@ const Home = () => {
                 />
               </div>
               <p className="text-neutral-900 font-bold text-[14px] md:text-[18px] md:leading-8 leading-7 -tracking-[0.02em] md:-tracking-[0.03em] text-center">
-                All Restaurant
+                Delivery
               </p>
             </div>
             <div className="flex flex-col gap-1 md:gap-1.5">
@@ -131,7 +131,7 @@ const Home = () => {
                 />
               </div>
               <p className="text-neutral-900 font-bold text-[14px] md:text-[18px] md:leading-8 leading-7 -tracking-[0.02em] md:-tracking-[0.03em] text-center">
-                All Restaurant
+                Lunch
               </p>
             </div>
           </div>
