@@ -5,14 +5,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
 import App from "./App";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Home from "./components/pages/Home";
+import Home from "./pages/Home";
 import Favorites from "./components/pages/Favorites";
 import ScrollToTop from "./components/common/ScrollToTop";
-import Details from "./components/pages/Details";
 import Search from "./components/pages/Search";
 import DetailsOld from "./components/pages/DetailsOld";
 import { TrailerModalProvider } from "./context/TrailerModalContext";
-import AuthPage from "./app/AuthPage";
+import AuthPage from "./pages/AuthPage";
+import Details from "./pages/Details";
 
 const queryClient = new QueryClient();
 
