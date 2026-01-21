@@ -21,10 +21,7 @@ body {
   /* ===================== */
   /* Primary (existing) */
   /* ===================== */
-  --color-primary-400: #640c00;
-  --color-primary-300: #961200;
-  --color-primary-200: #b96155;
-  --color-primary-100: #ead0cc;
+  --color-primary-100: #c12116;
 
   /* ===================== */
   /* Neutral (existing) */
@@ -45,9 +42,9 @@ body {
   /* ===================== */
   /* Accent */
   /* ===================== */
-  --color-accent-blue: #177eff;
-  --color-accent-pink: #ec1c96;
-  --color-accent-red: #e5352d;
+  --color-accent-green: #079455;
+  --color-accent-yellow: #fdb022;
+  --color-accent-red: #d9206e;
 }
 /* 
 :root {

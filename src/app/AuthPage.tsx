@@ -59,31 +59,33 @@ export default function AuthPage() {
         </div>
 
         {/* RIGHT (Form) */}
-        <div className="flex flex-1 items-center justify-center">
-          <div className="w-full max-w-md">
+        <div className="flex flex-1 items-center justify-center px-6 md:px-0">
+          <div className="w-full max-w-md flex flex-col gap-4 md:gap-5 md:w-93.5">
             {/* Logo Row */}
-            <div className="mb-8 flex items-center gap-3">
+            <div className="8 flex items-center gap-3 md:gap-3.75">
               <img
                 src="/images/common/logo-foody.svg"
                 alt="Foody"
-                className="h-10 w-10"
+                className="h-8 w-8 md:h-10.5 md:w-10.5"
                 draggable={false}
               />
-              <span className="text-2xl font-extrabold tracking-tight text-neutral-900">
+              <span className="text-[24.38px] md:text-[32px] md:leading-10.5 font-extrabold leading-8 text-neutral-950">
                 Foody
               </span>
             </div>
 
             {/* Title + subtitle */}
-            <h1 className="text-[40px] font-extrabold leading-[1.05] text-neutral-900">
-              Welcome Back
-            </h1>
-            <p className="mt-3 text-lg text-neutral-700">
-              Good to see you again! Let’s eat
-            </p>
+            <div className="flex flex-col gap-0 md:gap-1">
+              <h1 className="text-[24px] md:text-[28px] font-extrabold leading-9 md:leading-9.5 text-neutral-950">
+                Welcome Back
+              </h1>
+              <p className=" text-[14px] md:text-[16px] leading-7 md:leading-7.5 -tracking-[0.03em] text-neutral-950">
+                Good to see you again! Let’s eat
+              </p>
+            </div>
 
             {/* Toggle Tabs */}
-            <div className="mt-7">
+            <div className="">
               <Tabs
                 value={tab}
                 onValueChange={(v) => setTab(v as "signin" | "signup")}
@@ -104,8 +106,11 @@ export default function AuthPage() {
                 </TabsList>
 
                 {/* SIGN IN */}
-                <TabsContent value="signin" className="mt-6">
-                  <form onSubmit={onSubmitSignIn} className="space-y-5">
+                <TabsContent value="signin" className="mt-3">
+                  <form
+                    onSubmit={onSubmitSignIn}
+                    className="flex flex-col gap-4 md:gap-5"
+                  >
                     <input
                       type="email"
                       placeholder="Email"
@@ -113,7 +118,7 @@ export default function AuthPage() {
                       onChange={(e) =>
                         setSignIn((p) => ({ ...p, email: e.target.value }))
                       }
-                      className="h-14 w-full rounded-2xl border border-neutral-200 bg-white px-5 text-base outline-none placeholder:text-neutral-400 focus:border-neutral-300"
+                      className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
                     />
 
                     <div className="relative">
@@ -124,7 +129,7 @@ export default function AuthPage() {
                         onChange={(e) =>
                           setSignIn((p) => ({ ...p, password: e.target.value }))
                         }
-                        className="h-14 w-full rounded-2xl border border-neutral-200 bg-white px-5 pr-14 text-base outline-none placeholder:text-neutral-400 focus:border-neutral-300"
+                        className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
                       />
                       <button
                         type="button"
@@ -135,7 +140,7 @@ export default function AuthPage() {
                         <img
                           src="/images/common/eye.svg"
                           alt="Show/Hide"
-                          className="h-5 w-5 opacity-80"
+                          className="h-4 w-4"
                           draggable={false}
                         />
                       </button>
@@ -156,14 +161,14 @@ export default function AuthPage() {
                         />
                         <span className="pointer-events-none absolute h-3 w-3 scale-0 rounded-[3px] bg-neutral-900 transition peer-checked:scale-100" />
                       </span>
-                      <span className="text-base text-neutral-900">
+                      <span className="text-[14px] leading-7 md:text-[16px] md:leading-7.5 -tracking-[0.03em] font-medium text-neutral-900">
                         Remember Me
                       </span>
                     </label>
 
                     <button
                       type="submit"
-                      className="mt-2 h-14 w-full rounded-full bg-[#B80D0D] text-lg font-extrabold text-white shadow-[0_10px_20px_rgba(184,13,13,0.18)] transition active:scale-[0.99]"
+                      className=" h-12 w-full rounded-full px-2 py-2 bg-primary-100 text-[16px] leading-7.5 -tracking-[0.02em] font-bold text-neutral-25 shadow-[0_10px_20px_rgba(184,13,13,0.18)] transition active:scale-[0.99]"
                     >
                       Login
                     </button>
@@ -171,8 +176,11 @@ export default function AuthPage() {
                 </TabsContent>
 
                 {/* SIGN UP */}
-                <TabsContent value="signup" className="mt-6">
-                  <form onSubmit={onSubmitSignUp} className="space-y-5">
+                <TabsContent value="signup" className="mt-3">
+                  <form
+                    onSubmit={onSubmitSignUp}
+                    className="flex flex-col gap-4 md:gap-5"
+                  >
                     {/* FIX: add Name + Number Phone */}
                     <input
                       type="text"
@@ -181,7 +189,7 @@ export default function AuthPage() {
                       onChange={(e) =>
                         setSignUp((p) => ({ ...p, name: e.target.value }))
                       }
-                      className="h-14 w-full rounded-2xl border border-neutral-200 bg-white px-5 text-base outline-none placeholder:text-neutral-400 focus:border-neutral-300"
+                      className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
                     />
 
                     <input
@@ -191,7 +199,7 @@ export default function AuthPage() {
                       onChange={(e) =>
                         setSignUp((p) => ({ ...p, email: e.target.value }))
                       }
-                      className="h-14 w-full rounded-2xl border border-neutral-200 bg-white px-5 text-base outline-none placeholder:text-neutral-400 focus:border-neutral-300"
+                      className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
                     />
 
                     <input
@@ -201,7 +209,7 @@ export default function AuthPage() {
                       onChange={(e) =>
                         setSignUp((p) => ({ ...p, phone: e.target.value }))
                       }
-                      className="h-14 w-full rounded-2xl border border-neutral-200 bg-white px-5 text-base outline-none placeholder:text-neutral-400 focus:border-neutral-300"
+                      className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
                     />
 
                     <div className="relative">
@@ -212,7 +220,7 @@ export default function AuthPage() {
                         onChange={(e) =>
                           setSignUp((p) => ({ ...p, password: e.target.value }))
                         }
-                        className="h-14 w-full rounded-2xl border border-neutral-200 bg-white px-5 pr-14 text-base outline-none placeholder:text-neutral-400 focus:border-neutral-300"
+                        className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
                       />
                       <button
                         type="button"
@@ -240,7 +248,7 @@ export default function AuthPage() {
                             confirmPassword: e.target.value,
                           }))
                         }
-                        className="h-14 w-full rounded-2xl border border-neutral-200 bg-white px-5 pr-14 text-base outline-none placeholder:text-neutral-400 focus:border-neutral-300"
+                        className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
                       />
                       <button
                         type="button"
@@ -260,7 +268,7 @@ export default function AuthPage() {
                     {/* FIX: button label like design */}
                     <button
                       type="submit"
-                      className="mt-2 h-14 w-full rounded-full bg-[#B80D0D] text-lg font-extrabold text-white shadow-[0_10px_20px_rgba(184,13,13,0.18)] transition active:scale-[0.99]"
+                      className=" h-12 w-full rounded-full px-2 py-2 bg-primary-100 text-[16px] leading-7.5 -tracking-[0.02em] font-bold text-neutral-25 shadow-[0_10px_20px_rgba(184,13,13,0.18)] transition active:scale-[0.99]"
                     >
                       Register
                     </button>
