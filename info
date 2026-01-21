@@ -1,0 +1,12 @@
+git remote remove origin
+
+git remote -v
+
+git remote add origin url_baru
+
+git add .
+
+git commit -m "pesan nya apa"
+
+git push -u origin main
+
