@@ -13,6 +13,7 @@ import DetailsOld from "./components/pages/DetailsOld";
 import { TrailerModalProvider } from "./context/TrailerModalContext";
 import AuthPage from "./pages/AuthPage";
 import Details from "./pages/Details";
+import Category from "./pages/Category";
 
 const queryClient = new QueryClient();
 
@@ -28,8 +29,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/" element={<Home />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/details/:id" element={<Details />} />
-              <Route path="/detailsold" element={<DetailsOld />} />
-              <Route path="/search" element={<Search />} />
+              <Route path="/category" element={<Category />} />
               <Route path="/auth" element={<AuthPage />} />
             </Route>
           </Routes>

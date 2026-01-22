@@ -13,6 +13,25 @@ body {
 
 @theme {
   /* ===================== */
+  /* Typography – Text */
+  /* ===================== */
+  --font-size-text-xs: 0.75rem; /* 12px */
+  --font-size-text-sm: 0.875rem; /* 14px */
+  --font-size-text-md: 1rem; /* 16px */
+  --font-size-text-lg: 1.125rem; /* 18px */
+  --font-size-text-xl: 1.25rem; /* 20px */
+
+  /* ===================== */
+  /* Typography – Display */
+  /* ===================== */
+  --font-size-display-xs: 1.5rem; /* 24px */
+  --font-size-display-sm: 1.75rem; /* 28px */
+  --font-size-display-md: 2rem; /* 32px */
+  --font-size-display-lg: 2.25rem; /* 36px */
+  --font-size-display-xl: 2.5rem; /* 40px */
+  --font-size-display-2xl: 3rem; /* 48px */
+  --font-size-display-3xl: 3.5rem; /* 56px */
+  /* ===================== */
   /* Base */
   /* ===================== */
   --color-white: #ffffff;
@@ -61,6 +80,48 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 } */
+
+@layer utilities {
+  /* Text */
+  .text-xs {
+    font-size: var(--font-size-text-xs);
+  }
+  .text-sm {
+    font-size: var(--font-size-text-sm);
+  }
+  .text-md {
+    font-size: var(--font-size-text-md);
+  }
+  .text-lg {
+    font-size: var(--font-size-text-lg);
+  }
+  .text-xl {
+    font-size: var(--font-size-text-xl);
+  }
+
+  /* Display */
+  .display-xs {
+    font-size: var(--font-size-display-xs);
+  }
+  .display-sm {
+    font-size: var(--font-size-display-sm);
+  }
+  .display-md {
+    font-size: var(--font-size-display-md);
+  }
+  .display-lg {
+    font-size: var(--font-size-display-lg);
+  }
+  .display-xl {
+    font-size: var(--font-size-display-xl);
+  }
+  .display-2xl {
+    font-size: var(--font-size-display-2xl);
+  }
+  .display-3xl {
+    font-size: var(--font-size-display-3xl);
+  }
+}
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);

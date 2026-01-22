@@ -58,7 +58,7 @@ const Header = () => {
                   alt="cart-white"
                 />
                 <div className="absolute bg-primary-100 w-5 h-5 -right-1 -top-1.5 rounded-full flex items-center justify-center">
-                  <span className="text-[12px]">1</span>
+                  <span className="text-[12px] text-neutral-25">1</span>
                 </div>
               </div>
               <div className="flex flex-row items-center justify-center gap-4 ">
