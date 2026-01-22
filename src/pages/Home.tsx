@@ -29,10 +29,10 @@ const Home = () => {
       >
         <div className="flex flex-col gap-6 md:gap-10">
           <div className="flex flex-col gap-1 md:gap-2">
-            <h1 className="font-extrabold text-[36px] leading-11 md:text-[48px] md:leading-15">
+            <h1 className="font-extrabold text-[36px] leading-11 md:text-[48px] md:leading-15 text-white">
               Explore Culinary Experiences
             </h1>
-            <p className="font-bold text-[18px] leading-8 -tracking-[0.03em] md:text-[24px] md:leading-9 md:tracking-normal">
+            <p className="font-bold text-[18px] leading-8 -tracking-[0.03em] md:text-[24px] md:leading-9 md:tracking-normal text-white">
               Search and refine your choice to discover the perfect restaurant.
             </p>
           </div>
