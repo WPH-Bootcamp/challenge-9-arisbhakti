@@ -14,6 +14,7 @@ import AuthPage from "./pages/AuthPage";
 import Details from "./pages/Details";
 import Category from "./pages/Category";
 import MyCart from "./pages/MyCart";
+import Checkout from "./pages/Checkout";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/category" element={<Category />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/mycart" element={<MyCart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              
             </Route>
           </Routes>
 

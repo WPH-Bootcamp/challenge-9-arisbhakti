@@ -42,7 +42,7 @@ export default function MyCart() {
                   </span>
                 </div>
               </div>
-              <div className="flex flex-row items-center gap-4">
+              <div className="flex flex-row items-center gap-4 py-6">
                 <button className="h-9 w-9 ring-1 ring-inset ring-neutral-300 rounded-full flex items-center justify-center cursor-pointer md:h-10 md:w-10">
                   <img
                     src="/images/common/minus.svg"
