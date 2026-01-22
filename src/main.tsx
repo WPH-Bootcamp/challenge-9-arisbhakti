@@ -8,12 +8,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Home from "./pages/Home";
 import Favorites from "./components/pages/Favorites";
 import ScrollToTop from "./components/common/ScrollToTop";
-import Search from "./components/pages/Search";
-import DetailsOld from "./components/pages/DetailsOld";
+
 import { TrailerModalProvider } from "./context/TrailerModalContext";
 import AuthPage from "./pages/AuthPage";
 import Details from "./pages/Details";
 import Category from "./pages/Category";
+import MyCart from "./pages/MyCart";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +31,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/details/:id" element={<Details />} />
               <Route path="/category" element={<Category />} />
               <Route path="/auth" element={<AuthPage />} />
+              <Route path="/mycart" element={<MyCart />} />
             </Route>
           </Routes>
 
