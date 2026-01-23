@@ -1,28 +1,155 @@
 const Footer = () => {
   return (
-    <footer
-      className={`top-0 w-full z-50 h-30 flex flex-col md:flex-row md:justify-between md:items-center items-start justify-center gap-3 md:gap-0 px-4 md:px-35 transition-all duration-300  border-t border-neutral-800 `}
-    >
-      <div className="flex flex-row items-center justify-center">
-        <a
-          href="#home"
-          className="flex flex-row  gap-[7.11px] cursor-pointer "
-          id="home-button"
-        >
-          <img
-            src="/images/common/box.svg"
-            className="w-[23.33px] h-[21.82px] md:w-[33.33px] md:h-[31.18px] "
-            alt="Your Logo"
-          />
-          <p className="menu-hover font-semibold text-[19.91px] leading-[24.9px] tracking-[-0.8px] md:text-[28.44px] md:leading-[35.6px] md:tracking-[-0.04em]">
-            Movie
+    <footer className="bg-[#1a1d29] text-white py-12 md:py-20 px-4 md:px-30">
+      <div className="flex flex-wrap gap-y-6 md:gap-40 md:justify-around">
+        {/* Left Section - Foody Info */}
+        <div className="w-full md:w-[360px] flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <img
+              src="/images/common/logo-foody.svg"
+              className="w-10.5 h-10.5"
+              alt="logo"
+            />
+            <span className="text-[32px] font-extrabold leading-7">Foody</span>
+          </div>
+
+          <p className="text-neutral-25 text-sm leading-7 -tracking-[0.02em]">
+            Enjoy homemade flavors & chef's signature dishes, freshly prepared
+            every day. Order online or visit our nearest branch.
           </p>
-        </a>
+
+          <div className="flex flex-col gap-5">
+            <h3 className="font-semibold text-sm leading-7 -tracking-[0.02em]">
+              Follow on Social Media
+            </h3>
+            <div className="flex gap-3">
+              <img
+                src="/images/common/facebook.svg"
+                alt="Facebook"
+                className="h-10 w-10"
+              />
+              <img
+                src="/images/common/instagram.svg"
+                alt="Instagram"
+                className="h-10 w-10"
+              />
+              <img
+                src="/images/common/linkedin.svg"
+                alt="Twitter"
+                className="h-10 w-10"
+              />
+              <img
+                src="/images/common/tiktok.svg"
+                alt="LinkedIn"
+                className="h-10 w-10"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="w-1/2  md:flex-1 flex flex-col">
+          <h3 className="font-bold text-lg mb-4">Explore</h3>
+          <ul className="space-y-3">
+            <li>
+              <a
+                href="#"
+                className="text-gray-300 hover:text-white transition text-sm"
+              >
+                All Food
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="text-gray-300 hover:text-white transition text-sm"
+              >
+                Nearby
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="text-gray-300 hover:text-white transition text-sm"
+              >
+                Discount
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="text-gray-300 hover:text-white transition text-sm"
+              >
+                Best Seller
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="text-gray-300 hover:text-white transition text-sm"
+              >
+                Delivery
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="text-gray-300 hover:text-white transition text-sm"
+              >
+                Lunch
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        {/* Right Section - Help */}
+        <div className="w-1/2  md:flex-1 ">
+          <h3 className="font-bold text-lg mb-4">Help</h3>
+          <ul className="space-y-3">
+            <li>
+              <a
+                href="#"
+                className="text-gray-300 hover:text-white transition text-sm"
+              >
+                How to Order
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="text-gray-300 hover:text-white transition text-sm"
+              >
+                Payment Methods
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="text-gray-300 hover:text-white transition text-sm"
+              >
+                Track My Order
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="text-gray-300 hover:text-white transition text-sm"
+              >
+                FAQ
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="text-gray-300 hover:text-white transition text-sm"
+              >
+                Contact Us
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
-      <span className="text-[12px] md:text-[16px] leading-6 md:leading-7.5 text-neutral-600">
-        Copyright ©2025 Movie Explorer
-      </span>
     </footer>
   );
 };
+
 export default Footer;
