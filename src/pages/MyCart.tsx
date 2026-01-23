@@ -1,6 +1,6 @@
 export default function MyCart() {
   return (
-    <main className="w-full px-4 md:px-30 md:mt-32 pt-4 md:pt-0 mt-16 flex flex-col gap-4 md:gap-8 text-neutral-950 md:items-center">
+    <main className="w-full px-4 md:px-30  pt-4 md:pt-0 md:mt-32 mt-16 flex flex-col gap-4 md:gap-8 text-neutral-950 md:items-center">
       <div className="flex flex-col gap-4 md:gap-8 md:w-200">
         <h1 className="font-extrabold text-2xl leading-9 md:text-[32 px] md:leading-10.5">
           My Cart
