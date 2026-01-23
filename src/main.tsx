@@ -17,6 +17,8 @@ import MyCart from "./pages/MyCart";
 import Checkout from "./pages/Checkout";
 import Success from "./pages/Success";
 import MyOrders from "./pages/MyOrders";
+import BlankLayout from "./components/Layout/BlankLayout";
+import MyOrdersLayout from "./components/Layout/MyOrdersLayout";
 
 const queryClient = new QueryClient();
 
@@ -33,11 +35,17 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/details/:id" element={<Details />} />
               <Route path="/category" element={<Category />} />
-              <Route path="/auth" element={<AuthPage />} />
               <Route path="/mycart" element={<MyCart />} />
               <Route path="/checkout" element={<Checkout />} />
+
+              <Route path="/myorders" element={<MyOrdersLayout />}>
+                <Route index element={<MyOrders />} />
+              </Route>
+            </Route>
+
+            <Route element={<BlankLayout />}>
+              <Route path="/auth" element={<AuthPage />} />
               <Route path="/success" element={<Success />} />
-              <Route path="/myorders" element={<MyOrders />} />
             </Route>
           </Routes>
 

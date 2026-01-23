@@ -46,6 +46,16 @@ body {
   --color-accent-yellow: #fdb022;
   --color-accent-red: #d9206e;
 }
+
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE & Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+}
 /* 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
