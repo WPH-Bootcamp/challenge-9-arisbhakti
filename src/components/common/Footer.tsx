@@ -3,7 +3,7 @@ const Footer = () => {
     <footer className="bg-[#1a1d29] text-neutral-25 py-12 md:py-20 px-4 md:px-30">
       <div className="flex flex-wrap gap-y-6 md:gap-40 md:justify-around">
         {/* Left Section - Foody Info */}
-        <div className="w-full md:w-[360px] flex flex-col gap-4">
+        <div className="w-full md:w-90 flex flex-col gap-4">
           <div className="flex items-center gap-3">
             <img
               src="/images/common/logo-foody.svg"
@@ -47,7 +47,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="w-1/2  md:flex-1 flex flex-col ml-[5%] gap-4 ">
+        <div className="w-1/2  md:flex-1 flex flex-col md:ml-[5%] gap-4 ">
           <h3 className="font-extrabold text-sm leading-7 md:text-base md:leading-7.5">
             Explore
           </h3>
@@ -157,6 +157,3 @@ const Footer = () => {
 };
 
 export default Footer;
-
-
-

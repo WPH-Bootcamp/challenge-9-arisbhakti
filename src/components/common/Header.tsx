@@ -1,4 +1,17 @@
 import { useEffect, useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
+import { IoDocumentTextOutline } from "react-icons/io5";
+import { RiLogoutCircleLine } from "react-icons/ri";
+import { SlLocationPin } from "react-icons/sl";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -61,16 +74,69 @@ const Header = () => {
                   <span className="text-[12px] text-neutral-25">1</span>
                 </div>
               </div>
-              <div className="flex flex-row items-center justify-center gap-4 ">
-                <img
-                  src="/images/common/profile-dummy.svg"
-                  className="w-10 h-10 md:h-12 md:w-12 rounded-full"
-                  alt=""
-                />
-                <span className="hidden md:block font-semibold text-lg leading-8 -tracking-[0.02em]">
-                  John Doe
-                </span>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div
+                    id="profile-menu"
+                    className="flex flex-row items-center justify-center gap-4 cursor-pointer"
+                  >
+                    <Avatar className="w-10 h-10 md:h-12 md:w-12">
+                      <AvatarImage
+                        src="/images/common/profile-dummy.svg"
+                        alt="profile"
+                      />
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
+                    <span className="hidden md:block font-semibold text-lg leading-8 -tracking-[0.02em]">
+                      John Doe
+                    </span>
+                  </div>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent
+                  align="end"
+                  sideOffset={12}
+                  className="w-49.25 rounded-3xl p-4 shadow-lg"
+                >
+                  {/* USER INFO */}
+                  <div className="flex items-center gap-3 pb-3 border-b border-neutral-200">
+                    <Avatar className="w-9 h-9">
+                      <AvatarImage
+                        src="/images/common/profile-dummy.svg"
+                        alt="profile"
+                      />
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
+                    <span className="font-bold text-base leading-7.5 -tracking-[0.02em]">
+                      John Doe
+                    </span>
+                  </div>
+                  {/* MENU ITEMS */}
+
+                  <div className="pt-3 flex flex-col gap-0">
+                    <DropdownMenuItem className="gap-3 cursor-pointer rounded-xl">
+                      <SlLocationPin className="text-xl text-neutral-700" />
+                      <span className="text-sm leading-7 font-medium">
+                        Delivery Address
+                      </span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem className="gap-3 cursor-pointer rounded-xl">
+                      <IoDocumentTextOutline className="text-xl text-neutral-700" />
+                      <span className="text-sm leading-7 font-medium">
+                        My Orders
+                      </span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem className="gap-3 cursor-pointer rounded-xl text-primary-100 ">
+                      <RiLogoutCircleLine className="text-xl" />
+                      <span className="text-sm leading-7 font-medium">
+                        Logout
+                      </span>
+                    </DropdownMenuItem>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           )}
           {!isLogin && (

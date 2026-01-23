@@ -1,5 +1,6 @@
 import { Outlet, NavLink } from "react-router-dom";
-import { IoLocationOutline } from "react-icons/io5";
+import { SlLocationPin } from "react-icons/sl";
+
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { RiLogoutCircleLine } from "react-icons/ri";
 
@@ -21,7 +22,7 @@ export default function MyOrdersLayout() {
         <nav className="flex flex-col gap-6">
           <NavLink to="profile" className="">
             <div className="flex flex-row items-center gap-2 ">
-              <IoLocationOutline className="w-6 h-6" />
+              <SlLocationPin className="w-6 h-6" />
               <span className="text-base leading-7.5 -tracking-[0.03em] ">
                 Delivery Address
               </span>
