@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <footer className="bg-[#1a1d29] text-white py-12 md:py-20 px-4 md:px-30">
+    <footer className="bg-[#1a1d29] text-neutral-25 py-12 md:py-20 px-4 md:px-30">
       <div className="flex flex-wrap gap-y-6 md:gap-40 md:justify-around">
         {/* Left Section - Foody Info */}
         <div className="w-full md:w-[360px] flex flex-col gap-4">
@@ -47,13 +47,15 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="w-1/2  md:flex-1 flex flex-col">
-          <h3 className="font-bold text-lg mb-4">Explore</h3>
+        <div className="w-1/2  md:flex-1 flex flex-col ml-[5%] gap-4 ">
+          <h3 className="font-extrabold text-sm leading-7 md:text-base md:leading-7.5">
+            Explore
+          </h3>
           <ul className="space-y-3">
             <li>
               <a
                 href="#"
-                className="text-gray-300 hover:text-white transition text-sm"
+                className="font-normal text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[-0.02em]"
               >
                 All Food
               </a>
@@ -61,7 +63,7 @@ const Footer = () => {
             <li>
               <a
                 href="#"
-                className="text-gray-300 hover:text-white transition text-sm"
+                className="font-normal text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[-0.02em]"
               >
                 Nearby
               </a>
@@ -69,7 +71,7 @@ const Footer = () => {
             <li>
               <a
                 href="#"
-                className="text-gray-300 hover:text-white transition text-sm"
+                className="font-normal text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[-0.02em]"
               >
                 Discount
               </a>
@@ -77,7 +79,7 @@ const Footer = () => {
             <li>
               <a
                 href="#"
-                className="text-gray-300 hover:text-white transition text-sm"
+                className="font-normal text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[-0.02em]"
               >
                 Best Seller
               </a>
@@ -85,7 +87,7 @@ const Footer = () => {
             <li>
               <a
                 href="#"
-                className="text-gray-300 hover:text-white transition text-sm"
+                className="font-normal text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[-0.02em]"
               >
                 Delivery
               </a>
@@ -93,7 +95,7 @@ const Footer = () => {
             <li>
               <a
                 href="#"
-                className="text-gray-300 hover:text-white transition text-sm"
+                className="font-normal text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[-0.02em]"
               >
                 Lunch
               </a>
@@ -102,13 +104,15 @@ const Footer = () => {
         </div>
 
         {/* Right Section - Help */}
-        <div className="w-1/2  md:flex-1 ">
-          <h3 className="font-bold text-lg mb-4">Help</h3>
+        <div className="w-1/2  md:flex-1 flex flex-col gap-4 ">
+          <h3 className="font-extrabold text-sm leading-7 md:text-base md:leading-7.5">
+            Help
+          </h3>
           <ul className="space-y-3">
             <li>
               <a
                 href="#"
-                className="text-gray-300 hover:text-white transition text-sm"
+                className="font-normal text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[-0.02em]"
               >
                 How to Order
               </a>
@@ -116,7 +120,7 @@ const Footer = () => {
             <li>
               <a
                 href="#"
-                className="text-gray-300 hover:text-white transition text-sm"
+                className="font-normal text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[-0.02em]"
               >
                 Payment Methods
               </a>
@@ -124,7 +128,7 @@ const Footer = () => {
             <li>
               <a
                 href="#"
-                className="text-gray-300 hover:text-white transition text-sm"
+                className="font-normal text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[-0.02em]"
               >
                 Track My Order
               </a>
@@ -132,7 +136,7 @@ const Footer = () => {
             <li>
               <a
                 href="#"
-                className="text-gray-300 hover:text-white transition text-sm"
+                className="font-normal text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[-0.02em]"
               >
                 FAQ
               </a>
@@ -140,7 +144,7 @@ const Footer = () => {
             <li>
               <a
                 href="#"
-                className="text-gray-300 hover:text-white transition text-sm"
+                className="font-normal text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[-0.02em]"
               >
                 Contact Us
               </a>
