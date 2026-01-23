@@ -19,6 +19,7 @@ import Success from "./pages/Success";
 import MyOrders from "./pages/MyOrders";
 import BlankLayout from "./components/Layout/BlankLayout";
 import MyOrdersLayout from "./components/Layout/MyOrdersLayout";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
               <Route path="/myorders" element={<MyOrdersLayout />}>
                 <Route index element={<MyOrders />} />
+                <Route path="orders" element={<MyOrders />} />
+                <Route path="profile" element={<Profile />} />
               </Route>
             </Route>
 

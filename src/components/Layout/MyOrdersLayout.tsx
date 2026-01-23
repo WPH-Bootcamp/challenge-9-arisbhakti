@@ -19,7 +19,7 @@ export default function MyOrdersLayout() {
         <hr />
 
         <nav className="flex flex-col gap-6">
-          <NavLink to="orders" className="">
+          <NavLink to="profile" className="">
             <div className="flex flex-row items-center gap-2 ">
               <IoLocationOutline className="w-6 h-6" />
               <span className="text-base leading-7.5 -tracking-[0.03em] ">
@@ -27,7 +27,7 @@ export default function MyOrdersLayout() {
               </span>
             </div>
           </NavLink>
-          <NavLink to="review" className="">
+          <NavLink to="orders" className="">
             <div className="flex flex-row items-center gap-2 ">
               <IoDocumentTextOutline className="w-6 h-6 text-primary-100" />
               <span className="text-base leading-7.5 -tracking-[0.03em] text-primary-100 ">
@@ -35,7 +35,7 @@ export default function MyOrdersLayout() {
               </span>
             </div>
           </NavLink>
-          <NavLink to="review" className="">
+          <NavLink to="profile" className="">
             <div className="flex flex-row items-center gap-2 ">
               <RiLogoutCircleLine className="w-6 h-6 " />
               <span className="text-base leading-7.5 -tracking-[0.03em]">
