@@ -2,7 +2,7 @@ import React from "react";
 
 export default function Profile() {
   return (
-    <div className="flex flex-col gap-4 md:gap-6 pt-4 md:pt-0 md:w-131">
+    <div className="flex flex-col gap-4 md:gap-6 pt-4 md:pt-0 md:w-131 md:mb-[192px]">
       <h1 className=" font-extrabold text-2xl leading-9 md:text-[32px] md:leading-10.5 ">
         Profile
       </h1>
