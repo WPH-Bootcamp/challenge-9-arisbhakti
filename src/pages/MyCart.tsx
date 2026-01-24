@@ -120,18 +120,20 @@ export default function MyCart() {
           ),
           subtotal: group.items.reduce((sum, item) => {
             const qty =
-              item.id === payload.cartItemId
-                ? payload.quantity
-                : item.quantity;
+              item.id === payload.cartItemId ? payload.quantity : item.quantity;
             return sum + item.menu.price * qty;
           }, 0),
         }));
         return { ...old, data: { ...old.data, cart: next } };
       });
 
-      const target = cartItems.find((item) => item.cartItemId === payload.cartItemId);
+      const target = cartItems.find(
+        (item) => item.cartItemId === payload.cartItemId,
+      );
       if (target) {
-        dispatch(updateQuantity({ menuId: target.menuId, qty: payload.quantity }));
+        dispatch(
+          updateQuantity({ menuId: target.menuId, qty: payload.quantity }),
+        );
       }
 
       return { previous, previousItems };
@@ -147,7 +149,9 @@ export default function MyCart() {
     onSuccess: (data, payload) => {
       const cartItemId = data?.data?.cartItem?.id;
       const quantity = data?.data?.cartItem?.quantity;
-      const target = cartItems.find((item) => item.cartItemId === payload.cartItemId);
+      const target = cartItems.find(
+        (item) => item.cartItemId === payload.cartItemId,
+      );
       if (cartItemId && target) {
         dispatch(setCartItemId({ menuId: target.menuId, cartItemId }));
       }
@@ -182,7 +186,9 @@ export default function MyCart() {
         return { ...old, data: { ...old.data, cart: next } };
       });
 
-      const target = cartItems.find((item) => item.cartItemId === payload.cartItemId);
+      const target = cartItems.find(
+        (item) => item.cartItemId === payload.cartItemId,
+      );
       if (target) {
         dispatch(removeItem(target.menuId));
       }
@@ -310,7 +316,11 @@ export default function MyCart() {
                 key={group.restaurant.id}
                 className="flex flex-col gap-3 md:gap-5 py-4 px-4 shadow-sm rounded-3xl h-fit"
               >
-                <div className="flex flex-row gap-1 items-center md:gap-2 ">
+                <div
+                  id="restaurant-header"
+                  className="flex flex-row gap-1 items-center md:gap-2 cursor-pointer"
+                  onClick={() => navigate(`/details/${group.restaurant.id}`)}
+                >
                   <img
                     src={
                       group.restaurant.logo ||

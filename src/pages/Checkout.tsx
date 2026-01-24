@@ -341,7 +341,10 @@ export default function Checkout() {
                       {group.restaurant.name}
                     </span>
                   </div>
-                  <button className="h-9 w-26.5 md:h-10 md:w-30 rounded-full ring-1 ring-inset ring-neutral-300 flex items-center justify-center font-bold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em] ">
+                  <button
+                    onClick={() => navigate(`/details/${group.restaurant.id}`)}
+                    className="h-9 w-26.5 md:h-10 md:w-30 rounded-full ring-1 ring-inset ring-neutral-300 flex items-center justify-center font-bold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
+                  >
                     Add Item
                   </button>
                 </div>
