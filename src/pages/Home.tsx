@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { api } from "@/lib/api";
@@ -33,6 +34,7 @@ type RecommendedResponse = {
 };
 
 const Home = () => {
+  const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
   const [activeList, setActiveList] = useState<
     | "recommended"
@@ -459,7 +461,8 @@ const Home = () => {
               items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex flex-row gap-2 md:gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl px-3 py-3 md:px-4 md:py-4 items-center"
+                  className="flex flex-row gap-2 md:gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl px-3 py-3 md:px-4 md:py-4 items-center cursor-pointer"
+                  onClick={() => navigate(`/details/${item.id}`)}
                 >
                   <img
                     src={item.logo || "/images/common/restaurant-dummy.svg"}
