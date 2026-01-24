@@ -24,7 +24,10 @@ type SuccessPayload = {
   total: number;
 };
 
+import { useNavigate } from "react-router-dom";
+
 export default function Success() {
+  const navigate = useNavigate();
   const raw = localStorage.getItem("checkout_success");
   const data = raw ? (JSON.parse(raw) as SuccessPayload) : null;
   const fallback: SuccessPayload = {
@@ -40,7 +43,11 @@ export default function Success() {
 
   return (
     <main className="min-h-screen w-full bg-[#FAFAFA] flex flex-col items-center justify-center px-4  text-neutral-950 gap-7">
-      <div className="flex items-center gap-3 ">
+      <div
+        className="flex items-center gap-3 cursor-pointer"
+        id="foody-header"
+        onClick={() => navigate("/home")}
+      >
         <img
           src="/images/common/logo-foody.svg"
           alt="Foody"

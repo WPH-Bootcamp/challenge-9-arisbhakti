@@ -262,16 +262,16 @@ export default function AuthPage() {
                   setSignUpErrors({});
                 }}
               >
-                <TabsList className="h-14 w-full rounded-full bg-neutral-100 p-1">
+                <TabsList className="h-14 w-full rounded-full bg-neutral-100 p-1 cursor-pointer">
                   <TabsTrigger
                     value="signin"
-                    className="h-full w-1/2 rounded-full text-base font-semibold text-neutral-600 data-[state=active]:bg-white data-[state=active]:text-neutral-900 data-[state=active]:shadow-sm"
+                    className="h-full w-1/2 rounded-full text-base font-semibold text-neutral-600 data-[state=active]:bg-white data-[state=active]:text-neutral-900 data-[state=active]:shadow-sm cursor-pointer"
                   >
                     Sign in
                   </TabsTrigger>
                   <TabsTrigger
                     value="signup"
-                    className="h-full w-1/2 rounded-full text-base font-semibold text-neutral-600 data-[state=active]:bg-white data-[state=active]:text-neutral-900 data-[state=active]:shadow-sm"
+                    className="h-full w-1/2 rounded-full text-base font-semibold text-neutral-600 data-[state=active]:bg-white data-[state=active]:text-neutral-900 data-[state=active]:shadow-sm cursor-pointer"
                   >
                     Sign up
                   </TabsTrigger>
@@ -381,7 +381,7 @@ export default function AuthPage() {
                     <button
                       type="submit"
                       disabled={signInLoading}
-                      className=" h-12 w-full rounded-full px-2 py-2 bg-primary-100 text-[16px] leading-7.5 -tracking-[0.02em] font-bold text-neutral-25 shadow-[0_10px_20px_rgba(184,13,13,0.18)] transition active:scale-[0.99]"
+                      className=" h-12 w-full rounded-full px-2 py-2 bg-primary-100 text-[16px] leading-7.5 -tracking-[0.02em] font-bold text-neutral-25 shadow-[0_10px_20px_rgba(184,13,13,0.18)] transition active:scale-[0.99] cursor-pointer"
                     >
                       {signInLoading ? "Loading..." : "Login"}
                     </button>
@@ -565,7 +565,7 @@ export default function AuthPage() {
                     <button
                       type="submit"
                       disabled={signUpLoading}
-                      className=" h-12 w-full rounded-full px-2 py-2 bg-primary-100 text-[16px] leading-7.5 -tracking-[0.02em] font-bold text-neutral-25 shadow-[0_10px_20px_rgba(184,13,13,0.18)] transition active:scale-[0.99]"
+                      className=" h-12 w-full rounded-full px-2 py-2 bg-primary-100 text-[16px] leading-7.5 -tracking-[0.02em] font-bold text-neutral-25 shadow-[0_10px_20px_rgba(184,13,13,0.18)] transition active:scale-[0.99] cursor-pointer"
                     >
                       {signUpLoading ? "Loading..." : "Register"}
                     </button>
