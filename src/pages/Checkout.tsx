@@ -4,6 +4,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { clearCart } from "@/features/cart/cartSlice";
 
 type CheckoutCartItem = {
   id: number;
@@ -48,6 +50,7 @@ export default function Checkout() {
   const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const dispatch = useDispatch();
   const state = (location.state || {}) as CheckoutState;
   const cartGroups = state.cart ?? [];
   const summary = state.summary;
@@ -113,6 +116,8 @@ export default function Checkout() {
         cartItemIds.map((id) => api.delete(`/api/cart/${id}`)),
       );
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+      dispatch(clearCart());
+      localStorage.removeItem("cart_state");
       const successPayload = {
         date: new Date().toISOString(),
         paymentMethod,
