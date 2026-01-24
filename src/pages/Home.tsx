@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -22,17 +22,28 @@ type RecommendedResponse = {
   message: string;
   data?: {
     recommendations?: RecommendedItem[];
+    restaurants?: RecommendedItem[];
+    pagination?: {
+      page?: number;
+      limit?: number;
+      total?: number;
+      totalPages?: number;
+    };
   };
 };
 
 const Home = () => {
   const [keyword, setKeyword] = useState("");
+  const [activeList, setActiveList] = useState<"recommended" | "best-seller">(
+    "recommended",
+  );
+  const bestSellerLimit = 20;
 
   const handleSearch = (value: string) => {
     setKeyword(value);
   };
 
-  const { data, isLoading, isError, error } = useQuery({
+  const recommendedQuery = useQuery({
     queryKey: ["recommended-resto"],
     queryFn: async () => {
       const response = await api.get<RecommendedResponse>(
@@ -42,16 +53,60 @@ const Home = () => {
     },
   });
 
-  const errorMessage = (() => {
-    if (!isError) return "";
-    if (axios.isAxiosError(error)) {
-      const data = error.response?.data as { message?: string } | undefined;
+  const bestSellerQuery = useInfiniteQuery({
+    queryKey: ["best-seller-resto"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await api.get<RecommendedResponse>(
+        "/api/resto/best-seller",
+        {
+          params: { page: pageParam, limit: bestSellerLimit },
+        },
+      );
+      return response.data;
+    },
+    enabled: activeList === "best-seller",
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, pages) => {
+      const pagination = lastPage.data?.pagination;
+      if (pagination?.page && pagination?.totalPages) {
+        return pagination.page < pagination.totalPages
+          ? pagination.page + 1
+          : undefined;
+      }
+      const count = lastPage.data?.restaurants?.length ?? 0;
+      return count < bestSellerLimit ? undefined : pages.length + 1;
+    },
+  });
+
+  const getErrorMessage = (err: unknown) => {
+    if (axios.isAxiosError(err)) {
+      const data = err.response?.data as { message?: string } | undefined;
       if (data?.message) return data.message;
     }
-    return "Gagal memuat data rekomendasi.";
-  })();
+    return "Gagal memuat data.";
+  };
 
-  const recommendations = data?.data?.recommendations ?? [];
+  const isLoading =
+    activeList === "recommended"
+      ? recommendedQuery.isLoading
+      : bestSellerQuery.isLoading;
+  const isError =
+    activeList === "recommended"
+      ? recommendedQuery.isError
+      : bestSellerQuery.isError;
+  const errorMessage =
+    activeList === "recommended"
+      ? getErrorMessage(recommendedQuery.error)
+      : getErrorMessage(bestSellerQuery.error);
+
+  const recommendations = recommendedQuery.data?.data?.recommendations ?? [];
+  const bestSellers =
+    bestSellerQuery.data?.pages.flatMap(
+      (page) => page.data?.restaurants ?? [],
+    ) ?? [];
+  const items = activeList === "recommended" ? recommendations : bestSellers;
+
+  const titleText = activeList === "recommended" ? "Recommended" : "Best Seller";
 
   return (
     <>
@@ -144,7 +199,11 @@ const Home = () => {
                 Discount
               </p>
             </div>
-            <div className="flex flex-col gap-1 md:gap-1.5">
+            <div
+              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer"
+              id="best-seller-icon-section"
+              onClick={() => setActiveList("best-seller")}
+            >
               <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
                 <img
                   src="/images/common/category-best-seller.svg"
@@ -188,7 +247,7 @@ const Home = () => {
               id="title-type"
               className="text-neutral-950 font-extrabold text-2xl leading-9 md:text-[32px] md:leading-10.5"
             >
-              Recommended
+              {titleText}
             </h2>
             <button className="text-primary-100 cursor-pointer font-extrabold text-[16px] leading-7.5 md:text-lg md:leading-8">
               See All
@@ -229,14 +288,14 @@ const Home = () => {
             {isError && (
               <div className="md:col-span-3">
                 <Alert variant="destructive">
-                  <AlertTitle>Gagal memuat rekomendasi</AlertTitle>
+                  <AlertTitle>Gagal memuat data</AlertTitle>
                   <AlertDescription>{errorMessage}</AlertDescription>
                 </Alert>
               </div>
             )}
             {!isLoading &&
               !isError &&
-              recommendations.map((item) => (
+              items.map((item) => (
                 <div
                   key={item.id}
                   className="flex flex-row gap-2 md:gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl px-3 py-3 md:px-4 md:py-4 items-center"
@@ -271,10 +330,21 @@ const Home = () => {
           </div>
           <div className="flex flex-row flex-1 w-full items-center justify-center">
             <button
-              disabled
-              className="h-10 w-40 ring-1 ring-inset ring-neutral-300 rounded-[100px] text-neutral-400 text-[14px] leading-7 -tracking-[0.02em] font-bold cursor-not-allowed"
+              disabled={
+                activeList === "recommended" || !bestSellerQuery.hasNextPage
+              }
+              onClick={() => bestSellerQuery.fetchNextPage()}
+              className={`h-10 w-40 ring-1 ring-inset ring-neutral-300 rounded-[100px] text-[14px] leading-7 -tracking-[0.02em] font-bold ${
+                activeList === "recommended" || !bestSellerQuery.hasNextPage
+                  ? "text-neutral-400 cursor-not-allowed"
+                  : "text-neutral-950"
+              }`}
             >
-              No more data
+              {activeList === "recommended" || !bestSellerQuery.hasNextPage
+                ? "No more data"
+                : bestSellerQuery.isFetchingNextPage
+                  ? "Loading..."
+                  : "Show More"}
             </button>
           </div>
         </div>
