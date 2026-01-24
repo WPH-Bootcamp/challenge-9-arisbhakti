@@ -96,8 +96,9 @@ const Header = () => {
       >
         <>
           <div className="flex flex-row items-center justify-center">
-            <a
-              href="#home"
+            <button
+              // back to /home
+              onClick={() => navigate("/home")}
               className="flex flex-row items-center justify-center  gap-3.75 cursor-pointer "
               id="home-button"
             >
@@ -111,7 +112,7 @@ const Header = () => {
               >
                 Foody
               </p>
-            </a>
+            </button>
           </div>
           {isLogin && (
             <div className="relative flex flex-row gap-4 md:gap-6 items-center justify-center">
