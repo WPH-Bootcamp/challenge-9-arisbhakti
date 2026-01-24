@@ -96,13 +96,15 @@ export default function Details() {
   const REVIEW_STEP = 6;
   const [menuLimit, setMenuLimit] = React.useState(MENU_STEP);
   const [reviewLimit, setReviewLimit] = React.useState(REVIEW_STEP);
-  const [menuFilter, setMenuFilter] = React.useState<
-    "all" | "food" | "drink"
-  >("all");
+  const [menuFilter, setMenuFilter] = React.useState<"all" | "food" | "drink">(
+    "all",
+  );
   const [shareOpen, setShareOpen] = React.useState(false);
   const [shareStatus, setShareStatus] = React.useState<
     "idle" | "copied" | "failed"
   >("idle");
+  const [activeImageIndex, setActiveImageIndex] = React.useState(0);
+  const mobileCarouselRef = React.useRef<HTMLDivElement | null>(null);
 
   const { data, isLoading, isFetching, isError, error } = useQuery({
     queryKey: ["restaurant-detail", id, menuLimit, reviewLimit],
@@ -133,6 +135,18 @@ export default function Details() {
     images[2] || "/images/common/details-dummy-3.svg",
     images[3] || "/images/common/details-dummy-4.svg",
   ];
+  const mobileImages = images.length > 0 ? images : [heroImages[0]];
+
+  const handleMobileScroll = () => {
+    const el = mobileCarouselRef.current;
+    if (!el) return;
+    const width = el.clientWidth;
+    if (width === 0) return;
+    const nextIndex = Math.round(el.scrollLeft / width);
+    setActiveImageIndex(
+      Math.max(0, Math.min(nextIndex, mobileImages.length - 1)),
+    );
+  };
 
   const hasMoreMenu = (detail?.menus?.length ?? 0) >= menuLimit;
   const hasMoreReview = (detail?.reviews?.length ?? 0) >= reviewLimit;
@@ -141,8 +155,7 @@ export default function Details() {
       menuFilter === "all" ? true : menu.type === menuFilter,
     ) ?? [];
 
-  const shareUrl =
-    typeof window !== "undefined" ? window.location.href : "";
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const shareTitle = detail?.name ? `Foody - ${detail.name}` : "Foody";
 
   const handleShare = async () => {
@@ -228,11 +241,33 @@ export default function Details() {
               </div>
             </div>
             <div id="images-header-mobile" className="md:hidden">
-              <img
-                src={heroImages[0]}
-                className="w-full rounded-3xl object-cover"
-                alt={detail.name}
-              />
+              <div className="w-full">
+                <div
+                  ref={mobileCarouselRef}
+                  onScroll={handleMobileScroll}
+                  className="flex w-full overflow-x-auto snap-x snap-mandatory gap-4 no-scrollbar"
+                >
+                  {mobileImages.map((img, index) => (
+                    <img
+                      src={img}
+                      className="w-[361px] h-[260.63px] rounded-3xl  inset-0 object-cover bg-no-repeat "
+                      alt={detail.name}
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center justify-center gap-2 pt-3">
+                  {mobileImages.map((_, index) => (
+                    <span
+                      key={`dot-${index}`}
+                      className={`h-2.5 w-2.5 rounded-full ${
+                        index === activeImageIndex
+                          ? "bg-primary-100"
+                          : "bg-neutral-200"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -374,28 +409,28 @@ export default function Details() {
                   key={menu.id}
                   className="flex flex-col shadow-[0_8px_24px_rgba(0,0,0,0.08)] rounded-3xl"
                 >
-                <div
-                  className="h-[172.5px] rounded-tl-2xl rounded-tr-2xl inset-0 bg-cover bg-center bg-no-repeat text-xl"
-                  style={{
-                    backgroundImage: `url('${
-                      menu.image || "/images/common/details-dummy-1.svg"
-                    }')`,
-                  }}
-                ></div>
-                <div className="flex flex-col md:flex-row md:justify-between gap-4 py-3 px-3 md:py-4 md:px-4  ">
-                  <div className="flex flex-col md:flex-1">
-                    <span className="font-medium text-[14px] leading-7 md:text-[16px] md:leading-7 md:-tracking-[0.03em]">
-                      {menu.foodName}
-                    </span>
-                    <h3 className="font-extrabold text-[16px] leading-7.5 md:text-[18px] md:leading-8 md:-tracking-[0.02em]">
-                      {formatRupiah(menu.price)}
-                    </h3>
-                  </div>
-                  <div className="flex md:flex-1">
-                    <button className="h-9 md:h-10 w-full rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer">
-                      Add
-                    </button>
-                  </div>
+                  <div
+                    className="h-[172.5px] rounded-tl-2xl rounded-tr-2xl inset-0 bg-cover bg-center bg-no-repeat text-xl"
+                    style={{
+                      backgroundImage: `url('${
+                        menu.image || "/images/common/details-dummy-1.svg"
+                      }')`,
+                    }}
+                  ></div>
+                  <div className="flex flex-col md:flex-row md:justify-between gap-4 py-3 px-3 md:py-4 md:px-4  ">
+                    <div className="flex flex-col md:flex-1">
+                      <span className="font-medium text-[14px] leading-7 md:text-[16px] md:leading-7 md:-tracking-[0.03em]">
+                        {menu.foodName}
+                      </span>
+                      <h3 className="font-extrabold text-[16px] leading-7.5 md:text-[18px] md:leading-8 md:-tracking-[0.02em]">
+                        {formatRupiah(menu.price)}
+                      </h3>
+                    </div>
+                    <div className="flex md:flex-1">
+                      <button className="h-9 md:h-10 w-full rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer">
+                        Add
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
