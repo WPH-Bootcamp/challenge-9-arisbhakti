@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { api } from "@/lib/api";
 
@@ -35,6 +35,7 @@ type SignUpErrors = {
 
 export default function AuthPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [tab, setTab] = React.useState<"signin" | "signup">("signin");
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirm, setShowConfirm] = React.useState(false);
@@ -58,6 +59,16 @@ export default function AuthPage() {
     password: "",
     confirmPassword: "",
   });
+
+  React.useEffect(() => {
+    const stateTab = (location.state as { tab?: string } | null)?.tab;
+    const searchTab = new URLSearchParams(location.search).get("tab");
+    const nextTab = stateTab ?? searchTab;
+
+    if (nextTab === "signin" || nextTab === "signup") {
+      setTab(nextTab);
+    }
+  }, [location.search, location.state]);
 
   const triggerSignInAnimation = () => {
     setSignInAnimate(true);

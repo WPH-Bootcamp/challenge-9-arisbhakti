@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -14,6 +15,7 @@ import { RiLogoutCircleLine } from "react-icons/ri";
 import { SlLocationPin } from "react-icons/sl";
 
 const Header = () => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
 
@@ -154,13 +156,15 @@ const Header = () => {
           {!isLogin && (
             <div className="md:flex flex-row gap-4">
               <button
-                className={`py-2 px-5 md:h-12 md:w-40.75 md:px-2 md:py-2 rounded-[100px] ring-2 ring-inset ring-neutral-300 font-bold text-[16px] leading-7.5 -tracking-[0.02em] ${isScrolled ? "text-black" : "text-white"}`}
+                onClick={() => navigate("/auth", { state: { tab: "signin" } })}
+                className={`cursor-pointer py-2 px-5 md:h-12 md:w-40.75 md:px-2 md:py-2 rounded-[100px] ring-2 ring-inset ring-neutral-300 font-bold text-[16px] leading-7.5 -tracking-[0.02em] ${isScrolled ? "text-black" : "text-white"}`}
               >
                 Sign In
               </button>
               <span className="md:hidden">&nbsp;&nbsp;&nbsp;</span>
               <button
-                className={`py-2 px-5 md:h-12 ${isScrolled ? "bg-black text-white" : "bg-white"} text-black md:w-40.75 md:px-2 md:py-2 rounded-[100px]  font-bold text-[16px] leading-7.5 -tracking-[0.02em]`}
+                onClick={() => navigate("/auth", { state: { tab: "signup" } })}
+                className={`cursor-pointer py-2 px-5 md:h-12 ${isScrolled ? "bg-black text-white" : "bg-white"} text-black md:w-40.75 md:px-2 md:py-2 rounded-[100px]  font-bold text-[16px] leading-7.5 -tracking-[0.02em]`}
               >
                 Sign Up
               </button>
