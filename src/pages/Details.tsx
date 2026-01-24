@@ -249,6 +249,7 @@ export default function Details() {
                 >
                   {mobileImages.map((img, index) => (
                     <img
+                      key={index}
                       src={img}
                       className="w-[361px] h-[260.63px] rounded-3xl  inset-0 object-cover bg-no-repeat "
                       alt={detail.name}

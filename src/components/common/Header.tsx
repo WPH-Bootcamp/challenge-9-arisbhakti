@@ -13,13 +13,18 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { SlLocationPin } from "react-icons/sl";
+import type { RootState } from "@/app/store";
+import { useSelector } from "react-redux";
 
 const Header = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
+  const theme = useSelector((state: RootState) => state.theme.mode);
 
   useEffect(() => {
+    // const theme = useSelector((state: RootState) => state.theme.mode);
+    // console.log("Current theme mode:", theme);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 0);
     };
@@ -29,6 +34,10 @@ const Header = () => {
     // cleanup (WAJIB)
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    console.log("Current theme mode:", theme);
+  }, [theme]);
 
   useEffect(() => {
     const syncAuth = () => {
@@ -41,6 +50,42 @@ const Header = () => {
 
     return () => window.removeEventListener("storage", syncAuth);
   }, []);
+
+  const getlogoSrc = () => {
+    if (isScrolled && theme === "light") {
+      return "/images/common/logo-foody.svg";
+    } else if (!isScrolled && theme === "light") {
+      return "/images/common/logo-foody-white.svg";
+    } else if (isScrolled && theme === "dark") {
+      return "/images/common/logo-foody.svg";
+    } else {
+      return "/images/common/logo-foody.svg";
+    }
+  };
+
+  const getlogoTextColor = () => {
+    if (isScrolled && theme === "light") {
+      return "text-black";
+    } else if (!isScrolled && theme === "light") {
+      return "text-white";
+    } else if (isScrolled && theme === "dark") {
+      return "text-black";
+    } else {
+      return "text-black";
+    }
+  };
+
+  const getbuttonTextColor = () => {
+    if (isScrolled && theme === "light") {
+      return "/images/common/cart-black.svg";
+    } else if (!isScrolled && theme === "light") {
+      return "/images/common/cart-white.svg";
+    } else if (isScrolled && theme === "dark") {
+      return "/images/common/cart-black.svg";
+    } else {
+      return "/images/common/cart-black.svg";
+    }
+  };
 
   return (
     <>
@@ -57,16 +102,12 @@ const Header = () => {
               id="home-button"
             >
               <img
-                src={
-                  isScrolled
-                    ? "/images/common/logo-foody.svg"
-                    : "/images/common/logo-foody-white.svg"
-                }
+                src={getlogoSrc()}
                 className="w-10 h-10 md:w-[33.33px] md:h-[31.18px]"
                 alt="Your Logo"
               />
               <p
-                className={`hidden md:block menu-hover font-semibold text-[32px] leading-10.5 ${isScrolled ? "text-black" : "text-white"}`}
+                className={`hidden md:block menu-hover font-semibold text-[32px] leading-10.5 ${getlogoTextColor()}`}
               >
                 Foody
               </p>
@@ -76,11 +117,7 @@ const Header = () => {
             <div className="relative flex flex-row gap-4 md:gap-6 items-center justify-center">
               <div className="relative">
                 <img
-                  src={
-                    isScrolled
-                      ? "/images/common/cart-black.svg"
-                      : "/images/common/cart-white.svg"
-                  }
+                  src={getbuttonTextColor()}
                   className="w-7 h-7 md:w-8 md:h-8"
                   alt="cart-white"
                 />
