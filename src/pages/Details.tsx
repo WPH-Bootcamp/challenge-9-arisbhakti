@@ -427,7 +427,7 @@ export default function Details() {
                         {formatRupiah(menu.price)}
                       </h3>
                     </div>
-                    <div className="flex md:flex-1">
+                    <div className="flex md:flex-1 items-center justfiy-center">
                       <button className="h-9 md:h-10 w-full rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer">
                         Add
                       </button>

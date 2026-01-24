@@ -46,9 +46,7 @@ const Home = () => {
     | "lunch"
     | "search"
   >("recommended");
-  const bestSellerLimit = 20;
-  const allRestaurantsLimit = 20;
-  const nearbyLimit = 20;
+  const LIST_LIMIT = 20;
   const nearbyRangeKm = 1;
 
   const handleSearch = (value: string) => {
@@ -77,7 +75,7 @@ const Home = () => {
       const response = await api.get<RecommendedResponse>(
         "/api/resto/best-seller",
         {
-          params: { page: pageParam, limit: bestSellerLimit },
+          params: { page: pageParam, limit: LIST_LIMIT },
         },
       );
       return response.data;
@@ -92,7 +90,7 @@ const Home = () => {
           : undefined;
       }
       const count = lastPage.data?.restaurants?.length ?? 0;
-      return count < bestSellerLimit ? undefined : pages.length + 1;
+      return count < LIST_LIMIT ? undefined : pages.length + 1;
     },
   });
 
@@ -100,7 +98,7 @@ const Home = () => {
     queryKey: ["search-resto", keyword],
     queryFn: async () => {
       const response = await api.get<RecommendedResponse>("/api/resto/search", {
-        params: { q: keyword.trim(), page: 1, limit: 20 },
+        params: { q: keyword.trim(), page: 1, limit: LIST_LIMIT },
       });
       return response.data;
     },
@@ -111,7 +109,7 @@ const Home = () => {
     queryKey: ["all-restaurants"],
     queryFn: async ({ pageParam = 1 }) => {
       const response = await api.get<RecommendedResponse>("/api/resto", {
-        params: { page: pageParam, limit: allRestaurantsLimit },
+        params: { page: pageParam, limit: LIST_LIMIT },
       });
       return response.data;
     },
@@ -125,7 +123,7 @@ const Home = () => {
           : undefined;
       }
       const count = lastPage.data?.restaurants?.length ?? 0;
-      return count < allRestaurantsLimit ? undefined : pages.length + 1;
+      return count < LIST_LIMIT ? undefined : pages.length + 1;
     },
   });
 
@@ -133,7 +131,7 @@ const Home = () => {
     queryKey: ["nearby-resto", nearbyRangeKm],
     queryFn: async ({ pageParam = 1 }) => {
       const response = await api.get<RecommendedResponse>("/api/resto", {
-        params: { range: nearbyRangeKm, limit: nearbyLimit, page: pageParam },
+        params: { range: nearbyRangeKm, limit: LIST_LIMIT, page: pageParam },
       });
       return response.data;
     },
@@ -147,7 +145,7 @@ const Home = () => {
           : undefined;
       }
       const count = lastPage.data?.restaurants?.length ?? 0;
-      return count < nearbyLimit ? undefined : pages.length + 1;
+      return count < LIST_LIMIT ? undefined : pages.length + 1;
     },
   });
 
@@ -200,9 +198,8 @@ const Home = () => {
       (page) => page.data?.restaurants ?? [],
     ) ?? [];
   const nearbyRestaurants =
-    nearbyQuery.data?.pages.flatMap(
-      (page) => page.data?.restaurants ?? [],
-    ) ?? [];
+    nearbyQuery.data?.pages.flatMap((page) => page.data?.restaurants ?? []) ??
+    [];
   const searchRestaurants = searchQuery.data?.data?.restaurants ?? [];
   const items =
     activeList === "recommended"
@@ -415,44 +412,44 @@ const Home = () => {
               activeList !== "discount" &&
               activeList !== "delivery" &&
               activeList !== "lunch" && (
-              <>
-                <div className="md:col-span-3 flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)]">
-                  <div className="flex items-center gap-3">
-                    <div className="h-2.5 w-2.5 rounded-full bg-primary-100 animate-pulse" />
-                    <span className="text-sm font-semibold text-neutral-700">
-                      Loading data
+                <>
+                  <div className="md:col-span-3 flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)]">
+                    <div className="flex items-center gap-3">
+                      <div className="h-2.5 w-2.5 rounded-full bg-primary-100 animate-pulse" />
+                      <span className="text-sm font-semibold text-neutral-700">
+                        Loading data
+                      </span>
+                    </div>
+                    <span className="text-xs text-neutral-500">
+                      Mohon tunggu sebentar
                     </span>
                   </div>
-                  <span className="text-xs text-neutral-500">
-                    Mohon tunggu sebentar
-                  </span>
-                </div>
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <div
-                    key={`skeleton-${index}`}
-                    className="flex flex-row gap-2 md:gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl px-3 py-3 md:px-4 md:py-4"
-                  >
-                    <Skeleton className="w-22.5 h-22.5 md:h-30 md:w-30" />
-                    <div className="flex flex-col gap-2 w-full">
-                      <Skeleton className="h-5 w-3/4" />
-                      <Skeleton className="h-4 w-1/3" />
-                      <Skeleton className="h-4 w-2/3" />
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <div
+                      key={`skeleton-${index}`}
+                      className="flex flex-row gap-2 md:gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl px-3 py-3 md:px-4 md:py-4"
+                    >
+                      <Skeleton className="w-22.5 h-22.5 md:h-30 md:w-30" />
+                      <div className="flex flex-col gap-2 w-full">
+                        <Skeleton className="h-5 w-3/4" />
+                        <Skeleton className="h-4 w-1/3" />
+                        <Skeleton className="h-4 w-2/3" />
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </>
-            )}
+                  ))}
+                </>
+              )}
             {isError &&
               activeList !== "discount" &&
               activeList !== "delivery" &&
               activeList !== "lunch" && (
-              <div className="md:col-span-3">
-                <Alert variant="destructive">
-                  <AlertTitle>Gagal memuat data</AlertTitle>
-                  <AlertDescription>{errorMessage}</AlertDescription>
-                </Alert>
-              </div>
-            )}
+                <div className="md:col-span-3">
+                  <Alert variant="destructive">
+                    <AlertTitle>Gagal memuat data</AlertTitle>
+                    <AlertDescription>{errorMessage}</AlertDescription>
+                  </Alert>
+                </div>
+              )}
             {!isLoading &&
               !isError &&
               activeList !== "discount" &&
@@ -500,7 +497,8 @@ const Home = () => {
                 activeList === "discount" ||
                 activeList === "delivery" ||
                 activeList === "lunch" ||
-                (activeList === "best-seller" && !bestSellerQuery.hasNextPage) ||
+                (activeList === "best-seller" &&
+                  !bestSellerQuery.hasNextPage) ||
                 (activeList === "all-restaurants" &&
                   !allRestaurantsQuery.hasNextPage) ||
                 (activeList === "nearby" && !nearbyQuery.hasNextPage)
@@ -516,13 +514,14 @@ const Home = () => {
                   nearbyQuery.fetchNextPage();
                 }
               }}
-              className={`h-10 w-40 ring-1 ring-inset ring-neutral-300 rounded-[100px] text-[14px] leading-7 -tracking-[0.02em] font-bold ${
+              className={`h-10 w-40 ring-1 ring-inset ring-neutral-300 rounded-[100px] text-[14px] leading-7 -tracking-[0.02em] font-bold cursor-pointer ${
                 activeList === "recommended" ||
                 activeList === "search" ||
                 activeList === "discount" ||
                 activeList === "delivery" ||
                 activeList === "lunch" ||
-                (activeList === "best-seller" && !bestSellerQuery.hasNextPage) ||
+                (activeList === "best-seller" &&
+                  !bestSellerQuery.hasNextPage) ||
                 (activeList === "all-restaurants" &&
                   !allRestaurantsQuery.hasNextPage) ||
                 (activeList === "nearby" && !nearbyQuery.hasNextPage)
