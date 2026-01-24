@@ -34,10 +34,19 @@ type RecommendedResponse = {
 
 const Home = () => {
   const [keyword, setKeyword] = useState("");
-  const [activeList, setActiveList] = useState<"recommended" | "best-seller">(
-    "recommended",
-  );
+  const [activeList, setActiveList] = useState<
+    | "recommended"
+    | "best-seller"
+    | "all-restaurants"
+    | "nearby"
+    | "discount"
+    | "delivery"
+    | "lunch"
+  >("recommended");
   const bestSellerLimit = 20;
+  const allRestaurantsLimit = 20;
+  const nearbyLimit = 20;
+  const nearbyRangeKm = 1;
 
   const handleSearch = (value: string) => {
     setKeyword(value);
@@ -78,6 +87,50 @@ const Home = () => {
     },
   });
 
+  const allRestaurantsQuery = useInfiniteQuery({
+    queryKey: ["all-restaurants"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await api.get<RecommendedResponse>("/api/resto", {
+        params: { page: pageParam, limit: allRestaurantsLimit },
+      });
+      return response.data;
+    },
+    enabled: activeList === "all-restaurants",
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, pages) => {
+      const pagination = lastPage.data?.pagination;
+      if (pagination?.page && pagination?.totalPages) {
+        return pagination.page < pagination.totalPages
+          ? pagination.page + 1
+          : undefined;
+      }
+      const count = lastPage.data?.restaurants?.length ?? 0;
+      return count < allRestaurantsLimit ? undefined : pages.length + 1;
+    },
+  });
+
+  const nearbyQuery = useInfiniteQuery({
+    queryKey: ["nearby-resto", nearbyRangeKm],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await api.get<RecommendedResponse>("/api/resto", {
+        params: { range: nearbyRangeKm, limit: nearbyLimit, page: pageParam },
+      });
+      return response.data;
+    },
+    enabled: activeList === "nearby",
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, pages) => {
+      const pagination = lastPage.data?.pagination;
+      if (pagination?.page && pagination?.totalPages) {
+        return pagination.page < pagination.totalPages
+          ? pagination.page + 1
+          : undefined;
+      }
+      const count = lastPage.data?.restaurants?.length ?? 0;
+      return count < nearbyLimit ? undefined : pages.length + 1;
+    },
+  });
+
   const getErrorMessage = (err: unknown) => {
     if (axios.isAxiosError(err)) {
       const data = err.response?.data as { message?: string } | undefined;
@@ -89,24 +142,66 @@ const Home = () => {
   const isLoading =
     activeList === "recommended"
       ? recommendedQuery.isLoading
-      : bestSellerQuery.isLoading;
+      : activeList === "best-seller"
+        ? bestSellerQuery.isLoading
+        : activeList === "all-restaurants"
+          ? allRestaurantsQuery.isLoading
+          : nearbyQuery.isLoading;
   const isError =
     activeList === "recommended"
       ? recommendedQuery.isError
-      : bestSellerQuery.isError;
+      : activeList === "best-seller"
+        ? bestSellerQuery.isError
+        : activeList === "all-restaurants"
+          ? allRestaurantsQuery.isError
+          : nearbyQuery.isError;
   const errorMessage =
     activeList === "recommended"
       ? getErrorMessage(recommendedQuery.error)
-      : getErrorMessage(bestSellerQuery.error);
+      : activeList === "best-seller"
+        ? getErrorMessage(bestSellerQuery.error)
+        : activeList === "all-restaurants"
+          ? getErrorMessage(allRestaurantsQuery.error)
+          : getErrorMessage(nearbyQuery.error);
 
   const recommendations = recommendedQuery.data?.data?.recommendations ?? [];
   const bestSellers =
     bestSellerQuery.data?.pages.flatMap(
       (page) => page.data?.restaurants ?? [],
     ) ?? [];
-  const items = activeList === "recommended" ? recommendations : bestSellers;
+  const allRestaurants =
+    allRestaurantsQuery.data?.pages.flatMap(
+      (page) => page.data?.restaurants ?? [],
+    ) ?? [];
+  const nearbyRestaurants =
+    nearbyQuery.data?.pages.flatMap(
+      (page) => page.data?.restaurants ?? [],
+    ) ?? [];
+  const items =
+    activeList === "recommended"
+      ? recommendations
+      : activeList === "best-seller"
+        ? bestSellers
+        : activeList === "all-restaurants"
+          ? allRestaurants
+          : activeList === "nearby"
+            ? nearbyRestaurants
+            : [];
 
-  const titleText = activeList === "recommended" ? "Recommended" : "Best Seller";
+  const titleText =
+    activeList === "recommended"
+      ? "Recommended"
+      : activeList === "best-seller"
+        ? "Best Seller"
+        : activeList === "all-restaurants"
+          ? "All Restaurant"
+          : activeList === "nearby"
+            ? `Nearby ( ${nearbyRangeKm} km Range )`
+            : activeList === "discount"
+              ? "Discount"
+              : activeList === "delivery"
+                ? "Delivery"
+                : "Lunch";
 
   return (
     <>
@@ -163,7 +258,10 @@ const Home = () => {
       <main className="relative w-full z-20 px-4 md:px-30 flex flex-col">
         <section id="category" className="py-6 md:py-12">
           <div className="grid grid-cols-3  gap-x-5 gap-y-5 md:flex md:flex-row md:justify-between">
-            <div className="flex flex-col gap-1 md:gap-1.5">
+            <div
+              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer"
+              onClick={() => setActiveList("all-restaurants")}
+            >
               <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
                 <img
                   src="/images/common/category-all.svg"
@@ -175,7 +273,10 @@ const Home = () => {
                 All Restaurant
               </p>
             </div>
-            <div className="flex flex-col gap-1 md:gap-1.5">
+            <div
+              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer"
+              onClick={() => setActiveList("nearby")}
+            >
               <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
                 <img
                   src="/images/common/category-nearby.svg"
@@ -187,7 +288,10 @@ const Home = () => {
                 Nearby
               </p>
             </div>
-            <div className="flex flex-col gap-1 md:gap-1.5">
+            <div
+              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer"
+              onClick={() => setActiveList("discount")}
+            >
               <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
                 <img
                   src="/images/common/category-discount.svg"
@@ -215,7 +319,10 @@ const Home = () => {
                 Best Seller
               </p>
             </div>
-            <div className="flex flex-col gap-1 md:gap-1.5">
+            <div
+              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer"
+              onClick={() => setActiveList("delivery")}
+            >
               <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
                 <img
                   src="/images/common/category-delivery.svg"
@@ -227,7 +334,10 @@ const Home = () => {
                 Delivery
               </p>
             </div>
-            <div className="flex flex-col gap-1 md:gap-1.5">
+            <div
+              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer"
+              onClick={() => setActiveList("lunch")}
+            >
               <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
                 <img
                   src="/images/common/category-lunch.svg"
@@ -257,7 +367,23 @@ const Home = () => {
             id="recommended-list"
             className="flex flex-col gap-4 md:grid md:grid-cols-3 md:gap-x-5 md:gap-y-5  "
           >
-            {isLoading && (
+            {activeList === "discount" ||
+            activeList === "delivery" ||
+            activeList === "lunch" ? (
+              <div className="md:col-span-3">
+                <Alert>
+                  <AlertTitle>Coming Soon</AlertTitle>
+                  <AlertDescription>
+                    Fitur {titleText} sedang kami siapkan supaya pengalamanmu
+                    makin lengkap. Pantengin terus, ya!
+                  </AlertDescription>
+                </Alert>
+              </div>
+            ) : null}
+            {isLoading &&
+              activeList !== "discount" &&
+              activeList !== "delivery" &&
+              activeList !== "lunch" && (
               <>
                 <div className="md:col-span-3 flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)]">
                   <div className="flex items-center gap-3">
@@ -285,7 +411,10 @@ const Home = () => {
                 ))}
               </>
             )}
-            {isError && (
+            {isError &&
+              activeList !== "discount" &&
+              activeList !== "delivery" &&
+              activeList !== "lunch" && (
               <div className="md:col-span-3">
                 <Alert variant="destructive">
                   <AlertTitle>Gagal memuat data</AlertTitle>
@@ -295,6 +424,9 @@ const Home = () => {
             )}
             {!isLoading &&
               !isError &&
+              activeList !== "discount" &&
+              activeList !== "delivery" &&
+              activeList !== "lunch" &&
               items.map((item) => (
                 <div
                   key={item.id}
@@ -331,18 +463,51 @@ const Home = () => {
           <div className="flex flex-row flex-1 w-full items-center justify-center">
             <button
               disabled={
-                activeList === "recommended" || !bestSellerQuery.hasNextPage
+                activeList === "recommended" ||
+                activeList === "discount" ||
+                activeList === "delivery" ||
+                activeList === "lunch" ||
+                (activeList === "best-seller" && !bestSellerQuery.hasNextPage) ||
+                (activeList === "all-restaurants" &&
+                  !allRestaurantsQuery.hasNextPage) ||
+                (activeList === "nearby" && !nearbyQuery.hasNextPage)
               }
-              onClick={() => bestSellerQuery.fetchNextPage()}
+              onClick={() => {
+                if (activeList === "best-seller") {
+                  bestSellerQuery.fetchNextPage();
+                }
+                if (activeList === "all-restaurants") {
+                  allRestaurantsQuery.fetchNextPage();
+                }
+                if (activeList === "nearby") {
+                  nearbyQuery.fetchNextPage();
+                }
+              }}
               className={`h-10 w-40 ring-1 ring-inset ring-neutral-300 rounded-[100px] text-[14px] leading-7 -tracking-[0.02em] font-bold ${
-                activeList === "recommended" || !bestSellerQuery.hasNextPage
+                activeList === "recommended" ||
+                activeList === "discount" ||
+                activeList === "delivery" ||
+                activeList === "lunch" ||
+                (activeList === "best-seller" && !bestSellerQuery.hasNextPage) ||
+                (activeList === "all-restaurants" &&
+                  !allRestaurantsQuery.hasNextPage) ||
+                (activeList === "nearby" && !nearbyQuery.hasNextPage)
                   ? "text-neutral-400 cursor-not-allowed"
                   : "text-neutral-950"
               }`}
             >
-              {activeList === "recommended" || !bestSellerQuery.hasNextPage
+              {activeList === "recommended" ||
+              activeList === "discount" ||
+              activeList === "delivery" ||
+              activeList === "lunch" ||
+              (activeList === "best-seller" && !bestSellerQuery.hasNextPage) ||
+              (activeList === "all-restaurants" &&
+                !allRestaurantsQuery.hasNextPage) ||
+              (activeList === "nearby" && !nearbyQuery.hasNextPage)
                 ? "No more data"
-                : bestSellerQuery.isFetchingNextPage
+                : bestSellerQuery.isFetchingNextPage ||
+                    allRestaurantsQuery.isFetchingNextPage ||
+                    nearbyQuery.isFetchingNextPage
                   ? "Loading..."
                   : "Show More"}
             </button>

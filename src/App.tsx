@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
-import CheckoutBottomBar from "./components/popup/CheckoutBottomBar";
+import CheckoutBottomBar from "./components/popup/CheckoutBottomBar"; 
 
 export default function App() {
   return (
@@ -12,7 +12,7 @@ export default function App() {
         <Outlet />
       </main>
       <Footer />
-      <CheckoutBottomBar cartCount={5} totalPrice={200000} />
+      {/* <CheckoutBottomBar cartCount={5} totalPrice={200000} /> */}
     </div>
   );
 }
