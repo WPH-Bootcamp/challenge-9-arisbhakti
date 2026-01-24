@@ -5,6 +5,13 @@ import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type MenuItem = {
   id: number;
@@ -92,6 +99,10 @@ export default function Details() {
   const [menuFilter, setMenuFilter] = React.useState<
     "all" | "food" | "drink"
   >("all");
+  const [shareOpen, setShareOpen] = React.useState(false);
+  const [shareStatus, setShareStatus] = React.useState<
+    "idle" | "copied" | "failed"
+  >("idle");
 
   const { data, isLoading, isFetching, isError, error } = useQuery({
     queryKey: ["restaurant-detail", id, menuLimit, reviewLimit],
@@ -129,6 +140,36 @@ export default function Details() {
     detail?.menus?.filter((menu) =>
       menuFilter === "all" ? true : menu.type === menuFilter,
     ) ?? [];
+
+  const shareUrl =
+    typeof window !== "undefined" ? window.location.href : "";
+  const shareTitle = detail?.name ? `Foody - ${detail.name}` : "Foody";
+
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: shareTitle,
+          text: "Cek restoran ini di Foody!",
+          url: shareUrl,
+        });
+        return;
+      }
+    } catch {
+      // fall through to dialog
+    }
+    setShareStatus("idle");
+    setShareOpen(true);
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareStatus("copied");
+    } catch {
+      setShareStatus("failed");
+    }
+  };
 
   return (
     <main className="w-full px-4 md:px-30 md:mt-32 pt-4 md:pt-0 mt-16 flex flex-col gap-4 md:gap-8 text-neutral-950">
@@ -229,7 +270,10 @@ export default function Details() {
                 </div>
               </div>
             </div>
-            <button className="h-fit w-fit p-3 rounded-[100px] ring-1 ring-neutral-300 ring-inset flex flex-row gap-3 items-center justify-center md:px-4 md:py-3 md:h-11 md:w-35 cursor-pointer">
+            <button
+              onClick={handleShare}
+              className="h-fit w-fit p-3 rounded-[100px] ring-1 ring-neutral-300 ring-inset flex flex-row gap-3 items-center justify-center md:px-4 md:py-3 md:h-11 md:w-35 cursor-pointer"
+            >
               <img
                 src="/images/common/share.svg"
                 alt="share"
@@ -238,6 +282,38 @@ export default function Details() {
               <span className="hidden md:block text-neutral-950">Share</span>
             </button>
           </div>
+
+          <Dialog open={shareOpen} onOpenChange={setShareOpen}>
+            <DialogContent className="rounded-3xl">
+              <DialogHeader>
+                <DialogTitle>Bagikan restoran ini</DialogTitle>
+                <DialogDescription>
+                  Salin link di bawah dan kirim ke temanmu.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col gap-3">
+                <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800 break-all">
+                  {shareUrl}
+                </div>
+                <button
+                  onClick={handleCopyLink}
+                  className="h-10 rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] cursor-pointer"
+                >
+                  Copy Link
+                </button>
+                {shareStatus === "copied" && (
+                  <p className="text-sm text-accent-green font-semibold">
+                    Link berhasil disalin.
+                  </p>
+                )}
+                {shareStatus === "failed" && (
+                  <p className="text-sm text-red-600 font-semibold">
+                    Gagal menyalin link. Coba lagi.
+                  </p>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
 
           <hr />
 
