@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   keepPreviousData,
   useMutation,
@@ -19,6 +19,7 @@ import {
   updateQuantity,
   upsertItem,
 } from "@/features/cart/cartSlice";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -106,6 +107,7 @@ const StarRow = ({ count }: { count: number }) => {
 
 export default function Details() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const cartItems = useSelector((state: RootState) => state.cart.items);
@@ -122,6 +124,7 @@ export default function Details() {
   >("idle");
   const [activeImageIndex, setActiveImageIndex] = React.useState(0);
   const mobileCarouselRef = React.useRef<HTMLDivElement | null>(null);
+  const [isLogin, setIsLogin] = React.useState(false);
 
   const { data, isLoading, isFetching, isError, error } = useQuery({
     queryKey: ["restaurant-detail", id, menuLimit, reviewLimit],
@@ -142,6 +145,15 @@ export default function Details() {
       if (data?.message) return data.message;
     }
     return "Gagal memuat detail restoran.";
+  })();
+  const shouldLogin = (() => {
+    if (!isError) return false;
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      const data = error.response?.data as { message?: string } | undefined;
+      return status === 401 || data?.message === "Access token required";
+    }
+    return false;
   })();
 
   const detail = data?.data;
@@ -171,6 +183,17 @@ export default function Details() {
     detail?.menus?.filter((menu) =>
       menuFilter === "all" ? true : menu.type === menuFilter,
     ) ?? [];
+
+  React.useEffect(() => {
+    const syncAuth = () => {
+      const token = localStorage.getItem("auth_token");
+      setIsLogin(Boolean(token));
+    };
+
+    syncAuth();
+    window.addEventListener("storage", syncAuth);
+    return () => window.removeEventListener("storage", syncAuth);
+  }, []);
 
   const addMutation = useMutation({
     mutationFn: async (payload: {
@@ -365,6 +388,16 @@ export default function Details() {
         <Alert variant="destructive">
           <AlertTitle>Gagal memuat detail</AlertTitle>
           <AlertDescription>{errorMessage}</AlertDescription>
+          {shouldLogin && (
+            <div className="pt-3">
+              <Button
+                onClick={() => navigate("/auth", { state: { tab: "signin" } })}
+                className="h-9 rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em]"
+              >
+                Login untuk melihat detail
+              </Button>
+            </div>
+          )}
         </Alert>
       )}
 
@@ -585,66 +618,68 @@ export default function Details() {
                       </h3>
                     </div>
                     <div className="flex md:flex-1 items-center justfiy-center">
-                      {(() => {
-                        const item = cartItems.find(
-                          (it) => it.menuId === menu.id,
-                        );
-                        const qty = item?.qty ?? 0;
+                      {isLogin
+                        ? (() => {
+                            const item = cartItems.find(
+                              (it) => it.menuId === menu.id,
+                            );
+                            const qty = item?.qty ?? 0;
 
-                        if (qty === 0) {
-                          return (
-                            <button
-                              onClick={() =>
-                                detail &&
-                                addMutation.mutate({
-                                  restaurantId: detail.id,
-                                  menuId: menu.id,
-                                  quantity: 1,
-                                })
-                              }
-                              className="h-9 md:h-10 w-full rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
-                            >
-                              Add
-                            </button>
-                          );
-                        }
+                            if (qty === 0) {
+                              return (
+                                <button
+                                  onClick={() =>
+                                    detail &&
+                                    addMutation.mutate({
+                                      restaurantId: detail.id,
+                                      menuId: menu.id,
+                                      quantity: 1,
+                                    })
+                                  }
+                                  className="h-9 md:h-10 w-full rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
+                                >
+                                  Add
+                                </button>
+                              );
+                            }
 
-                        return (
-                          <div
-                            id="quantity-controls"
-                            className="flex flex-row items-center gap-4"
-                          >
-                            <button
-                              onClick={() => handleDecrease(menu.id)}
-                              className="h-9 w-9 ring-1 ring-inset ring-neutral-300 rounded-full flex items-center justify-center cursor-pointer md:h-10 md:w-10"
-                            >
-                              <img
-                                src="/images/common/minus.svg"
-                                alt="decrease"
-                                className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
-                              />
-                            </button>
-                            <div
-                              id="quantity-info"
-                              className="text-[16px] leading-7.5 -tracking-[0.02em] font-semibold md:text-[18px] md:leading-8 md:-tracking-[0.02em]"
-                            >
-                              {qty}
-                            </div>
-                            <button
-                              onClick={() =>
-                                detail && handleIncrease(menu.id, detail.id)
-                              }
-                              className="h-9 w-9 bg-primary-100 rounded-full flex items-center justify-center cursor-pointer  md:h-10 md:w-10"
-                            >
-                              <img
-                                src="/images/common/plus.svg"
-                                alt="increase"
-                                className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
-                              />
-                            </button>
-                          </div>
-                        );
-                      })()}
+                            return (
+                              <div
+                                id="quantity-controls"
+                                className="flex flex-row items-center gap-4"
+                              >
+                                <button
+                                  onClick={() => handleDecrease(menu.id)}
+                                  className="h-9 w-9 ring-1 ring-inset ring-neutral-300 rounded-full flex items-center justify-center cursor-pointer md:h-10 md:w-10"
+                                >
+                                  <img
+                                    src="/images/common/minus.svg"
+                                    alt="decrease"
+                                    className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
+                                  />
+                                </button>
+                                <div
+                                  id="quantity-info"
+                                  className="text-[16px] leading-7.5 -tracking-[0.02em] font-semibold md:text-[18px] md:leading-8 md:-tracking-[0.02em]"
+                                >
+                                  {qty}
+                                </div>
+                                <button
+                                  onClick={() =>
+                                    detail && handleIncrease(menu.id, detail.id)
+                                  }
+                                  className="h-9 w-9 bg-primary-100 rounded-full flex items-center justify-center cursor-pointer  md:h-10 md:w-10"
+                                >
+                                  <img
+                                    src="/images/common/plus.svg"
+                                    alt="increase"
+                                    className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
+                                  />
+                                </button>
+                              </div>
+                            );
+                          })()
+                        : null}
                     </div>
                   </div>
                 </div>

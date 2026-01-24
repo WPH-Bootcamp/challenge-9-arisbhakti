@@ -20,6 +20,8 @@ const Header = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
+  const [profileName, setProfileName] = useState("User");
+  const [profileAvatar, setProfileAvatar] = useState<string | null>(null);
   const cartCount = useSelector((state: RootState) =>
     state.cart.items.reduce((sum, item) => sum + item.qty, 0),
   );
@@ -46,6 +48,23 @@ const Header = () => {
     const syncAuth = () => {
       const token = localStorage.getItem("auth_token");
       setIsLogin(Boolean(token));
+      const rawUser = localStorage.getItem("auth_user");
+      if (rawUser) {
+        try {
+          const parsed = JSON.parse(rawUser) as {
+            name?: string;
+            avatar?: string | null;
+          };
+          setProfileName(parsed.name || "User");
+          setProfileAvatar(parsed.avatar ?? null);
+        } catch {
+          setProfileName("User");
+          setProfileAvatar(null);
+        }
+      } else {
+        setProfileName("User");
+        setProfileAvatar(null);
+      }
     };
 
     syncAuth();
@@ -53,6 +72,14 @@ const Header = () => {
 
     return () => window.removeEventListener("storage", syncAuth);
   }, []);
+
+  const getInitials = (name: string) =>
+    name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "US";
 
   const getlogoSrc = () => {
     if (isScrolled && theme === "light") {
@@ -87,6 +114,30 @@ const Header = () => {
       return "/images/common/cart-black.svg";
     } else {
       return "/images/common/cart-black.svg";
+    }
+  };
+
+  const getButtonSignInTextColor = () => {
+    if (isScrolled && theme === "light") {
+      return "text-black";
+    } else if (!isScrolled && theme === "light") {
+      return "text-white";
+    } else if (isScrolled && theme === "dark") {
+      return "text-black";
+    } else {
+      return "text-black";
+    }
+  };
+
+  const getButtonSignUpTextColor = () => {
+    if (isScrolled && theme === "light") {
+      return "bg-black text-white";
+    } else if (!isScrolled && theme === "light") {
+      return "bg-white";
+    } else if (isScrolled && theme === "dark") {
+      return "bg-black text-white";
+    } else {
+      return "bg-black text-white";
     }
   };
 
@@ -147,13 +198,19 @@ const Header = () => {
                   >
                     <Avatar className="w-10 h-10 md:h-12 md:w-12">
                       <AvatarImage
-                        src="/images/common/profile-dummy.svg"
-                        alt="profile"
+                        src={
+                          profileAvatar || "/images/common/profile-dummy.svg"
+                        }
+                        alt={profileName}
                       />
-                      <AvatarFallback>JD</AvatarFallback>
+                      <AvatarFallback>
+                        {getInitials(profileName)}
+                      </AvatarFallback>
                     </Avatar>
-                    <span className="hidden md:block font-semibold text-lg leading-8 -tracking-[0.02em]">
-                      John Doe
+                    <span
+                      className={`hidden md:block font-semibold text-base leading-7.5 -tracking-[0.02em] ${getlogoTextColor()}`}
+                    >
+                      {profileName}
                     </span>
                   </div>
                 </DropdownMenuTrigger>
@@ -167,13 +224,17 @@ const Header = () => {
                   <div className="flex items-center gap-3 pb-3 border-b border-neutral-200">
                     <Avatar className="w-9 h-9">
                       <AvatarImage
-                        src="/images/common/profile-dummy.svg"
-                        alt="profile"
+                        src={
+                          profileAvatar || "/images/common/profile-dummy.svg"
+                        }
+                        alt={profileName}
                       />
-                      <AvatarFallback>JD</AvatarFallback>
+                      <AvatarFallback>
+                        {getInitials(profileName)}
+                      </AvatarFallback>
                     </Avatar>
                     <span className="font-bold text-base leading-7.5 -tracking-[0.02em]">
-                      John Doe
+                      {profileName}
                     </span>
                   </div>
                   {/* MENU ITEMS */}
@@ -208,14 +269,14 @@ const Header = () => {
             <div className="md:flex flex-row gap-4">
               <button
                 onClick={() => navigate("/auth", { state: { tab: "signin" } })}
-                className={`cursor-pointer py-2 px-5 md:h-12 md:w-40.75 md:px-2 md:py-2 rounded-[100px] ring-2 ring-inset ring-neutral-300 font-bold text-[16px] leading-7.5 -tracking-[0.02em] ${isScrolled ? "text-black" : "text-white"}`}
+                className={`cursor-pointer py-2 px-5 md:h-12 md:w-40.75 md:px-2 md:py-2 rounded-[100px] ring-2 ring-inset ring-neutral-300 font-bold text-[16px] leading-7.5 -tracking-[0.02em] ${getButtonSignInTextColor()}`}
               >
                 Sign In
               </button>
               <span className="md:hidden">&nbsp;&nbsp;&nbsp;</span>
               <button
                 onClick={() => navigate("/auth", { state: { tab: "signup" } })}
-                className={`cursor-pointer py-2 px-5 md:h-12 ${isScrolled ? "bg-black text-white" : "bg-white"} text-black md:w-40.75 md:px-2 md:py-2 rounded-[100px]  font-bold text-[16px] leading-7.5 -tracking-[0.02em]`}
+                className={`cursor-pointer py-2 px-5 md:h-12 ${getButtonSignUpTextColor()} text-black md:w-40.75 md:px-2 md:py-2 rounded-[100px]  font-bold text-[16px] leading-7.5 -tracking-[0.02em]`}
               >
                 Sign Up
               </button>

@@ -5,6 +5,7 @@ import axios from "axios";
 import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 type RecommendedItem = {
   id: number;
@@ -157,6 +158,15 @@ const Home = () => {
     return "Gagal memuat data.";
   };
 
+  const isUnauthorized = (err: unknown) => {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status;
+      const data = err.response?.data as { message?: string } | undefined;
+      return status === 401 || data?.message === "Access token required";
+    }
+    return false;
+  };
+
   const isLoading =
     activeList === "recommended"
       ? recommendedQuery.isLoading
@@ -187,6 +197,16 @@ const Home = () => {
           : activeList === "nearby"
             ? getErrorMessage(nearbyQuery.error)
             : getErrorMessage(searchQuery.error);
+  const shouldLogin =
+    activeList === "recommended"
+      ? isUnauthorized(recommendedQuery.error)
+      : activeList === "best-seller"
+        ? isUnauthorized(bestSellerQuery.error)
+        : activeList === "all-restaurants"
+          ? isUnauthorized(allRestaurantsQuery.error)
+          : activeList === "nearby"
+            ? isUnauthorized(nearbyQuery.error)
+            : isUnauthorized(searchQuery.error);
 
   const recommendations = recommendedQuery.data?.data?.recommendations ?? [];
   const bestSellers =
@@ -447,6 +467,18 @@ const Home = () => {
                   <Alert variant="destructive">
                     <AlertTitle>Gagal memuat data</AlertTitle>
                     <AlertDescription>{errorMessage}</AlertDescription>
+                    {shouldLogin && (
+                      <div className="pt-3">
+                        <Button
+                          onClick={() =>
+                            navigate("/auth", { state: { tab: "signin" } })
+                          }
+                          className="h-9 rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em]"
+                        >
+                          Login untuk melihat data
+                        </Button>
+                      </div>
+                    )}
                   </Alert>
                 </div>
               )}
