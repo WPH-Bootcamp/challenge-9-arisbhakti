@@ -86,7 +86,7 @@ export default function Category() {
   const restaurants = data?.data?.restaurants ?? [];
 
   return (
-    <main className="w-full px-4 md:px-30 md:mt-32 pt-4 md:pt-0 mt-16 flex flex-col gap-4 md:gap-8 text-neutral-950">
+    <main className="w-full px-4 md:px-30 md:mt-32 pt-4 md:pt-0 mt-16 flex flex-col gap-4 md:gap-8 text-neutral-950 mb-12 md:mb-25">
       <div className="flex flex-col gap-4">
         <h1 className="text-[24px] leading-9 font-extrabold">All Restaurant</h1>
 
