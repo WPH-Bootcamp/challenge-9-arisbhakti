@@ -15,7 +15,7 @@ import { SlLocationPin } from "react-icons/sl";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +26,18 @@ const Header = () => {
 
     // cleanup (WAJIB)
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const syncAuth = () => {
+      const token = localStorage.getItem("auth_token");
+      setIsLogin(Boolean(token));
+    };
+
+    syncAuth();
+    window.addEventListener("storage", syncAuth);
+
+    return () => window.removeEventListener("storage", syncAuth);
   }, []);
 
   return (
@@ -140,14 +152,15 @@ const Header = () => {
             </div>
           )}
           {!isLogin && (
-            <div className="hidden md:flex flex-row gap-4">
+            <div className="md:flex flex-row gap-4">
               <button
-                className={`h-12 w-40.75 px-2 py-2 rounded-[100px] ring-2 ring-inset ring-neutral-300 font-bold text-[16px] leading-7.5 -tracking-[0.02em] ${isScrolled ? "text-black" : "text-white"}`}
+                className={`py-2 px-5 md:h-12 md:w-40.75 md:px-2 md:py-2 rounded-[100px] ring-2 ring-inset ring-neutral-300 font-bold text-[16px] leading-7.5 -tracking-[0.02em] ${isScrolled ? "text-black" : "text-white"}`}
               >
                 Sign In
               </button>
+              <span className="md:hidden">&nbsp;&nbsp;&nbsp;</span>
               <button
-                className={`h-12 ${isScrolled ? "bg-black text-white" : "bg-white"} text-black w-40.75 px-2 py-2 rounded-[100px]  font-bold text-[16px] leading-7.5 -tracking-[0.02em]`}
+                className={`py-2 px-5 md:h-12 ${isScrolled ? "bg-black text-white" : "bg-white"} text-black md:w-40.75 md:px-2 md:py-2 rounded-[100px]  font-bold text-[16px] leading-7.5 -tracking-[0.02em]`}
               >
                 Sign Up
               </button>

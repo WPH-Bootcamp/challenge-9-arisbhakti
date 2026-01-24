@@ -6,7 +6,6 @@ import { Toaster } from "sonner";
 import App from "./App";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Home from "./pages/Home";
-import Favorites from "./components/pages/Favorites";
 import ScrollToTop from "./components/common/ScrollToTop";
 
 import { TrailerModalProvider } from "./context/TrailerModalContext";
@@ -36,7 +35,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Routes>
               <Route element={<App />}>
                 <Route path="/" element={<Home />} />
-                <Route path="/favorites" element={<Favorites />} />
                 <Route path="/details/:id" element={<Details />} />
                 <Route path="/category" element={<Category />} />
                 <Route path="/mycart" element={<MyCart />} />
