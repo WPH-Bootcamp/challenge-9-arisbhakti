@@ -1,11 +1,17 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { clearCart } from "@/features/cart/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/app/store";
+import {
+  clearCart,
+  removeItem,
+  upsertItem,
+  setItems,
+} from "@/features/cart/cartSlice";
 
 type CheckoutCartItem = {
   id: number;
@@ -51,9 +57,26 @@ export default function Checkout() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
+  const cartItems = useSelector((state: RootState) => state.cart.items);
   const state = (location.state || {}) as CheckoutState;
-  const cartGroups = state.cart ?? [];
-  const summary = state.summary;
+  const selectedRestaurantIds = (state.cart ?? []).map(
+    (group) => group.restaurant.id,
+  );
+  const cartQuery = useQuery({
+    queryKey: ["cart"],
+    queryFn: async () => {
+      const response = await api.get<{
+        data?: { cart?: CheckoutCartGroup[]; summary?: CheckoutState["summary"] };
+      }>("/api/cart");
+      return response.data;
+    },
+  });
+
+  const cartGroups =
+    cartQuery.data?.data?.cart?.filter((group) =>
+      selectedRestaurantIds.includes(group.restaurant.id),
+    ) ?? state.cart ?? [];
+  const summary = cartQuery.data?.data?.summary ?? state.summary;
 
   const DELIVERY_FEE = 15000;
   const SERVICE_FEE = 5000;
@@ -64,17 +87,115 @@ export default function Checkout() {
   const [errorOpen, setErrorOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("Terjadi kesalahan.");
 
-  const totalItems =
-    summary?.totalItems ??
-    cartGroups.reduce(
-      (sum, group) =>
-        sum + group.items.reduce((acc, item) => acc + item.quantity, 0),
-      0,
-    );
-  const totalPrice =
-    summary?.totalPrice ??
-    cartGroups.reduce((sum, group) => sum + group.subtotal, 0);
+  const totalItems = cartGroups.reduce(
+    (sum, group) =>
+      sum + group.items.reduce((acc, item) => acc + item.quantity, 0),
+    0,
+  );
+  const totalPrice = cartGroups.reduce(
+    (sum, group) => sum + group.subtotal,
+    0,
+  );
   const grandTotal = totalPrice + DELIVERY_FEE + SERVICE_FEE;
+
+  const updateMutation = useMutation({
+    mutationFn: async (payload: { cartItemId: number; quantity: number }) => {
+      const response = await api.put(`/api/cart/${payload.cartItemId}`, {
+        quantity: payload.quantity,
+      });
+      return response.data as {
+        data?: { cartItem?: { id: number; quantity: number } };
+      };
+    },
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+      const previous = queryClient.getQueryData(["cart"]);
+      const previousItems = cartItems;
+
+      queryClient.setQueryData(["cart"], (old: unknown) => {
+        if (!old || typeof old !== "object") return old;
+        const typed = old as {
+          data?: { cart?: CheckoutCartGroup[] };
+        };
+        if (!typed.data?.cart) return old;
+        const next = typed.data.cart.map((group) => ({
+          ...group,
+          items: group.items.map((item) =>
+            item.id === payload.cartItemId
+              ? { ...item, quantity: payload.quantity }
+              : item,
+          ),
+          subtotal: group.items.reduce((sum, item) => {
+            const qty =
+              item.id === payload.cartItemId
+                ? payload.quantity
+                : item.quantity;
+            return sum + item.menu.price * qty;
+          }, 0),
+        }));
+        return { ...typed, data: { ...typed.data, cart: next } };
+      });
+
+      return { previous, previousItems };
+    },
+    onError: (_err, _payload, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["cart"], context.previous);
+      }
+      if (context?.previousItems) {
+        dispatch(setItems(context.previousItems));
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (payload: { cartItemId: number }) => {
+      const response = await api.delete(`/api/cart/${payload.cartItemId}`);
+      return response.data as { success: boolean };
+    },
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+      const previous = queryClient.getQueryData(["cart"]);
+      const previousItems = cartItems;
+
+      queryClient.setQueryData(["cart"], (old: unknown) => {
+        if (!old || typeof old !== "object") return old;
+        const typed = old as {
+          data?: { cart?: CheckoutCartGroup[] };
+        };
+        if (!typed.data?.cart) return old;
+        const next = typed.data.cart
+          .map((group) => ({
+            ...group,
+            items: group.items.filter((item) => item.id !== payload.cartItemId),
+          }))
+          .filter((group) => group.items.length > 0);
+        return { ...typed, data: { ...typed.data, cart: next } };
+      });
+
+      return { previous, previousItems };
+    },
+    onError: (_err, _payload, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["cart"], context.previous);
+      }
+      if (context?.previousItems) {
+        dispatch(setItems(context.previousItems));
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+  });
 
   const checkoutMutation = useMutation({
     mutationFn: async () => {
@@ -246,7 +367,33 @@ export default function Checkout() {
                       </div>
                     </div>
                     <div className="flex flex-row items-center gap-4 py-6">
-                      <button className="h-9 w-9 ring-1 ring-inset ring-neutral-300 rounded-full flex items-center justify-center cursor-pointer md:h-10 md:w-10">
+                      <button
+                        onClick={() => {
+                          const nextQty = item.quantity - 1;
+                          if (nextQty <= 0) {
+                            deleteMutation.mutate({ cartItemId: item.id });
+                            dispatch(removeItem(item.menu.id));
+                            return;
+                          }
+                          updateMutation.mutate({
+                            cartItemId: item.id,
+                            quantity: nextQty,
+                          });
+                          dispatch(
+                            upsertItem({
+                              menuId: item.menu.id,
+                              cartItemId: item.id,
+                              name: item.menu.foodName,
+                              price: item.menu.price,
+                              image: item.menu.image,
+                              restaurantId: group.restaurant.id,
+                              restaurantName: group.restaurant.name,
+                              qty: nextQty,
+                            }),
+                          );
+                        }}
+                        className="h-9 w-9 ring-1 ring-inset ring-neutral-300 rounded-full flex items-center justify-center cursor-pointer md:h-10 md:w-10"
+                      >
                         <img
                           src="/images/common/minus.svg"
                           alt="decrease"
@@ -256,7 +403,28 @@ export default function Checkout() {
                       <div className="text-[16px] leading-7.5 -tracking-[0.02em] font-semibold md:text-[18px] md:leading-8 md:-tracking-[0.02em]">
                         {item.quantity}
                       </div>
-                      <button className="h-9 w-9 bg-primary-100 rounded-full flex items-center justify-center cursor-pointer  md:h-10 md:w-10">
+                      <button
+                        onClick={() => {
+                          const nextQty = item.quantity + 1;
+                          updateMutation.mutate({
+                            cartItemId: item.id,
+                            quantity: nextQty,
+                          });
+                          dispatch(
+                            upsertItem({
+                              menuId: item.menu.id,
+                              cartItemId: item.id,
+                              name: item.menu.foodName,
+                              price: item.menu.price,
+                              image: item.menu.image,
+                              restaurantId: group.restaurant.id,
+                              restaurantName: group.restaurant.name,
+                              qty: nextQty,
+                            }),
+                          );
+                        }}
+                        className="h-9 w-9 bg-primary-100 rounded-full flex items-center justify-center cursor-pointer  md:h-10 md:w-10"
+                      >
                         <img
                           src="/images/common/plus.svg"
                           alt="increase"

@@ -1,10 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/app/store";
+import {
+  removeItem,
+  setItems,
+  setCartItemId,
+  updateQuantity,
+  upsertItem,
+} from "@/features/cart/cartSlice";
 
 type CartMenu = {
   id: number;
@@ -53,6 +62,9 @@ const formatRupiah = (value: number) =>
 
 export default function MyCart() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const dispatch = useDispatch();
+  const cartItems = useSelector((state: RootState) => state.cart.items);
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["cart"],
     queryFn: async () => {
@@ -82,6 +94,155 @@ export default function MyCart() {
 
   const cartGroups = data?.data?.cart ?? [];
   const summary = data?.data?.summary;
+
+  const updateMutation = useMutation({
+    mutationFn: async (payload: { cartItemId: number; quantity: number }) => {
+      const response = await api.put(`/api/cart/${payload.cartItemId}`, {
+        quantity: payload.quantity,
+      });
+      return response.data as {
+        data?: { cartItem?: { id: number; quantity: number } };
+      };
+    },
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+      const previous = queryClient.getQueryData(["cart"]);
+      const previousItems = cartItems;
+
+      queryClient.setQueryData<CartResponse>(["cart"], (old) => {
+        if (!old?.data?.cart) return old;
+        const next = old.data.cart.map((group) => ({
+          ...group,
+          items: group.items.map((item) =>
+            item.id === payload.cartItemId
+              ? { ...item, quantity: payload.quantity }
+              : item,
+          ),
+          subtotal: group.items.reduce((sum, item) => {
+            const qty =
+              item.id === payload.cartItemId
+                ? payload.quantity
+                : item.quantity;
+            return sum + item.menu.price * qty;
+          }, 0),
+        }));
+        return { ...old, data: { ...old.data, cart: next } };
+      });
+
+      const target = cartItems.find((item) => item.cartItemId === payload.cartItemId);
+      if (target) {
+        dispatch(updateQuantity({ menuId: target.menuId, qty: payload.quantity }));
+      }
+
+      return { previous, previousItems };
+    },
+    onError: (_err, _payload, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["cart"], context.previous);
+      }
+      if (context?.previousItems) {
+        dispatch(setItems(context.previousItems));
+      }
+    },
+    onSuccess: (data, payload) => {
+      const cartItemId = data?.data?.cartItem?.id;
+      const quantity = data?.data?.cartItem?.quantity;
+      const target = cartItems.find((item) => item.cartItemId === payload.cartItemId);
+      if (cartItemId && target) {
+        dispatch(setCartItemId({ menuId: target.menuId, cartItemId }));
+      }
+      if (typeof quantity === "number" && target) {
+        dispatch(updateQuantity({ menuId: target.menuId, qty: quantity }));
+      }
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (payload: { cartItemId: number }) => {
+      const response = await api.delete(`/api/cart/${payload.cartItemId}`);
+      return response.data as { success: boolean };
+    },
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+      const previous = queryClient.getQueryData(["cart"]);
+      const previousItems = cartItems;
+
+      queryClient.setQueryData<CartResponse>(["cart"], (old) => {
+        if (!old?.data?.cart) return old;
+        const next = old.data.cart
+          .map((group) => ({
+            ...group,
+            items: group.items.filter((item) => item.id !== payload.cartItemId),
+          }))
+          .filter((group) => group.items.length > 0);
+        return { ...old, data: { ...old.data, cart: next } };
+      });
+
+      const target = cartItems.find((item) => item.cartItemId === payload.cartItemId);
+      if (target) {
+        dispatch(removeItem(target.menuId));
+      }
+
+      return { previous, previousItems };
+    },
+    onError: (_err, _payload, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["cart"], context.previous);
+      }
+      if (context?.previousItems) {
+        dispatch(setItems(context.previousItems));
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+  });
+
+  const handleIncrease = (item: CartItem, group: CartRestaurant) => {
+    const nextQty = item.quantity + 1;
+    updateMutation.mutate({ cartItemId: item.id, quantity: nextQty });
+    dispatch(
+      upsertItem({
+        menuId: item.menu.id,
+        cartItemId: item.id,
+        name: item.menu.foodName,
+        price: item.menu.price,
+        image: item.menu.image,
+        restaurantId: group.restaurant.id,
+        restaurantName: group.restaurant.name,
+        qty: nextQty,
+      }),
+    );
+  };
+
+  const handleDecrease = (item: CartItem, group: CartRestaurant) => {
+    const nextQty = item.quantity - 1;
+    if (nextQty <= 0) {
+      deleteMutation.mutate({ cartItemId: item.id });
+      dispatch(removeItem(item.menu.id));
+      return;
+    }
+    updateMutation.mutate({ cartItemId: item.id, quantity: nextQty });
+    dispatch(
+      upsertItem({
+        menuId: item.menu.id,
+        cartItemId: item.id,
+        name: item.menu.foodName,
+        price: item.menu.price,
+        image: item.menu.image,
+        restaurantId: group.restaurant.id,
+        restaurantName: group.restaurant.name,
+        qty: nextQty,
+      }),
+    );
+  };
 
   return (
     <main className="w-full px-4 md:px-30  pt-4 md:pt-0 md:mt-32 mt-16 flex flex-col gap-4 md:gap-8 text-neutral-950 md:items-center mb-12 md:mb-25">
@@ -187,7 +348,10 @@ export default function MyCart() {
                       </div>
                     </div>
                     <div className="flex flex-row items-center gap-4 py-6">
-                      <button className="h-9 w-9 ring-1 ring-inset ring-neutral-300 rounded-full flex items-center justify-center cursor-pointer md:h-10 md:w-10">
+                      <button
+                        onClick={() => handleDecrease(item, group)}
+                        className="h-9 w-9 ring-1 ring-inset ring-neutral-300 rounded-full flex items-center justify-center cursor-pointer md:h-10 md:w-10"
+                      >
                         <img
                           src="/images/common/minus.svg"
                           alt="decrease"
@@ -197,7 +361,10 @@ export default function MyCart() {
                       <div className="text-[16px] leading-7.5 -tracking-[0.02em] font-semibold md:text-[18px] md:leading-8 md:-tracking-[0.02em]">
                         {item.quantity}
                       </div>
-                      <button className="h-9 w-9 bg-primary-100 rounded-full flex items-center justify-center cursor-pointer  md:h-10 md:w-10">
+                      <button
+                        onClick={() => handleIncrease(item, group)}
+                        className="h-9 w-9 bg-primary-100 rounded-full flex items-center justify-center cursor-pointer  md:h-10 md:w-10"
+                      >
                         <img
                           src="/images/common/plus.svg"
                           alt="increase"
