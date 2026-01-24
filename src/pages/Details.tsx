@@ -89,6 +89,9 @@ export default function Details() {
   const REVIEW_STEP = 6;
   const [menuLimit, setMenuLimit] = React.useState(MENU_STEP);
   const [reviewLimit, setReviewLimit] = React.useState(REVIEW_STEP);
+  const [menuFilter, setMenuFilter] = React.useState<
+    "all" | "food" | "drink"
+  >("all");
 
   const { data, isLoading, isFetching, isError, error } = useQuery({
     queryKey: ["restaurant-detail", id, menuLimit, reviewLimit],
@@ -237,24 +240,49 @@ export default function Details() {
           <article id="menu" className="text-neutral-950 flex flex-col gap-4 ">
             <h1 className="font-extrabold text-[24px] leading-9">Menu</h1>
             <div className="flex flex-row gap-2 md:gap-3">
-              <button className="h-10 md:h-11.5 px-4 py-2  rounded-[100px] ring-1 ring-inset  font-bold text-[14px] leading-7 -tracking-[-0.02em]  text-center flex items-center justify-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] ring-primary-100 bg-[#FFECEC] text-primary-100">
+              <button
+                onClick={() => setMenuFilter("all")}
+                className={`h-10 md:h-11.5 px-4 py-2 rounded-[100px] ring-1 ring-inset font-bold text-[14px] leading-7 -tracking-[-0.02em] text-center flex items-center justify-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] ${
+                  menuFilter === "all"
+                    ? "ring-primary-100 bg-[#FFECEC] text-primary-100"
+                    : "ring-neutral-300 text-neutral-950"
+                }`}
+              >
                 All Menu
               </button>
-              <button className="h-10 md:h-11.5 px-4  ring-1 ring-inset ring-neutral-300 rounded-[100px] font-semibold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]">
+              <button
+                onClick={() => setMenuFilter("food")}
+                className={`h-10 md:h-11.5 px-4 rounded-[100px] ring-1 ring-inset font-semibold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] ${
+                  menuFilter === "food"
+                    ? "ring-primary-100 bg-[#FFECEC] text-primary-100"
+                    : "ring-neutral-300 text-neutral-950"
+                }`}
+              >
                 Food
               </button>
-              <button className="h-10 md:h-11.5 px-4  ring-1 ring-inset ring-neutral-300 rounded-[100px] font-semibold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]">
+              <button
+                onClick={() => setMenuFilter("drink")}
+                className={`h-10 md:h-11.5 px-4 rounded-[100px] ring-1 ring-inset font-semibold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] ${
+                  menuFilter === "drink"
+                    ? "ring-primary-100 bg-[#FFECEC] text-primary-100"
+                    : "ring-neutral-300 text-neutral-950"
+                }`}
+              >
                 Drink
               </button>
             </div>
           </article>
 
           <article className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4 md:gap-x-5 md:gap-y-6">
-            {detail.menus.map((menu) => (
-              <div
-                key={menu.id}
-                className="flex flex-col shadow-[0_8px_24px_rgba(0,0,0,0.08)] rounded-3xl"
-              >
+            {detail.menus
+              .filter((menu) =>
+                menuFilter === "all" ? true : menu.type === menuFilter,
+              )
+              .map((menu) => (
+                <div
+                  key={menu.id}
+                  className="flex flex-col shadow-[0_8px_24px_rgba(0,0,0,0.08)] rounded-3xl"
+                >
                 <div
                   className="h-[172.5px] rounded-tl-2xl rounded-tr-2xl inset-0 bg-cover bg-center bg-no-repeat text-xl"
                   style={{
@@ -277,8 +305,8 @@ export default function Details() {
                       Add
                     </button>
                   </div>
+                  </div>
                 </div>
-              </div>
             ))}
           </article>
 
