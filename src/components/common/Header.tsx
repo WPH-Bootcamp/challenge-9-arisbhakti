@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
+import { clearCart } from "@/features/cart/cartSlice";
+import { clearFilters } from "@/features/filters/categoryFilterSlice";
+import { setTheme } from "@/features/theme/themeSlice";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -18,6 +21,7 @@ import { SlLocationPin } from "react-icons/sl";
 
 const Header = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const [profileName, setProfileName] = useState("User");
@@ -254,7 +258,19 @@ const Header = () => {
                       </span>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem className="gap-3 cursor-pointer rounded-xl text-primary-100 ">
+                    <DropdownMenuItem
+                      className="gap-3 cursor-pointer rounded-xl text-primary-100 "
+                      onClick={() => {
+                        localStorage.removeItem("auth_token");
+                        localStorage.removeItem("auth_user");
+                        localStorage.removeItem("cart_state");
+                        dispatch(clearCart());
+                        dispatch(clearFilters());
+                        dispatch(setTheme("dark"));
+                        setIsLogin(false);
+                        navigate("/auth", { state: { tab: "signin" } });
+                      }}
+                    >
                       <RiLogoutCircleLine className="text-xl" />
                       <span className="text-sm leading-7 font-medium">
                         Logout
