@@ -1,4 +1,29 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { api } from "@/lib/api";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+
+type RecommendedItem = {
+  id: number;
+  name: string;
+  star: number;
+  place: string;
+  logo: string;
+  images: string[];
+  category: string;
+  reviewCount: number;
+  isFrequentlyOrdered: boolean;
+};
+
+type RecommendedResponse = {
+  success: boolean;
+  message: string;
+  data?: {
+    recommendations?: RecommendedItem[];
+  };
+};
 
 const Home = () => {
   const [keyword, setKeyword] = useState("");
@@ -6,6 +31,27 @@ const Home = () => {
   const handleSearch = (value: string) => {
     setKeyword(value);
   };
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["recommended-resto"],
+    queryFn: async () => {
+      const response = await api.get<RecommendedResponse>(
+        "/api/resto/recommended",
+      );
+      return response.data;
+    },
+  });
+
+  const errorMessage = (() => {
+    if (!isError) return "";
+    if (axios.isAxiosError(error)) {
+      const data = error.response?.data as { message?: string } | undefined;
+      if (data?.message) return data.message;
+    }
+    return "Gagal memuat data rekomendasi.";
+  })();
+
+  const recommendations = data?.data?.recommendations ?? [];
 
   return (
     <>
@@ -138,51 +184,97 @@ const Home = () => {
         </section>
         <div className="flex flex-col gap-4 md:gap-8 pt-6 pb-12 md:pt-0 md:pb-25">
           <div className="flex flex-row justify-between">
-            <h2 className="text-neutral-950 font-extrabold text-2xl leading-9 md:text-[32px] md:leading-10.5">
+            <h2
+              id="title-type"
+              className="text-neutral-950 font-extrabold text-2xl leading-9 md:text-[32px] md:leading-10.5"
+            >
               Recommended
             </h2>
             <button className="text-primary-100 cursor-pointer font-extrabold text-[16px] leading-7.5 md:text-lg md:leading-8">
               See All
             </button>
           </div>
-          <div className="flex flex-col gap-4 md:grid md:grid-cols-3 md:gap-x-5 md:gap-y-5  ">
-            <div className="flex flex-row gap-2 md:gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl px-3 py-3 md:px-4 md:py-4">
-              <img
-                src="/images/common/restaurant-dummy.svg"
-                alt="restaurant image"
-                className="w-22.5 h-22.5 md:h-30 md:w-30 rounded-2xl"
-              />
-              <div className="flex flex-col gap-0.5 w-full">
-                <h3 className="text-neutral-950 font-extrabold text-[16px] leading-7.5 md:text-[18px] md:leading-8 -tracking-[0.02em]">
-                  Burger King
-                </h3>
-                <div className="flex flex-row gap-1">
-                  <img
-                    src="/images/common/star.svg"
-                    className="w-6 h-6"
-                    alt="star"
-                  />
-                  <span className="text-neutral-950 font-medium leading-7 text-[14px] md:text-[16px] md:leading-7.5 -tracking-[0.03em]">
-                    4.9
-                  </span>
-                </div>
-                <div className="flex flex-row gap-1.5 items-center justify-start w-fit">
-                  <span className="text-neutral-950 text-[14px] leading-7 -tracking-[-0.02em] md:text-[16px] md:leading-7.5">
-                    Jakarta Selatan
-                  </span>
-                  <div className="flex flex-row w-fit items-center justify-center">
-                    <div className="w-0.5 h-0.5 bg-neutral-950"></div>
+          <div
+            id="recommended-list"
+            className="flex flex-col gap-4 md:grid md:grid-cols-3 md:gap-x-5 md:gap-y-5  "
+          >
+            {isLoading && (
+              <>
+                <div className="md:col-span-3 flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)]">
+                  <div className="flex items-center gap-3">
+                    <div className="h-2.5 w-2.5 rounded-full bg-primary-100 animate-pulse" />
+                    <span className="text-sm font-semibold text-neutral-700">
+                      Loading data
+                    </span>
                   </div>
-                  <span className="text-neutral-950 text-[14px] leading-7 -tracking-[-0.02em] md:text-[16px] md:leading-7.5">
-                    2.4 km
+                  <span className="text-xs text-neutral-500">
+                    Mohon tunggu sebentar
                   </span>
                 </div>
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div
+                    key={`skeleton-${index}`}
+                    className="flex flex-row gap-2 md:gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl px-3 py-3 md:px-4 md:py-4"
+                  >
+                    <Skeleton className="w-22.5 h-22.5 md:h-30 md:w-30" />
+                    <div className="flex flex-col gap-2 w-full">
+                      <Skeleton className="h-5 w-3/4" />
+                      <Skeleton className="h-4 w-1/3" />
+                      <Skeleton className="h-4 w-2/3" />
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+            {isError && (
+              <div className="md:col-span-3">
+                <Alert variant="destructive">
+                  <AlertTitle>Gagal memuat rekomendasi</AlertTitle>
+                  <AlertDescription>{errorMessage}</AlertDescription>
+                </Alert>
               </div>
-            </div>
+            )}
+            {!isLoading &&
+              !isError &&
+              recommendations.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex flex-row gap-2 md:gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl px-3 py-3 md:px-4 md:py-4 items-center"
+                >
+                  <img
+                    src={item.logo || "/images/common/restaurant-dummy.svg"}
+                    alt={item.name}
+                    className="w-22.5 h-22.5 md:h-30 md:w-30 rounded-2xl object-cover"
+                  />
+                  <div className="flex flex-col gap-0.5 w-full">
+                    <h3 className="text-neutral-950 font-extrabold text-[16px] leading-7.5 md:text-[18px] md:leading-8 -tracking-[0.02em]">
+                      {item.name}
+                    </h3>
+                    <div className="flex flex-row gap-1">
+                      <img
+                        src="/images/common/star.svg"
+                        className="w-6 h-6"
+                        alt="star"
+                      />
+                      <span className="text-neutral-950 font-medium leading-7 text-[14px] md:text-[16px] md:leading-7.5 -tracking-[0.03em]">
+                        {item.star}
+                      </span>
+                    </div>
+                    <div className="flex flex-row gap-1.5 items-center justify-start w-fit">
+                      <span className="text-neutral-950 text-[14px] leading-7 -tracking-[-0.02em] md:text-[16px] md:leading-7.5">
+                        {item.place}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
           </div>
           <div className="flex flex-row flex-1 w-full items-center justify-center">
-            <button className="h-10 w-40 ring-1 ring-inset ring-neutral-300 rounded-[100px] text-neutral-950 text-[14px] leading-7 -tracking-[0.02em] font-bold">
-              Show More
+            <button
+              disabled
+              className="h-10 w-40 ring-1 ring-inset ring-neutral-300 rounded-[100px] text-neutral-400 text-[14px] leading-7 -tracking-[0.02em] font-bold cursor-not-allowed"
+            >
+              No more data
             </button>
           </div>
         </div>
