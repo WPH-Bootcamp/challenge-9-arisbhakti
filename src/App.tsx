@@ -18,6 +18,8 @@ export default function App() {
   const totalPrice = useSelector((state: RootState) =>
     state.cart.items.reduce((sum, item) => sum + item.price * item.qty, 0),
   );
+  const hideCheckoutBar =
+    location.pathname === "/mycart" || location.pathname === "/checkout";
 
   useEffect(() => {
     const isHome = location.pathname === "/" || location.pathname === "/home";
@@ -35,7 +37,9 @@ export default function App() {
         <Outlet />
       </main>
       <Footer />
-      <CheckoutBottomBar cartCount={cartCount} totalPrice={totalPrice} />
+      {!hideCheckoutBar && (
+        <CheckoutBottomBar cartCount={cartCount} totalPrice={totalPrice} />
+      )}
     </div>
   );
 }

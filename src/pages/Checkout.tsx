@@ -1,15 +1,150 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState } from "react";
+
+type CheckoutCartItem = {
+  id: number;
+  menu: {
+    id: number;
+    foodName: string;
+    price: number;
+    type: "food" | "drink";
+    image: string;
+  };
+  quantity: number;
+  itemTotal: number;
+};
+
+type CheckoutCartGroup = {
+  restaurant: {
+    id: number;
+    name: string;
+    logo: string;
+  };
+  items: CheckoutCartItem[];
+  subtotal: number;
+};
+
+type CheckoutState = {
+  cart?: CheckoutCartGroup[];
+  summary?: {
+    totalItems: number;
+    totalPrice: number;
+    restaurantCount: number;
+  };
+};
+
+const formatRupiah = (value: number) =>
+  new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(value);
 
 export default function Checkout() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const state = (location.state || {}) as CheckoutState;
+  const cartGroups = state.cart ?? [];
+  const summary = state.summary;
+
+  const DELIVERY_FEE = 15000;
+  const SERVICE_FEE = 5000;
+
+  const [paymentMethod, setPaymentMethod] = useState(
+    "BNI Bank Negara Indonesia",
+  );
+  const [errorOpen, setErrorOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("Terjadi kesalahan.");
+
+  const totalItems =
+    summary?.totalItems ??
+    cartGroups.reduce(
+      (sum, group) =>
+        sum + group.items.reduce((acc, item) => acc + item.quantity, 0),
+      0,
+    );
+  const totalPrice =
+    summary?.totalPrice ??
+    cartGroups.reduce((sum, group) => sum + group.subtotal, 0);
+  const grandTotal = totalPrice + DELIVERY_FEE + SERVICE_FEE;
+
+  const checkoutMutation = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        restaurants: cartGroups.map((group) => ({
+          restaurantId: group.restaurant.id,
+          items: group.items.map((item) => ({
+            menuId: item.menu.id,
+            quantity: item.quantity,
+          })),
+        })),
+        deliveryAddress: "Jl. Sudirman No. 25, Jakarta Pusat, 10220",
+        phone: "0812-3456-7890",
+        paymentMethod,
+        notes: "Please ring the doorbell",
+      };
+      const response = await api.post("/api/order/checkout", payload);
+      return response.data as { success: boolean };
+    },
+    onSuccess: () => {
+      const successPayload = {
+        date: new Date().toISOString(),
+        paymentMethod,
+        totalItems,
+        price: totalPrice,
+        deliveryFee: DELIVERY_FEE,
+        serviceFee: SERVICE_FEE,
+        total: grandTotal,
+      };
+      localStorage.setItem("checkout_success", JSON.stringify(successPayload));
+      navigate("/success");
+    },
+    onError: (err: unknown) => {
+      if (err instanceof Error) {
+        setErrorMessage(err.message);
+      } else {
+        setErrorMessage("Checkout gagal. Coba lagi.");
+      }
+      setErrorOpen(true);
+    },
+  });
+
+  const banks = [
+    {
+      value: "BNI Bank Negara Indonesia",
+      label: "Bank Negara Indonesia",
+      logo: "/images/common/BNI.svg",
+    },
+    {
+      value: "BRI Bank Rakyat Indonesia",
+      label: "BRI Bank Rakyat Indonesia",
+      logo: "/images/common/BRI.svg",
+    },
+    {
+      value: "BCA Virtual Account",
+      label: "BCA Virtual Account",
+      logo: "/images/common/BCA.svg",
+    },
+    {
+      value: "Mandiri",
+      label: "Mandiri",
+      logo: "/images/common/Mandiri.svg",
+    },
+  ];
+
   return (
     <main className="text-neutral-950 w-full px-4  md:mt-32 pt-4 md:pt-0 mt-16 md:flex md:flex-col gap-4 md:gap-6 items-center z-10 mb-12 md:mb-25">
       <div className="flex flex-col gap-4 md:gap-6 md:w-250">
         <h1 className="font-extrabold text-2xl leading-9 md:text-[32px] md:leading-10.5">
           Checkout
         </h1>
-        <div className="flex flex-col gap-4 md:flex-row md:gap-5 md:items-start">
-          {/* left side */}
-          <div className="flex flex-col gap-4 md:flex-1/4">
+          <div className="flex flex-col gap-4 md:flex-row md:gap-5 md:items-start">
+            {/* left side */}
+            <div className="flex flex-col gap-4 md:flex-1/4">
             {/* Delviery Address */}
             <div className="flex flex-col gap-4 p-4 rounded-3xl shadow-sm md:gap-5.25 md:p-5">
               {/* Header & Text */}
@@ -39,62 +174,73 @@ export default function Checkout() {
               </button>
             </div>
             {/* Order Items */}
-            <div className="flex flex-col gap-3 p-4 rounded-3xl shadow-sm md:p-5 md:gap-5.25">
-              {/* Header & Button */}
-              <div className="flex flex-row justify-between items-center just">
-                <div className="flex flex-row gap-1 items-center  md:gap-2 ">
-                  <img
-                    src="/images/common/icon-restaurant-dummy.svg"
-                    className="w-8 h-8"
-                    alt="restaurant"
-                  />
-                  <span className="font-bold text-base leading-7.5 -tracking-[0.02em] md:text-lg md:leading-8 md:-tracking-[0.03em] ">
-                    Burger King
-                  </span>
+            {cartGroups.map((group) => (
+              <div
+                key={group.restaurant.id}
+                className="flex flex-col gap-3 p-4 rounded-3xl shadow-sm md:p-5 md:gap-5.25"
+              >
+                <div className="flex flex-row justify-between items-center just">
+                  <div className="flex flex-row gap-1 items-center  md:gap-2 ">
+                    <img
+                      src={
+                        group.restaurant.logo ||
+                        "/images/common/icon-restaurant-dummy.svg"
+                      }
+                      className="w-8 h-8"
+                      alt={group.restaurant.name}
+                    />
+                    <span className="font-bold text-base leading-7.5 -tracking-[0.02em] md:text-lg md:leading-8 md:-tracking-[0.03em] ">
+                      {group.restaurant.name}
+                    </span>
+                  </div>
+                  <button className="h-9 w-26.5 md:h-10 md:w-30 rounded-full ring-1 ring-inset ring-neutral-300 flex items-center justify-center font-bold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em] ">
+                    Add Item
+                  </button>
                 </div>
-                <button className="h-9 w-26.5 md:h-10 md:w-30 rounded-full ring-1 ring-inset ring-neutral-300 flex items-center justify-center font-bold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em] ">
-                  Add Item
-                </button>
-              </div>
-              {/* Item List */}
-              <div className="flex flex-row items-center justify-between">
-                <div className="flex flex-row gap-4.25">
+                {group.items.map((item) => (
                   <div
-                    className="bg-cover bg-center bg-no-repeat text-xl w-16 h-16 md:h-20 md:w-20 rounded-2xl"
-                    style={{
-                      backgroundImage: `url('/images/common/burger-hero.svg')`,
-                    }}
-                  />
-                  <div className="flex flex-col justify-center">
-                    <span className="font-medium text-sm leading-7 md:text-base md:leading-7.5 -tracking-[0.03em]">
-                      Beef Burger
-                    </span>
-                    <span className="font-extrabold text-base leading-7.5 md:text-lg md:leading-8 -tracking-[0.02em]">
-                      Rp50.000
-                    </span>
+                    key={item.id}
+                    className="flex flex-row items-center justify-between"
+                  >
+                    <div className="flex flex-row gap-4.25">
+                      <div
+                        className="bg-cover bg-center bg-no-repeat text-xl w-16 h-16 md:h-20 md:w-20 rounded-2xl"
+                        style={{
+                          backgroundImage: `url('${item.menu.image}')`,
+                        }}
+                      />
+                      <div className="flex flex-col justify-center">
+                        <span className="font-medium text-sm leading-7 md:text-base md:leading-7.5 -tracking-[0.03em]">
+                          {item.menu.foodName}
+                        </span>
+                        <span className="font-extrabold text-base leading-7.5 md:text-lg md:leading-8 -tracking-[0.02em]">
+                          {formatRupiah(item.menu.price)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-row items-center gap-4 py-6">
+                      <button className="h-9 w-9 ring-1 ring-inset ring-neutral-300 rounded-full flex items-center justify-center cursor-pointer md:h-10 md:w-10">
+                        <img
+                          src="/images/common/minus.svg"
+                          alt="decrease"
+                          className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
+                        />
+                      </button>
+                      <div className="text-[16px] leading-7.5 -tracking-[0.02em] font-semibold md:text-[18px] md:leading-8 md:-tracking-[0.02em]">
+                        {item.quantity}
+                      </div>
+                      <button className="h-9 w-9 bg-primary-100 rounded-full flex items-center justify-center cursor-pointer  md:h-10 md:w-10">
+                        <img
+                          src="/images/common/plus.svg"
+                          alt="increase"
+                          className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
+                        />
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-row items-center gap-4 py-6">
-                  <button className="h-9 w-9 ring-1 ring-inset ring-neutral-300 rounded-full flex items-center justify-center cursor-pointer md:h-10 md:w-10">
-                    <img
-                      src="/images/common/minus.svg"
-                      alt="decrease"
-                      className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
-                    />
-                  </button>
-                  <div className="text-[16px] leading-7.5 -tracking-[0.02em] font-semibold md:text-[18px] md:leading-8 md:-tracking-[0.02em]">
-                    1
-                  </div>
-                  <button className="h-9 w-9 bg-primary-100 rounded-full flex items-center justify-center cursor-pointer  md:h-10 md:w-10">
-                    <img
-                      src="/images/common/plus.svg"
-                      alt="decrease"
-                      className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
-                    />
-                  </button>
-                </div>
+                ))}
               </div>
-            </div>
+            ))}
           </div>
           {/* Right Side, Payment Method */}
           <div className="flex flex-col gap-4 p-4 rounded-3xl shadow-sm w-full md:flex-1 md:p-5">
@@ -103,102 +249,34 @@ export default function Checkout() {
               <h1 className="font-bold text-base leading-7.5 md:text-lg md:leading-8 -tracking-[0.02em] ">
                 Payment Method
               </h1>
-              {/* banks */}
-              <div className="flex flex-row justify-between">
-                {/* bank image and name */}
-                <div className="flex flex-row gap-2 items-center ">
-                  {/* bank image */}
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl ring-[0.75px] ring-inset ring-neutral-300">
-                    <img
-                      src="/images/common/BNI.svg"
-                      className="w-6 h-6"
-                      alt="bank-bca"
-                    />
+              <RadioGroup
+                value={paymentMethod}
+                onValueChange={setPaymentMethod}
+                className="flex flex-col gap-3"
+              >
+                {banks.map((bank) => (
+                  <div key={bank.value} className="flex flex-col gap-3">
+                    <div className="flex flex-row justify-between">
+                      <div className="flex flex-row gap-2 items-center ">
+                        <div className="w-10 h-10 flex items-center justify-center rounded-xl ring-[0.75px] ring-inset ring-neutral-300">
+                          <img
+                            src={bank.logo}
+                            className="w-6 h-6"
+                            alt={bank.label}
+                          />
+                        </div>
+                        <span className="font-bold text-sm leading-7.5 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
+                          {bank.label}
+                        </span>
+                      </div>
+                      <label className="flex items-center ">
+                        <RadioGroupItem value={bank.value} />
+                      </label>
+                    </div>
+                    <hr />
                   </div>
-                  {/* bank name */}
-                  <span className="font-bold text-sm leading-7.5 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
-                    Bank Negara Indonesia
-                  </span>
-                </div>
-                {/* radio button */}
-                <RadioGroup>
-                  <label className="flex items-center ">
-                    <RadioGroupItem value="BNI" checked />
-                  </label>
-                </RadioGroup>
-              </div>
-              <hr />
-              <div className="flex flex-row justify-between">
-                {/* bank image and name */}
-                <div className="flex flex-row gap-2 items-center ">
-                  {/* bank image */}
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl ring-[0.75px] ring-inset ring-neutral-300">
-                    <img
-                      src="/images/common/BRI.svg"
-                      className="w-6 h-6"
-                      alt="bank-bca"
-                    />
-                  </div>
-                  {/* bank name */}
-                  <span className="font-bold text-sm leading-7.5 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
-                    BCA Rakyat Indonesia
-                  </span>
-                </div>
-                {/* radio button */}
-                <RadioGroup>
-                  <label className="flex items-center ">
-                    <RadioGroupItem value="BRI" />
-                  </label>
-                </RadioGroup>
-              </div>
-              <hr />
-              <div className="flex flex-row justify-between">
-                {/* bank image and name */}
-                <div className="flex flex-row gap-2 items-center ">
-                  {/* bank image */}
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl ring-[0.75px] ring-inset ring-neutral-300">
-                    <img
-                      src="/images/common/BCA.svg"
-                      className="w-6 h-6"
-                      alt="bank-bca"
-                    />
-                  </div>
-                  {/* bank name */}
-                  <span className="font-bold text-sm leading-7.5 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
-                    BCA Virtual Account
-                  </span>
-                </div>
-                {/* radio button */}
-                <RadioGroup>
-                  <label className="flex items-center ">
-                    <RadioGroupItem value="BCA" />
-                  </label>
-                </RadioGroup>
-              </div>
-              <hr />
-              <div className="flex flex-row justify-between">
-                {/* bank image and name */}
-                <div className="flex flex-row gap-2 items-center ">
-                  {/* bank image */}
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl ring-[0.75px] ring-inset ring-neutral-300">
-                    <img
-                      src="/images/common/Mandiri.svg"
-                      className="w-6 h-6"
-                      alt="bank-bca"
-                    />
-                  </div>
-                  {/* bank name */}
-                  <span className="font-bold text-sm leading-7.5 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
-                    Mandiri
-                  </span>
-                </div>
-                {/* radio button */}
-                <RadioGroup>
-                  <label className="flex items-center ">
-                    <RadioGroupItem value="Mandiri" />
-                  </label>
-                </RadioGroup>
-              </div>
+                ))}
+              </RadioGroup>
               <hr className="border-t border-dashed border-neutral-300" />
               {/* Payment Summary */}
               <div className="flex flex-col gap-4">
@@ -207,10 +285,10 @@ export default function Checkout() {
                 </h1>
                 <div className="flex flex-row justify-between">
                   <span className="text-sm leading-7 font-medium md:text-base md:leading-7.5 md:-tracking-[0.03em]">
-                    Price ( 2 items )
+                    Price ( {totalItems} items )
                   </span>
                   <span className="font-bold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
-                    Rp100.000
+                    {formatRupiah(totalPrice)}
                   </span>
                 </div>
                 <div className="flex flex-row justify-between">
@@ -218,7 +296,7 @@ export default function Checkout() {
                     Delivery Fee
                   </span>
                   <span className="font-bold text-sm leading-7 -tracking-[0.02em]  md:text-base md:leading-7.5 md:-tracking-[0.02em]">
-                    Rp100.000
+                    {formatRupiah(DELIVERY_FEE)}
                   </span>
                 </div>
                 <div className="flex flex-row justify-between">
@@ -226,7 +304,7 @@ export default function Checkout() {
                     Service Fee
                   </span>
                   <span className="font-bold text-sm leading-7 -tracking-[0.02em]  md:text-base md:leading-7.5 md:-tracking-[0.02em]">
-                    Rp100.000
+                    {formatRupiah(SERVICE_FEE)}
                   </span>
                 </div>
                 <div className="flex flex-row justify-between">
@@ -234,17 +312,29 @@ export default function Checkout() {
                     Total
                   </span>
                   <span className="font-extrabold text-base leading-7.5 md:text-lg md:leading-8 -tracking-[0.02em]">
-                    Rp100.000
+                    {formatRupiah(grandTotal)}
                   </span>
                 </div>
-                <button className="h-11 md:h-12 w-full rounded-[100px] bg-primary-100 text-white font-bold text-base leading-7.5 -tracking-[0.02em] items-center justify-center text-center ">
-                  Buy
+                <button
+                  onClick={() => checkoutMutation.mutate()}
+                  disabled={checkoutMutation.isPending || cartGroups.length === 0}
+                  className="h-11 md:h-12 w-full rounded-[100px] bg-primary-100 text-white font-bold text-base leading-7.5 -tracking-[0.02em] items-center justify-center text-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {checkoutMutation.isPending ? "Processing..." : "Buy"}
                 </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <Dialog open={errorOpen} onOpenChange={setErrorOpen}>
+        <DialogContent className="rounded-3xl">
+          <DialogHeader>
+            <DialogTitle>Checkout gagal</DialogTitle>
+            <DialogDescription>{errorMessage}</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }

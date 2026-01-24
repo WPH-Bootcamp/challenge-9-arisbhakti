@@ -81,6 +81,7 @@ export default function MyCart() {
   })();
 
   const cartGroups = data?.data?.cart ?? [];
+  const summary = data?.data?.summary;
 
   return (
     <main className="w-full px-4 md:px-30  pt-4 md:pt-0 md:mt-32 mt-16 flex flex-col gap-4 md:gap-8 text-neutral-950 md:items-center mb-12 md:mb-25">
@@ -217,7 +218,25 @@ export default function MyCart() {
                       {formatRupiah(group.subtotal)}
                     </span>
                   </div>
-                  <button className="h-11 md:h-12 w-full md:w-60 rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]">
+                  <button
+                    onClick={() => {
+                      const groupSummary = {
+                        totalItems: group.items.reduce(
+                          (sum, item) => sum + item.quantity,
+                          0,
+                        ),
+                        totalPrice: group.subtotal,
+                        restaurantCount: 1,
+                      };
+                      navigate("/checkout", {
+                        state: {
+                          cart: [group],
+                          summary: groupSummary,
+                        },
+                      });
+                    }}
+                    className="h-11 md:h-12 w-full md:w-60 rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
+                  >
                     Checkout
                   </button>
                 </div>

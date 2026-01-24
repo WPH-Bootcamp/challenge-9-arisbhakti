@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   cartCount: number;
@@ -6,6 +7,7 @@ type Props = {
 };
 
 export default function CheckoutBottomBar({ cartCount, totalPrice }: Props) {
+  const navigate = useNavigate();
   const isVisible = cartCount > 0;
   if (!isVisible) return null;
 
@@ -40,6 +42,7 @@ export default function CheckoutBottomBar({ cartCount, totalPrice }: Props) {
         </div>
 
         <Button
+          onClick={() => navigate("/mycart")}
           className="
     h-10 md:h-11
     p-2

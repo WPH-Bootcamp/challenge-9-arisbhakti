@@ -1,13 +1,54 @@
+const formatRupiah = (value: number) =>
+  new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(value);
+
+const formatDate = (iso: string) =>
+  new Intl.DateTimeFormat("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(iso));
+
+type SuccessPayload = {
+  date: string;
+  paymentMethod: string;
+  totalItems: number;
+  price: number;
+  deliveryFee: number;
+  serviceFee: number;
+  total: number;
+};
+
 export default function Success() {
+  const raw = localStorage.getItem("checkout_success");
+  const data = raw ? (JSON.parse(raw) as SuccessPayload) : null;
+  const fallback: SuccessPayload = {
+    date: new Date().toISOString(),
+    paymentMethod: "Bank Negara Indonesia",
+    totalItems: 0,
+    price: 0,
+    deliveryFee: 15000,
+    serviceFee: 5000,
+    total: 0,
+  };
+  const payload = data ?? fallback;
+
   return (
     <main className="min-h-screen w-full bg-[#FAFAFA] flex flex-col items-center justify-center px-4  text-neutral-950 gap-7">
       <div className="flex items-center gap-3 ">
         <img
           src="/images/common/logo-foody.svg"
           alt="Foody"
-          className="w-7 h-7"
+          className="w-7 h-7 md:w-10.5 md:h-10.5"
         />
-        <span className="text-2xl font-bold">Foody</span>
+        <span className="text-2xl  md:text-[32px] leading-10.5 font-extrabold">
+          Foody
+        </span>
       </div>
 
       <section className="w-full md:w-107 bg-white rounded-3xl shadow-sm px-4 py-4 md:px-5 md:py-5 relative gap-4">
@@ -33,7 +74,7 @@ export default function Success() {
             <div className="flex items-center justify-between">
               <span className="text-sm leading-7 font-medium">Date</span>
               <span className="font-semibold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
-                25 August 2025, 15:51
+                {formatDate(payload.date)}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -41,15 +82,15 @@ export default function Success() {
                 Payment Method
               </span>
               <span className="font-semibold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
-                Bank Rakyat Indonesia
+                {payload.paymentMethod}
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm leading-7 font-medium">
-                Price ( 2 items)
+                Price ( {payload.totalItems} items)
               </span>
               <span className="font-semibold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
-                Rp100.000
+                {formatRupiah(payload.price)}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -57,13 +98,13 @@ export default function Success() {
                 Delivery Fee
               </span>
               <span className="font-semibold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
-                Rp10.000
+                {formatRupiah(payload.deliveryFee)}
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm leading-7 font-medium">Service Fee</span>
               <span className="font-semibold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
-                Rp1.000
+                {formatRupiah(payload.serviceFee)}
               </span>
             </div>
           </div>
@@ -77,7 +118,7 @@ export default function Success() {
               Total
             </span>
             <span className="text-base font-extrabold leading-7.5 md:text-lg md:leading-8 -tracking-[0.02em] ">
-              Rp1.000
+              {formatRupiah(payload.total)}
             </span>
           </div>
         </div>
