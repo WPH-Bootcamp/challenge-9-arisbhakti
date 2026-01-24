@@ -1,5 +1,8 @@
 import * as React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { api } from "@/lib/api";
 
 type SignInForm = {
   email: string;
@@ -15,10 +18,32 @@ type SignUpForm = {
   confirmPassword: string;
 };
 
+type SignInErrors = {
+  email?: string;
+  password?: string;
+  form?: string;
+};
+
+type SignUpErrors = {
+  name?: string;
+  email?: string;
+  phone?: string;
+  password?: string;
+  confirmPassword?: string;
+  form?: string;
+};
+
 export default function AuthPage() {
+  const navigate = useNavigate();
   const [tab, setTab] = React.useState<"signin" | "signup">("signin");
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirm, setShowConfirm] = React.useState(false);
+  const [signInLoading, setSignInLoading] = React.useState(false);
+  const [signUpLoading, setSignUpLoading] = React.useState(false);
+  const [signInErrors, setSignInErrors] = React.useState<SignInErrors>({});
+  const [signUpErrors, setSignUpErrors] = React.useState<SignUpErrors>({});
+  const [signInAnimate, setSignInAnimate] = React.useState(false);
+  const [signUpAnimate, setSignUpAnimate] = React.useState(false);
 
   const [signIn, setSignIn] = React.useState<SignInForm>({
     email: "",
@@ -34,14 +59,146 @@ export default function AuthPage() {
     confirmPassword: "",
   });
 
-  const onSubmitSignIn = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("SIGN IN:", signIn);
+  const triggerSignInAnimation = () => {
+    setSignInAnimate(true);
+    window.setTimeout(() => setSignInAnimate(false), 400);
   };
 
-  const onSubmitSignUp = (e: React.FormEvent) => {
+  const triggerSignUpAnimation = () => {
+    setSignUpAnimate(true);
+    window.setTimeout(() => setSignUpAnimate(false), 400);
+  };
+
+  const getErrorMessage = (error: unknown) => {
+    if (axios.isAxiosError(error)) {
+      const data = error.response?.data as
+        | { message?: string; errors?: string[] }
+        | undefined;
+      if (data?.errors?.length) return data.errors.join(", ");
+      if (data?.message) return data.message;
+    }
+    return "Terjadi kesalahan. Coba lagi.";
+  };
+
+  const validateSignIn = (data: SignInForm) => {
+    const next: SignInErrors = {};
+    const email = data.email.trim();
+    const password = data.password;
+
+    if (!email) next.email = "Email wajib diisi.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      next.email = "Format email tidak valid.";
+
+    if (!password) next.password = "Password wajib diisi.";
+    else if (password.length < 6)
+      next.password = "Password minimal 6 karakter.";
+
+    return next;
+  };
+
+  const validateSignUp = (data: SignUpForm) => {
+    const next: SignUpErrors = {};
+    const name = data.name.trim();
+    const email = data.email.trim();
+    const phoneDigits = data.phone.replace(/\D/g, "");
+    const password = data.password;
+    const confirmPassword = data.confirmPassword;
+
+    if (!name) next.name = "Nama wajib diisi.";
+    else if (name.length < 2) next.name = "Nama minimal 2 karakter.";
+
+    if (!email) next.email = "Email wajib diisi.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      next.email = "Format email tidak valid.";
+
+    if (!data.phone) next.phone = "Nomor telepon wajib diisi.";
+    else if (phoneDigits.length < 8 || phoneDigits.length > 15)
+      next.phone = "Nomor telepon harus 8-15 digit.";
+
+    if (!password) next.password = "Password wajib diisi.";
+    else if (password.length < 6)
+      next.password = "Password minimal 6 karakter.";
+
+    if (!confirmPassword)
+      next.confirmPassword = "Konfirmasi password wajib diisi.";
+    else if (confirmPassword !== password)
+      next.confirmPassword = "Password tidak sama.";
+
+    return next;
+  };
+
+  const onSubmitSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("SIGN UP:", signUp);
+    setSignInErrors({});
+    const errors = validateSignIn(signIn);
+    if (Object.keys(errors).length > 0) {
+      setSignInErrors(errors);
+      triggerSignInAnimation();
+      return;
+    }
+
+    try {
+      setSignInLoading(true);
+      const response = await api.post("/api/auth/login", {
+        email: signIn.email.trim(),
+        password: signIn.password,
+      });
+
+      const token = response.data?.data?.token;
+      const user = response.data?.data?.user;
+
+      if (token) {
+        localStorage.setItem("auth_token", token);
+        localStorage.setItem("auth_user", JSON.stringify(user ?? {}));
+        navigate("/");
+      } else {
+        setSignInErrors({ form: "Login gagal. Silakan coba lagi." });
+        triggerSignInAnimation();
+      }
+    } catch (error) {
+      setSignInErrors({ form: getErrorMessage(error) });
+      triggerSignInAnimation();
+    } finally {
+      setSignInLoading(false);
+    }
+  };
+
+  const onSubmitSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSignUpErrors({});
+    const errors = validateSignUp(signUp);
+    if (Object.keys(errors).length > 0) {
+      setSignUpErrors(errors);
+      triggerSignUpAnimation();
+      return;
+    }
+
+    try {
+      setSignUpLoading(true);
+      const response = await api.post("/api/auth/register", {
+        name: signUp.name.trim(),
+        email: signUp.email.trim(),
+        phone: signUp.phone.trim(),
+        password: signUp.password,
+      });
+
+      const token = response.data?.data?.token;
+      const user = response.data?.data?.user;
+
+      if (token) {
+        localStorage.setItem("auth_token", token);
+        localStorage.setItem("auth_user", JSON.stringify(user ?? {}));
+        navigate("/");
+      } else {
+        setSignUpErrors({ form: "Register gagal. Silakan coba lagi." });
+        triggerSignUpAnimation();
+      }
+    } catch (error) {
+      setSignUpErrors({ form: getErrorMessage(error) });
+      triggerSignUpAnimation();
+    } finally {
+      setSignUpLoading(false);
+    }
   };
 
   return (
@@ -88,7 +245,11 @@ export default function AuthPage() {
             <div className="">
               <Tabs
                 value={tab}
-                onValueChange={(v) => setTab(v as "signin" | "signup")}
+                onValueChange={(v) => {
+                  setTab(v as "signin" | "signup");
+                  setSignInErrors({});
+                  setSignUpErrors({});
+                }}
               >
                 <TabsList className="h-14 w-full rounded-full bg-neutral-100 p-1">
                   <TabsTrigger
@@ -118,8 +279,21 @@ export default function AuthPage() {
                       onChange={(e) =>
                         setSignIn((p) => ({ ...p, email: e.target.value }))
                       }
-                      className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
+                      className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                        signInErrors.email
+                          ? "border-red-400 focus:border-red-400"
+                          : "border-neutral-200 focus:border-neutral-300"
+                      } ${signInAnimate && signInErrors.email ? "animate-shake" : ""}`}
                     />
+                    {signInErrors.email ? (
+                      <p
+                        className={`-mt-3 text-xs text-red-600 ${
+                          signInAnimate ? "animate-shake" : ""
+                        }`}
+                      >
+                        {signInErrors.email}
+                      </p>
+                    ) : null}
 
                     <div className="relative">
                       <input
@@ -129,7 +303,15 @@ export default function AuthPage() {
                         onChange={(e) =>
                           setSignIn((p) => ({ ...p, password: e.target.value }))
                         }
-                        className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
+                        className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                          signInErrors.password
+                            ? "border-red-400 focus:border-red-400"
+                            : "border-neutral-200 focus:border-neutral-300"
+                        } ${
+                          signInAnimate && signInErrors.password
+                            ? "animate-shake"
+                            : ""
+                        }`}
                       />
                       <button
                         type="button"
@@ -145,6 +327,15 @@ export default function AuthPage() {
                         />
                       </button>
                     </div>
+                    {signInErrors.password ? (
+                      <p
+                        className={`-mt-3 text-xs text-red-600 ${
+                          signInAnimate ? "animate-shake" : ""
+                        }`}
+                      >
+                        {signInErrors.password}
+                      </p>
+                    ) : null}
 
                     <label className="flex cursor-pointer items-center gap-3 select-none">
                       <span className="relative flex h-6 w-6 items-center justify-center">
@@ -166,11 +357,22 @@ export default function AuthPage() {
                       </span>
                     </label>
 
+                    {signInErrors.form ? (
+                      <p
+                        className={`-mt-2 text-sm text-red-600 ${
+                          signInAnimate ? "animate-shake" : ""
+                        }`}
+                      >
+                        {signInErrors.form}
+                      </p>
+                    ) : null}
+
                     <button
                       type="submit"
+                      disabled={signInLoading}
                       className=" h-12 w-full rounded-full px-2 py-2 bg-primary-100 text-[16px] leading-7.5 -tracking-[0.02em] font-bold text-neutral-25 shadow-[0_10px_20px_rgba(184,13,13,0.18)] transition active:scale-[0.99]"
                     >
-                      Login
+                      {signInLoading ? "Loading..." : "Login"}
                     </button>
                   </form>
                 </TabsContent>
@@ -189,8 +391,21 @@ export default function AuthPage() {
                       onChange={(e) =>
                         setSignUp((p) => ({ ...p, name: e.target.value }))
                       }
-                      className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
+                      className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                        signUpErrors.name
+                          ? "border-red-400 focus:border-red-400"
+                          : "border-neutral-200 focus:border-neutral-300"
+                      } ${signUpAnimate && signUpErrors.name ? "animate-shake" : ""}`}
                     />
+                    {signUpErrors.name ? (
+                      <p
+                        className={`-mt-3 text-xs text-red-600 ${
+                          signUpAnimate ? "animate-shake" : ""
+                        }`}
+                      >
+                        {signUpErrors.name}
+                      </p>
+                    ) : null}
 
                     <input
                       type="email"
@@ -199,8 +414,21 @@ export default function AuthPage() {
                       onChange={(e) =>
                         setSignUp((p) => ({ ...p, email: e.target.value }))
                       }
-                      className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
+                      className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                        signUpErrors.email
+                          ? "border-red-400 focus:border-red-400"
+                          : "border-neutral-200 focus:border-neutral-300"
+                      } ${signUpAnimate && signUpErrors.email ? "animate-shake" : ""}`}
                     />
+                    {signUpErrors.email ? (
+                      <p
+                        className={`-mt-3 text-xs text-red-600 ${
+                          signUpAnimate ? "animate-shake" : ""
+                        }`}
+                      >
+                        {signUpErrors.email}
+                      </p>
+                    ) : null}
 
                     <input
                       type="tel"
@@ -209,8 +437,21 @@ export default function AuthPage() {
                       onChange={(e) =>
                         setSignUp((p) => ({ ...p, phone: e.target.value }))
                       }
-                      className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
+                      className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                        signUpErrors.phone
+                          ? "border-red-400 focus:border-red-400"
+                          : "border-neutral-200 focus:border-neutral-300"
+                      } ${signUpAnimate && signUpErrors.phone ? "animate-shake" : ""}`}
                     />
+                    {signUpErrors.phone ? (
+                      <p
+                        className={`-mt-3 text-xs text-red-600 ${
+                          signUpAnimate ? "animate-shake" : ""
+                        }`}
+                      >
+                        {signUpErrors.phone}
+                      </p>
+                    ) : null}
 
                     <div className="relative">
                       <input
@@ -220,7 +461,15 @@ export default function AuthPage() {
                         onChange={(e) =>
                           setSignUp((p) => ({ ...p, password: e.target.value }))
                         }
-                        className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
+                        className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                          signUpErrors.password
+                            ? "border-red-400 focus:border-red-400"
+                            : "border-neutral-200 focus:border-neutral-300"
+                        } ${
+                          signUpAnimate && signUpErrors.password
+                            ? "animate-shake"
+                            : ""
+                        }`}
                       />
                       <button
                         type="button"
@@ -236,6 +485,15 @@ export default function AuthPage() {
                         />
                       </button>
                     </div>
+                    {signUpErrors.password ? (
+                      <p
+                        className={`-mt-3 text-xs text-red-600 ${
+                          signUpAnimate ? "animate-shake" : ""
+                        }`}
+                      >
+                        {signUpErrors.password}
+                      </p>
+                    ) : null}
 
                     <div className="relative">
                       <input
@@ -248,7 +506,15 @@ export default function AuthPage() {
                             confirmPassword: e.target.value,
                           }))
                         }
-                        className="h-12 md:h-14 w-full rounded-2xl border border-neutral-200 bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] focus:border-neutral-300"
+                        className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                          signUpErrors.confirmPassword
+                            ? "border-red-400 focus:border-red-400"
+                            : "border-neutral-200 focus:border-neutral-300"
+                        } ${
+                          signUpAnimate && signUpErrors.confirmPassword
+                            ? "animate-shake"
+                            : ""
+                        }`}
                       />
                       <button
                         type="button"
@@ -264,13 +530,33 @@ export default function AuthPage() {
                         />
                       </button>
                     </div>
+                    {signUpErrors.confirmPassword ? (
+                      <p
+                        className={`-mt-3 text-xs text-red-600 ${
+                          signUpAnimate ? "animate-shake" : ""
+                        }`}
+                      >
+                        {signUpErrors.confirmPassword}
+                      </p>
+                    ) : null}
 
                     {/* FIX: button label like design */}
+                    {signUpErrors.form ? (
+                      <p
+                        className={`-mt-2 text-sm text-red-600 ${
+                          signUpAnimate ? "animate-shake" : ""
+                        }`}
+                      >
+                        {signUpErrors.form}
+                      </p>
+                    ) : null}
+
                     <button
                       type="submit"
+                      disabled={signUpLoading}
                       className=" h-12 w-full rounded-full px-2 py-2 bg-primary-100 text-[16px] leading-7.5 -tracking-[0.02em] font-bold text-neutral-25 shadow-[0_10px_20px_rgba(184,13,13,0.18)] transition active:scale-[0.99]"
                     >
-                      Register
+                      {signUpLoading ? "Loading..." : "Register"}
                     </button>
                   </form>
                 </TabsContent>

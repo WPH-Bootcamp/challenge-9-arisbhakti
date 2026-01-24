@@ -1,11 +1,18 @@
-import axios from 'axios';
+import axios from "axios";
+
+const rawBaseUrl = import.meta.env.VITE_API_URL as string | undefined;
+const sanitizedBaseUrl = rawBaseUrl
+  ? rawBaseUrl.replace(/\/api-swagger\/?$/i, "")
+  : "";
+
+export const API_BASE_URL = sanitizedBaseUrl;
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL,
+  baseURL: API_BASE_URL,
 });
 
 api.interceptors.request.use((config) => {
-  const token = import.meta.env.VITE_READ_ACCESS_TOKEN;
+  const token = localStorage.getItem("auth_token");
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
