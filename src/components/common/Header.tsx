@@ -68,9 +68,13 @@ const Header = () => {
 
   useEffect(() => {
     const syncAuth = () => {
-      const token = localStorage.getItem("auth_token");
+      const token =
+        localStorage.getItem("auth_token") ||
+        sessionStorage.getItem("auth_token");
       setIsLogin(Boolean(token));
-      const rawUser = localStorage.getItem("auth_user");
+      const rawUser =
+        localStorage.getItem("auth_user") ||
+        sessionStorage.getItem("auth_user");
       if (rawUser) {
         try {
           const parsed = JSON.parse(rawUser) as {
@@ -293,6 +297,8 @@ const Header = () => {
                       onClick={() => {
                         localStorage.removeItem("auth_token");
                         localStorage.removeItem("auth_user");
+                        sessionStorage.removeItem("auth_token");
+                        sessionStorage.removeItem("auth_user");
                         localStorage.removeItem("cart_state");
                         dispatch(clearCart());
                         dispatch(clearFilters());

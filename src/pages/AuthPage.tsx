@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { api } from "@/lib/api";
@@ -159,8 +160,17 @@ export default function AuthPage() {
       const user = response.data?.data?.user;
 
       if (token) {
-        localStorage.setItem("auth_token", token);
-        localStorage.setItem("auth_user", JSON.stringify(user ?? {}));
+        if (signIn.remember) {
+          localStorage.setItem("auth_token", token);
+          localStorage.setItem("auth_user", JSON.stringify(user ?? {}));
+          sessionStorage.removeItem("auth_token");
+          sessionStorage.removeItem("auth_user");
+        } else {
+          sessionStorage.setItem("auth_token", token);
+          sessionStorage.setItem("auth_user", JSON.stringify(user ?? {}));
+          localStorage.removeItem("auth_token");
+          localStorage.removeItem("auth_user");
+        }
         navigate("/");
       } else {
         setSignInErrors({ form: "Login gagal. Silakan coba lagi." });
@@ -199,6 +209,8 @@ export default function AuthPage() {
       if (token) {
         localStorage.setItem("auth_token", token);
         localStorage.setItem("auth_user", JSON.stringify(user ?? {}));
+        sessionStorage.removeItem("auth_token");
+        sessionStorage.removeItem("auth_user");
         navigate("/");
       } else {
         setSignUpErrors({ form: "Register gagal. Silakan coba lagi." });
@@ -349,20 +361,16 @@ export default function AuthPage() {
                     ) : null}
 
                     <label className="flex cursor-pointer items-center gap-3 select-none">
-                      <span className="relative flex h-6 w-6 items-center justify-center">
-                        <input
-                          type="checkbox"
-                          checked={signIn.remember}
-                          onChange={(e) =>
-                            setSignIn((p) => ({
-                              ...p,
-                              remember: e.target.checked,
-                            }))
-                          }
-                          className="peer h-6 w-6 appearance-none rounded-md border border-neutral-300 bg-white outline-none transition"
-                        />
-                        <span className="pointer-events-none absolute h-3 w-3 scale-0 rounded-[3px] bg-neutral-900 transition peer-checked:scale-100" />
-                      </span>
+                      <Checkbox
+                        checked={signIn.remember}
+                        onCheckedChange={(checked) =>
+                          setSignIn((p) => ({
+                            ...p,
+                            remember: Boolean(checked),
+                          }))
+                        }
+                        className="h-6 w-6 rounded-md border-neutral-300 data-[state=checked]:bg-primary-100 data-[state=checked]:border-primary-100 cursor-pointer"
+                      />
                       <span className="text-[14px] leading-7 md:text-[16px] md:leading-7.5 -tracking-[0.03em] font-medium text-neutral-900">
                         Remember Me
                       </span>
