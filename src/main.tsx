@@ -20,41 +20,45 @@ import MyOrders from "./pages/MyOrders";
 import BlankLayout from "./components/Layout/BlankLayout";
 import MyOrdersLayout from "./components/Layout/MyOrdersLayout";
 import Profile from "./pages/Profile";
+import { Provider } from "react-redux";
+import { store } from "./app/store";
 
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <TrailerModalProvider>
-          <ScrollToTop />
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <TrailerModalProvider>
+            <ScrollToTop />
 
-          <Routes>
-            <Route element={<App />}>
-              <Route path="/" element={<Home />} />
-              <Route path="/favorites" element={<Favorites />} />
-              <Route path="/details/:id" element={<Details />} />
-              <Route path="/category" element={<Category />} />
-              <Route path="/mycart" element={<MyCart />} />
-              <Route path="/checkout" element={<Checkout />} />
+            <Routes>
+              <Route element={<App />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/favorites" element={<Favorites />} />
+                <Route path="/details/:id" element={<Details />} />
+                <Route path="/category" element={<Category />} />
+                <Route path="/mycart" element={<MyCart />} />
+                <Route path="/checkout" element={<Checkout />} />
 
-              <Route path="/myorders" element={<MyOrdersLayout />}>
-                <Route index element={<MyOrders />} />
-                <Route path="orders" element={<MyOrders />} />
-                <Route path="profile" element={<Profile />} />
+                <Route path="/myorders" element={<MyOrdersLayout />}>
+                  <Route index element={<MyOrders />} />
+                  <Route path="orders" element={<MyOrders />} />
+                  <Route path="profile" element={<Profile />} />
+                </Route>
               </Route>
-            </Route>
 
-            <Route element={<BlankLayout />}>
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/success" element={<Success />} />
-            </Route>
-          </Routes>
+              <Route element={<BlankLayout />}>
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/success" element={<Success />} />
+              </Route>
+            </Routes>
 
-          <Toaster position="top-center" />
-        </TrailerModalProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+            <Toaster position="top-center" />
+          </TrailerModalProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </Provider>
   </React.StrictMode>,
 );
