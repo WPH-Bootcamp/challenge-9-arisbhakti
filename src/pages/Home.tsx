@@ -6,6 +6,8 @@ import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { useDispatch } from "react-redux";
+import { setDistance } from "@/features/filters/categoryFilterSlice";
 
 type RecommendedItem = {
   id: number;
@@ -36,6 +38,7 @@ type RecommendedResponse = {
 
 const Home = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [keyword, setKeyword] = useState("");
   const [activeList, setActiveList] = useState<
     | "recommended"
@@ -326,7 +329,10 @@ const Home = () => {
             </div>
             <div
               className="flex flex-col gap-1 md:gap-1.5 cursor-pointer"
-              onClick={() => setActiveList("nearby")}
+              onClick={() => {
+                dispatch(setDistance("nearby"));
+                navigate("/category");
+              }}
             >
               <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
                 <img
@@ -476,7 +482,14 @@ const Home = () => {
                           onClick={() =>
                             navigate("/auth", { state: { tab: "signin" } })
                           }
-                          className="h-9 rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em]"
+                          className="h-10 md:h-11
+    p-2
+    w-40 md:w-60
+    rounded-[100px]
+    bg-primary-100 text-white
+    font-bold
+    text-[14px] leading-7 -tracking-[0.02em]
+    md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
                         >
                           Login untuk melihat data
                         </Button>

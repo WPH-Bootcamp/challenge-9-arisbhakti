@@ -48,7 +48,7 @@ export default function CheckoutBottomBar({ cartCount, totalPrice }: Props) {
     bg-primary-100 text-white
     font-bold
     text-[14px] leading-7 -tracking-[0.02em]
-    md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]
+    md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer
   "
         >
           Checkout
