@@ -254,7 +254,10 @@ const Home = () => {
   return (
     <>
       {/* HERO BACKGROUND */}
-      <div className="relative w-full h-162 md:h-206.75 overflow-hidden">
+      <div
+        id="hero-background"
+        className="relative w-full h-162 md:h-206.75 overflow-hidden"
+      >
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat text-xl"
           style={{
