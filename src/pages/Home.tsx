@@ -42,6 +42,7 @@ const Home = () => {
     | "discount"
     | "delivery"
     | "lunch"
+    | "search"
   >("recommended");
   const bestSellerLimit = 20;
   const allRestaurantsLimit = 20;
@@ -50,6 +51,12 @@ const Home = () => {
 
   const handleSearch = (value: string) => {
     setKeyword(value);
+    const next = value.trim();
+    if (next.length > 0) {
+      setActiveList("search");
+    } else {
+      setActiveList("recommended");
+    }
   };
 
   const recommendedQuery = useQuery({
@@ -85,6 +92,17 @@ const Home = () => {
       const count = lastPage.data?.restaurants?.length ?? 0;
       return count < bestSellerLimit ? undefined : pages.length + 1;
     },
+  });
+
+  const searchQuery = useQuery({
+    queryKey: ["search-resto", keyword],
+    queryFn: async () => {
+      const response = await api.get<RecommendedResponse>("/api/resto/search", {
+        params: { q: keyword.trim(), page: 1, limit: 20 },
+      });
+      return response.data;
+    },
+    enabled: activeList === "search" && keyword.trim().length > 0,
   });
 
   const allRestaurantsQuery = useInfiniteQuery({
@@ -146,7 +164,9 @@ const Home = () => {
         ? bestSellerQuery.isLoading
         : activeList === "all-restaurants"
           ? allRestaurantsQuery.isLoading
-          : nearbyQuery.isLoading;
+          : activeList === "nearby"
+            ? nearbyQuery.isLoading
+            : searchQuery.isLoading;
   const isError =
     activeList === "recommended"
       ? recommendedQuery.isError
@@ -154,7 +174,9 @@ const Home = () => {
         ? bestSellerQuery.isError
         : activeList === "all-restaurants"
           ? allRestaurantsQuery.isError
-          : nearbyQuery.isError;
+          : activeList === "nearby"
+            ? nearbyQuery.isError
+            : searchQuery.isError;
   const errorMessage =
     activeList === "recommended"
       ? getErrorMessage(recommendedQuery.error)
@@ -162,7 +184,9 @@ const Home = () => {
         ? getErrorMessage(bestSellerQuery.error)
         : activeList === "all-restaurants"
           ? getErrorMessage(allRestaurantsQuery.error)
-          : getErrorMessage(nearbyQuery.error);
+          : activeList === "nearby"
+            ? getErrorMessage(nearbyQuery.error)
+            : getErrorMessage(searchQuery.error);
 
   const recommendations = recommendedQuery.data?.data?.recommendations ?? [];
   const bestSellers =
@@ -177,6 +201,7 @@ const Home = () => {
     nearbyQuery.data?.pages.flatMap(
       (page) => page.data?.restaurants ?? [],
     ) ?? [];
+  const searchRestaurants = searchQuery.data?.data?.restaurants ?? [];
   const items =
     activeList === "recommended"
       ? recommendations
@@ -186,7 +211,9 @@ const Home = () => {
           ? allRestaurants
           : activeList === "nearby"
             ? nearbyRestaurants
-            : [];
+            : activeList === "search"
+              ? searchRestaurants
+              : [];
 
   const titleText =
     activeList === "recommended"
@@ -201,7 +228,9 @@ const Home = () => {
               ? "Discount"
               : activeList === "delivery"
                 ? "Delivery"
-                : "Lunch";
+                : activeList === "lunch"
+                  ? "Lunch"
+                  : `Search Result of ${keyword.trim()}`;
 
   return (
     <>
@@ -464,6 +493,7 @@ const Home = () => {
             <button
               disabled={
                 activeList === "recommended" ||
+                activeList === "search" ||
                 activeList === "discount" ||
                 activeList === "delivery" ||
                 activeList === "lunch" ||
@@ -485,6 +515,7 @@ const Home = () => {
               }}
               className={`h-10 w-40 ring-1 ring-inset ring-neutral-300 rounded-[100px] text-[14px] leading-7 -tracking-[0.02em] font-bold ${
                 activeList === "recommended" ||
+                activeList === "search" ||
                 activeList === "discount" ||
                 activeList === "delivery" ||
                 activeList === "lunch" ||
@@ -497,6 +528,7 @@ const Home = () => {
               }`}
             >
               {activeList === "recommended" ||
+              activeList === "search" ||
               activeList === "discount" ||
               activeList === "delivery" ||
               activeList === "lunch" ||
