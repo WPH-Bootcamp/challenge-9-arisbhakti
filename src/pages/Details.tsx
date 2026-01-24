@@ -125,6 +125,10 @@ export default function Details() {
 
   const hasMoreMenu = (detail?.menus?.length ?? 0) >= menuLimit;
   const hasMoreReview = (detail?.reviews?.length ?? 0) >= reviewLimit;
+  const filteredMenus =
+    detail?.menus?.filter((menu) =>
+      menuFilter === "all" ? true : menu.type === menuFilter,
+    ) ?? [];
 
   return (
     <main className="w-full px-4 md:px-30 md:mt-32 pt-4 md:pt-0 mt-16 flex flex-col gap-4 md:gap-8 text-neutral-950">
@@ -225,7 +229,7 @@ export default function Details() {
                 </div>
               </div>
             </div>
-            <button className="h-fit w-fit p-3 rounded-[100px] ring-1 ring-neutral-300 ring-inset flex flex-row gap-3 items-center justify-center md:px-4 md:py-3 md:h-11 md:w-35">
+            <button className="h-fit w-fit p-3 rounded-[100px] ring-1 ring-neutral-300 ring-inset flex flex-row gap-3 items-center justify-center md:px-4 md:py-3 md:h-11 md:w-35 cursor-pointer">
               <img
                 src="/images/common/share.svg"
                 alt="share"
@@ -246,7 +250,7 @@ export default function Details() {
                   menuFilter === "all"
                     ? "ring-primary-100 bg-[#FFECEC] text-primary-100"
                     : "ring-neutral-300 text-neutral-950"
-                }`}
+                } cursor-pointer`}
               >
                 All Menu
               </button>
@@ -256,7 +260,7 @@ export default function Details() {
                   menuFilter === "food"
                     ? "ring-primary-100 bg-[#FFECEC] text-primary-100"
                     : "ring-neutral-300 text-neutral-950"
-                }`}
+                } cursor-pointer`}
               >
                 Food
               </button>
@@ -266,19 +270,30 @@ export default function Details() {
                   menuFilter === "drink"
                     ? "ring-primary-100 bg-[#FFECEC] text-primary-100"
                     : "ring-neutral-300 text-neutral-950"
-                }`}
+                } cursor-pointer`}
               >
                 Drink
               </button>
             </div>
           </article>
 
-          <article className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4 md:gap-x-5 md:gap-y-6">
-            {detail.menus
-              .filter((menu) =>
-                menuFilter === "all" ? true : menu.type === menuFilter,
-              )
-              .map((menu) => (
+          {filteredMenus.length === 0 ? (
+            <Alert>
+              <AlertTitle>Belum ada menu</AlertTitle>
+              <AlertDescription>
+                Menu untuk kategori{" "}
+                {menuFilter === "all"
+                  ? "All Menu"
+                  : menuFilter === "food"
+                    ? "Food"
+                    : "Drink"}{" "}
+                belum tersedia. Coba pilih kategori lain atau kembali lagi
+                nanti.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <article className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4 md:gap-x-5 md:gap-y-6">
+              {filteredMenus.map((menu) => (
                 <div
                   key={menu.id}
                   className="flex flex-col shadow-[0_8px_24px_rgba(0,0,0,0.08)] rounded-3xl"
@@ -301,14 +316,15 @@ export default function Details() {
                     </h3>
                   </div>
                   <div className="flex md:flex-1">
-                    <button className="h-9 md:h-10 w-full rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]">
+                    <button className="h-9 md:h-10 w-full rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer">
                       Add
                     </button>
                   </div>
                   </div>
                 </div>
-            ))}
-          </article>
+              ))}
+            </article>
+          )}
 
           <div className="flex flex-row flex-1 w-full items-center justify-center pb-4 md:pb-0">
             <button
@@ -317,7 +333,7 @@ export default function Details() {
               className={`h-10 w-40 ring-1 ring-inset ring-neutral-300 rounded-[100px] text-[14px] leading-7 -tracking-[0.02em] font-bold ${
                 !hasMoreMenu || isFetching
                   ? "text-neutral-400 cursor-not-allowed"
-                  : "text-neutral-950"
+                  : "text-neutral-950 cursor-pointer"
               }`}
             >
               {!hasMoreMenu
@@ -387,7 +403,7 @@ export default function Details() {
               className={`h-10 w-40 ring-1 ring-inset ring-neutral-300 rounded-[100px] text-[14px] leading-7 -tracking-[0.02em] font-bold ${
                 !hasMoreReview || isFetching
                   ? "text-neutral-400 cursor-not-allowed"
-                  : "text-neutral-950"
+                  : "text-neutral-950 cursor-pointer"
               }`}
             >
               {!hasMoreReview
