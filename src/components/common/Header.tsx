@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { api } from "@/lib/api";
 import type { RootState } from "@/app/store";
 import { clearCart } from "@/features/cart/cartSlice";
 import { clearFilters } from "@/features/filters/categoryFilterSlice";
@@ -26,9 +29,21 @@ const Header = () => {
   const [isLogin, setIsLogin] = useState(false);
   const [profileName, setProfileName] = useState("User");
   const [profileAvatar, setProfileAvatar] = useState<string | null>(null);
-  const cartCount = useSelector((state: RootState) =>
-    state.cart.items.reduce((sum, item) => sum + item.qty, 0),
-  );
+  const { data: cartData, isError: cartError, error: cartErr } = useQuery({
+    queryKey: ["cart"],
+    queryFn: async () => {
+      const response = await api.get("/api/cart");
+      return response.data as {
+        data?: { summary?: { totalItems: number } };
+      };
+    },
+  });
+  const cartCount =
+    cartError &&
+    axios.isAxiosError(cartErr) &&
+    cartErr.response?.status === 401
+      ? 0
+      : cartData?.data?.summary?.totalItems ?? 0;
   const theme = useSelector((state: RootState) => state.theme.mode);
 
   useEffect(() => {

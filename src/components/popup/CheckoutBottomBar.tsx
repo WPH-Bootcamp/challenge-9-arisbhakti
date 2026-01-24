@@ -1,13 +1,37 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { api } from "@/lib/api";
 
-type Props = {
-  cartCount: number;
-  totalPrice: number;
+type CartResponse = {
+  success: boolean;
+  message: string;
+  data?: {
+    summary?: {
+      totalItems: number;
+      totalPrice: number;
+      restaurantCount: number;
+    };
+  };
 };
 
-export default function CheckoutBottomBar({ cartCount, totalPrice }: Props) {
+export default function CheckoutBottomBar() {
   const navigate = useNavigate();
+  const { data, isError, error } = useQuery({
+    queryKey: ["cart"],
+    queryFn: async () => {
+      const response = await api.get<CartResponse>("/api/cart");
+      return response.data;
+    },
+  });
+
+  if (isError && axios.isAxiosError(error) && error.response?.status === 401) {
+    return null;
+  }
+
+  const cartCount = data?.data?.summary?.totalItems ?? 0;
+  const totalPrice = data?.data?.summary?.totalPrice ?? 0;
   const isVisible = cartCount > 0;
   if (!isVisible) return null;
 

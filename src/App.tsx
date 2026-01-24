@@ -1,8 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setTheme } from "./features/theme/themeSlice";
-import type { RootState } from "./app/store";
 
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
@@ -12,12 +11,6 @@ export default function App() {
   const location = useLocation();
   const dispatch = useDispatch();
   //const theme = useSelector((state: RootState) => state.theme.mode);
-  const cartCount = useSelector((state: RootState) =>
-    state.cart.items.reduce((sum, item) => sum + item.qty, 0),
-  );
-  const totalPrice = useSelector((state: RootState) =>
-    state.cart.items.reduce((sum, item) => sum + item.price * item.qty, 0),
-  );
   const hideCheckoutBar =
     location.pathname === "/mycart" || location.pathname === "/checkout";
 
@@ -37,9 +30,7 @@ export default function App() {
         <Outlet />
       </main>
       <Footer />
-      {!hideCheckoutBar && (
-        <CheckoutBottomBar cartCount={cartCount} totalPrice={totalPrice} />
-      )}
+      {!hideCheckoutBar && <CheckoutBottomBar />}
     </div>
   );
 }

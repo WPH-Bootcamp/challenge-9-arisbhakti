@@ -246,6 +246,10 @@ export default function Details() {
       if (typeof quantity === "number") {
         dispatch(updateQuantity({ menuId: payload.menuId, qty: quantity }));
       }
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
 
@@ -282,6 +286,10 @@ export default function Details() {
       if (typeof quantity === "number" && target) {
         dispatch(updateQuantity({ menuId: target.menuId, qty: quantity }));
       }
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
 
@@ -303,6 +311,12 @@ export default function Details() {
       if (context?.previousItems) {
         dispatch(setItems(context.previousItems));
       }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
 

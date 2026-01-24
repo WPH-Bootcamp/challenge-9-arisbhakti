@@ -1,6 +1,6 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
@@ -47,6 +47,7 @@ const formatRupiah = (value: number) =>
 export default function Checkout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const state = (location.state || {}) as CheckoutState;
   const cartGroups = state.cart ?? [];
   const summary = state.summary;
@@ -90,7 +91,28 @@ export default function Checkout() {
       const response = await api.post("/api/order/checkout", payload);
       return response.data as { success: boolean };
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      queryClient.setQueryData(["cart"], (prev) => {
+        if (!prev || typeof prev !== "object") return prev;
+        return {
+          ...prev,
+          data: {
+            ...(prev as { data?: unknown }).data,
+            summary: {
+              totalItems: 0,
+              totalPrice: 0,
+              restaurantCount: 0,
+            },
+          },
+        };
+      });
+      const cartItemIds = cartGroups.flatMap((group) =>
+        group.items.map((item) => item.id),
+      );
+      await Promise.allSettled(
+        cartItemIds.map((id) => api.delete(`/api/cart/${id}`)),
+      );
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
       const successPayload = {
         date: new Date().toISOString(),
         paymentMethod,
