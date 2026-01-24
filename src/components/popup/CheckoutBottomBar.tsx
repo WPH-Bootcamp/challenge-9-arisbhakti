@@ -9,6 +9,12 @@ export default function CheckoutBottomBar({ cartCount, totalPrice }: Props) {
   const isVisible = cartCount > 0;
   if (!isVisible) return null;
 
+  const formattedTotal = new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(totalPrice);
+
   return (
     <div className="fixed bottom-1.5 left-0 right-0 z-50 w-full h-16 md:bottom-3">
       <div className="flex items-center justify-between px-4 md:px-30 shadow-[0_-12px_24px_-12px_rgba(0,0,0,0.18)] bg-white py-2  ">
@@ -24,8 +30,11 @@ export default function CheckoutBottomBar({ cartCount, totalPrice }: Props) {
             </span>
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="font-extrabold text-base leading-7.5 md:text-xl md:leading-8.5">
-              Rp{totalPrice}
+            <span
+              id="total-price"
+              className="font-extrabold text-base leading-7.5 md:text-xl md:leading-8.5"
+            >
+              {formattedTotal}
             </span>
           </div>
         </div>

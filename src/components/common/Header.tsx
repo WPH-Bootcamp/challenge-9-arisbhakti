@@ -98,7 +98,7 @@ const Header = () => {
         }`}
       >
         <>
-          <div className="flex flex-row items-center justify-center">
+          <div className="flex flex-row items-center justify-center cursor-pointer">
             <button
               // back to /home
               onClick={() => navigate("/home")}

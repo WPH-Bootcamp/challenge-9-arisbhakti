@@ -1,12 +1,24 @@
 import { useParams } from "react-router-dom";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import axios from "axios";
 import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import React from "react";
-import { useDispatch } from "react-redux";
-import { addToCart } from "@/features/cart/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/app/store";
+import {
+  removeItem,
+  setItems,
+  setCartItemId,
+  updateQuantity,
+  upsertItem,
+} from "@/features/cart/cartSlice";
 import {
   Dialog,
   DialogContent,
@@ -95,6 +107,8 @@ const StarRow = ({ count }: { count: number }) => {
 export default function Details() {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+  const cartItems = useSelector((state: RootState) => state.cart.items);
   const MENU_STEP = 10;
   const REVIEW_STEP = 6;
   const [menuLimit, setMenuLimit] = React.useState(MENU_STEP);
@@ -157,6 +171,146 @@ export default function Details() {
     detail?.menus?.filter((menu) =>
       menuFilter === "all" ? true : menu.type === menuFilter,
     ) ?? [];
+
+  const addMutation = useMutation({
+    mutationFn: async (payload: {
+      restaurantId: number;
+      menuId: number;
+      quantity: number;
+    }) => {
+      const response = await api.post("/api/cart", payload);
+      return response.data as {
+        data?: { cartItem?: { id: number; quantity: number } };
+      };
+    },
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+      const previousItems = cartItems;
+      const existing = cartItems.find((item) => item.menuId === payload.menuId);
+      const nextQty = (existing?.qty ?? 0) + payload.quantity;
+
+      if (detail) {
+        const menu = detail.menus.find((m) => m.id === payload.menuId);
+        if (menu) {
+          dispatch(
+            upsertItem({
+              menuId: menu.id,
+              name: menu.foodName,
+              price: menu.price,
+              image: menu.image,
+              restaurantId: detail.id,
+              restaurantName: detail.name,
+              qty: nextQty,
+              cartItemId: existing?.cartItemId,
+            }),
+          );
+        }
+      }
+
+      return { previousItems };
+    },
+    onError: (_err, _payload, context) => {
+      if (context?.previousItems) {
+        dispatch(setItems(context.previousItems));
+      }
+    },
+    onSuccess: (data, payload) => {
+      const cartItemId = data?.data?.cartItem?.id;
+      const quantity = data?.data?.cartItem?.quantity;
+      if (cartItemId) {
+        dispatch(setCartItemId({ menuId: payload.menuId, cartItemId }));
+      }
+      if (typeof quantity === "number") {
+        dispatch(updateQuantity({ menuId: payload.menuId, qty: quantity }));
+      }
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (payload: { cartItemId: number; quantity: number }) => {
+      const response = await api.put(`/api/cart/${payload.cartItemId}`, {
+        quantity: payload.quantity,
+      });
+      return response.data as {
+        data?: { cartItem?: { id: number; quantity: number } };
+      };
+    },
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+      const previousItems = cartItems;
+      const target = cartItems.find((item) => item.cartItemId === payload.cartItemId);
+      if (target) {
+        dispatch(updateQuantity({ menuId: target.menuId, qty: payload.quantity }));
+      }
+      return { previousItems };
+    },
+    onError: (_err, _payload, context) => {
+      if (context?.previousItems) {
+        dispatch(setItems(context.previousItems));
+      }
+    },
+    onSuccess: (data, payload) => {
+      const cartItemId = data?.data?.cartItem?.id;
+      const quantity = data?.data?.cartItem?.quantity;
+      const target = cartItems.find((item) => item.cartItemId === payload.cartItemId);
+      if (cartItemId && target) {
+        dispatch(setCartItemId({ menuId: target.menuId, cartItemId }));
+      }
+      if (typeof quantity === "number" && target) {
+        dispatch(updateQuantity({ menuId: target.menuId, qty: quantity }));
+      }
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (payload: { cartItemId: number }) => {
+      const response = await api.delete(`/api/cart/${payload.cartItemId}`);
+      return response.data as { success: boolean };
+    },
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+      const previousItems = cartItems;
+      const target = cartItems.find((item) => item.cartItemId === payload.cartItemId);
+      if (target) {
+        dispatch(removeItem(target.menuId));
+      }
+      return { previousItems };
+    },
+    onError: (_err, _payload, context) => {
+      if (context?.previousItems) {
+        dispatch(setItems(context.previousItems));
+      }
+    },
+  });
+
+  const handleIncrease = (menuId: number, restaurantId: number) => {
+    const item = cartItems.find((it) => it.menuId === menuId);
+    const nextQty = (item?.qty ?? 0) + 1;
+    if (item?.cartItemId) {
+      updateMutation.mutate({ cartItemId: item.cartItemId, quantity: nextQty });
+    } else {
+      addMutation.mutate({ restaurantId, menuId, quantity: 1 });
+    }
+  };
+
+  const handleDecrease = (menuId: number) => {
+    const item = cartItems.find((it) => it.menuId === menuId);
+    if (!item) return;
+    const nextQty = item.qty - 1;
+    if (nextQty <= 0) {
+      if (item.cartItemId) {
+        deleteMutation.mutate({ cartItemId: item.cartItemId });
+      } else {
+        dispatch(removeItem(menuId));
+      }
+      return;
+    }
+    if (item.cartItemId) {
+      updateMutation.mutate({ cartItemId: item.cartItemId, quantity: nextQty });
+    } else {
+      dispatch(updateQuantity({ menuId, qty: nextQty }));
+    }
+  };
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const shareTitle = detail?.name ? `Foody - ${detail.name}` : "Foody";
@@ -431,46 +585,66 @@ export default function Details() {
                       </h3>
                     </div>
                     <div className="flex md:flex-1 items-center justfiy-center">
-                      <button
-                        onClick={() =>
-                          detail &&
-                          dispatch(
-                            addToCart({
-                              id: menu.id,
-                              name: menu.foodName,
-                              price: menu.price,
-                              image: menu.image,
-                              restaurantId: detail.id,
-                              restaurantName: detail.name,
-                            }),
-                          )
+                      {(() => {
+                        const item = cartItems.find(
+                          (it) => it.menuId === menu.id,
+                        );
+                        const qty = item?.qty ?? 0;
+
+                        if (qty === 0) {
+                          return (
+                            <button
+                              onClick={() =>
+                                detail &&
+                                addMutation.mutate({
+                                  restaurantId: detail.id,
+                                  menuId: menu.id,
+                                  quantity: 1,
+                                })
+                              }
+                              className="h-9 md:h-10 w-full rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
+                            >
+                              Add
+                            </button>
+                          );
                         }
-                        className="h-9 md:h-10 w-full rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
-                      >
-                        Add
-                      </button>
-                      <div
-                        id="quantity-controls"
-                        className="flex flex-row items-center gap-4"
-                      >
-                        <button className="h-9 w-9 ring-1 ring-inset ring-neutral-300 rounded-full flex items-center justify-center cursor-pointer md:h-10 md:w-10">
-                          <img
-                            src="/images/common/minus.svg"
-                            alt="decrease"
-                            className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
-                          />
-                        </button>
-                        <div id="quantity-info" className="text-[16px] leading-7.5 -tracking-[0.02em] font-semibold md:text-[18px] md:leading-8 md:-tracking-[0.02em]">
-                          0
-                        </div>
-                        <button className="h-9 w-9 bg-primary-100 rounded-full flex items-center justify-center cursor-pointer  md:h-10 md:w-10">
-                          <img
-                            src="/images/common/plus.svg"
-                            alt="decrease"
-                            className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
-                          />
-                        </button>
-                      </div>
+
+                        return (
+                          <div
+                            id="quantity-controls"
+                            className="flex flex-row items-center gap-4"
+                          >
+                            <button
+                              onClick={() => handleDecrease(menu.id)}
+                              className="h-9 w-9 ring-1 ring-inset ring-neutral-300 rounded-full flex items-center justify-center cursor-pointer md:h-10 md:w-10"
+                            >
+                              <img
+                                src="/images/common/minus.svg"
+                                alt="decrease"
+                                className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
+                              />
+                            </button>
+                            <div
+                              id="quantity-info"
+                              className="text-[16px] leading-7.5 -tracking-[0.02em] font-semibold md:text-[18px] md:leading-8 md:-tracking-[0.02em]"
+                            >
+                              {qty}
+                            </div>
+                            <button
+                              onClick={() =>
+                                detail && handleIncrease(menu.id, detail.id)
+                              }
+                              className="h-9 w-9 bg-primary-100 rounded-full flex items-center justify-center cursor-pointer  md:h-10 md:w-10"
+                            >
+                              <img
+                                src="/images/common/plus.svg"
+                                alt="increase"
+                                className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
+                              />
+                            </button>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
