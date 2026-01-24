@@ -5,6 +5,8 @@ import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import React from "react";
+import { useDispatch } from "react-redux";
+import { addToCart } from "@/features/cart/cartSlice";
 import {
   Dialog,
   DialogContent,
@@ -92,6 +94,7 @@ const StarRow = ({ count }: { count: number }) => {
 
 export default function Details() {
   const { id } = useParams();
+  const dispatch = useDispatch();
   const MENU_STEP = 10;
   const REVIEW_STEP = 6;
   const [menuLimit, setMenuLimit] = React.useState(MENU_STEP);
@@ -428,9 +431,46 @@ export default function Details() {
                       </h3>
                     </div>
                     <div className="flex md:flex-1 items-center justfiy-center">
-                      <button className="h-9 md:h-10 w-full rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer">
+                      <button
+                        onClick={() =>
+                          detail &&
+                          dispatch(
+                            addToCart({
+                              id: menu.id,
+                              name: menu.foodName,
+                              price: menu.price,
+                              image: menu.image,
+                              restaurantId: detail.id,
+                              restaurantName: detail.name,
+                            }),
+                          )
+                        }
+                        className="h-9 md:h-10 w-full rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
+                      >
                         Add
                       </button>
+                      <div
+                        id="quantity-controls"
+                        className="flex flex-row items-center gap-4"
+                      >
+                        <button className="h-9 w-9 ring-1 ring-inset ring-neutral-300 rounded-full flex items-center justify-center cursor-pointer md:h-10 md:w-10">
+                          <img
+                            src="/images/common/minus.svg"
+                            alt="decrease"
+                            className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
+                          />
+                        </button>
+                        <div id="quantity-info" className="text-[16px] leading-7.5 -tracking-[0.02em] font-semibold md:text-[18px] md:leading-8 md:-tracking-[0.02em]">
+                          0
+                        </div>
+                        <button className="h-9 w-9 bg-primary-100 rounded-full flex items-center justify-center cursor-pointer  md:h-10 md:w-10">
+                          <img
+                            src="/images/common/plus.svg"
+                            alt="decrease"
+                            className="w-[19.5px] h-[19.5px] md:w-6 md:h-6"
+                          />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -12,6 +12,12 @@ export default function App() {
   const location = useLocation();
   const dispatch = useDispatch();
   //const theme = useSelector((state: RootState) => state.theme.mode);
+  const cartCount = useSelector((state: RootState) =>
+    state.cart.items.reduce((sum, item) => sum + item.qty, 0),
+  );
+  const totalPrice = useSelector((state: RootState) =>
+    state.cart.items.reduce((sum, item) => sum + item.price * item.qty, 0),
+  );
 
   useEffect(() => {
     const isHome = location.pathname === "/" || location.pathname === "/home";
@@ -29,7 +35,7 @@ export default function App() {
         <Outlet />
       </main>
       <Footer />
-      {/* <CheckoutBottomBar cartCount={5} totalPrice={200000} /> */}
+      <CheckoutBottomBar cartCount={cartCount} totalPrice={totalPrice} />
     </div>
   );
 }

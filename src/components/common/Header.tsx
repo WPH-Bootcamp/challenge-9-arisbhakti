@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/app/store";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -13,13 +15,14 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { SlLocationPin } from "react-icons/sl";
-import type { RootState } from "@/app/store";
-import { useSelector } from "react-redux";
 
 const Header = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
+  const cartCount = useSelector((state: RootState) =>
+    state.cart.items.reduce((sum, item) => sum + item.qty, 0),
+  );
   const theme = useSelector((state: RootState) => state.theme.mode);
 
   useEffect(() => {
@@ -122,9 +125,19 @@ const Header = () => {
                   className="w-7 h-7 md:w-8 md:h-8"
                   alt="cart-white"
                 />
-                <div className="absolute bg-primary-100 w-5 h-5 -right-1 -top-1.5 rounded-full flex items-center justify-center">
-                  <span className="text-[12px] text-neutral-25">1</span>
-                </div>
+                {cartCount > 0 && (
+                  <div
+                    id="cart-container"
+                    className="absolute bg-primary-100 w-5 h-5 -right-1 -top-1.5 rounded-full flex items-center justify-center"
+                  >
+                    <span
+                      id="cart-count"
+                      className="text-[12px] text-neutral-25"
+                    >
+                      {cartCount}
+                    </span>
+                  </div>
+                )}
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
