@@ -388,10 +388,10 @@ const Home = () => {
         <section id="category" className="py-6 md:py-12">
           <div className="grid grid-cols-3  gap-x-5 gap-y-5 md:flex md:flex-row md:justify-between">
             <div
-              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer"
+              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer transition-transform duration-200 hover:scale-[1.1]"
               onClick={() => setActiveList("all-restaurants")}
             >
-              <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
+              <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl transition-transform duration-200 hover:scale-[1.02]">
                 <img
                   src="/images/common/category-all.svg"
                   className="w-12 h-12 md:w-16.25 md:h-16.25"
@@ -403,13 +403,13 @@ const Home = () => {
               </p>
             </div>
             <div
-              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer"
+              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer transition-transform duration-200 hover:scale-[1.1]"
               onClick={() => {
                 dispatch(setDistance("nearby"));
                 navigate("/category");
               }}
             >
-              <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
+              <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl transition-transform duration-200 hover:scale-[1.02]">
                 <img
                   src="/images/common/category-nearby.svg"
                   className="w-12 h-12 md:w-16.25 md:h-16.25"
@@ -421,10 +421,10 @@ const Home = () => {
               </p>
             </div>
             <div
-              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer"
+              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer transition-transform duration-200 hover:scale-[1.1]"
               onClick={() => setActiveList("discount")}
             >
-              <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
+              <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl transition-transform duration-200 hover:scale-[1.1]">
                 <img
                   src="/images/common/category-discount.svg"
                   className="w-12 h-12 md:w-16.25 md:h-16.25"
@@ -436,11 +436,11 @@ const Home = () => {
               </p>
             </div>
             <div
-              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer"
+              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer transition-transform duration-200 hover:scale-[1.1]"
               id="best-seller-icon-section"
               onClick={() => setActiveList("best-seller")}
             >
-              <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
+              <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl transition-transform duration-200 hover:scale-[1.1]">
                 <img
                   src="/images/common/category-best-seller.svg"
                   className="w-12 h-12 md:w-16.25 md:h-16.25"
@@ -452,10 +452,10 @@ const Home = () => {
               </p>
             </div>
             <div
-              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer"
+              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer transition-transform duration-200 hover:scale-[1.1]"
               onClick={() => setActiveList("delivery")}
             >
-              <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
+              <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl transition-transform duration-200 hover:scale-[1.1]">
                 <img
                   src="/images/common/category-delivery.svg"
                   className="w-12 h-12 md:w-16.25 md:h-16.25"
@@ -467,10 +467,10 @@ const Home = () => {
               </p>
             </div>
             <div
-              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer"
+              className="flex flex-col gap-1 md:gap-1.5 cursor-pointer transition-transform duration-200 hover:scale-[1.1]"
               onClick={() => setActiveList("lunch")}
             >
-              <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl">
+              <div className="w-full h-25 flex items-center justify-center p-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl transition-transform duration-200 hover:scale-[1.1]">
                 <img
                   src="/images/common/category-lunch.svg"
                   className="w-12 h-12 md:w-16.25 md:h-16.25"
@@ -586,7 +586,7 @@ const Home = () => {
               items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex flex-row gap-2 md:gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl px-3 py-3 md:px-4 md:py-4 items-center cursor-pointer"
+                  className="flex flex-row gap-2 md:gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.06)] rounded-3xl px-3 py-3 md:px-4 md:py-4 items-center cursor-pointer transition-transform duration-200 hover:scale-[1.05]"
                   onClick={() => navigate(`/details/${item.id}`)}
                 >
                   <img

@@ -520,14 +520,14 @@ export default function Details() {
             </div>
             <button
               onClick={handleShare}
-              className="h-fit w-fit p-3 rounded-[100px] ring-1 ring-neutral-300 ring-inset flex flex-row gap-3 items-center justify-center md:px-4 md:py-3 md:h-11 md:w-35 cursor-pointer"
+              className="h-fit w-fit p-3 rounded-[100px] ring-1 ring-neutral-300 ring-inset flex flex-row gap-3 items-center justify-center md:px-4 md:py-3 md:h-11 md:w-35 cursor-pointer hover:scale-[1.05] transition-transform duration-200"
             >
               <img
                 src="/images/common/share.svg"
                 alt="share"
                 className="w-5 h-5"
               />
-              <span className="hidden md:block text-neutral-950">Share</span>
+              <span className="hidden md:block text-neutral-950 ">Share</span>
             </button>
           </div>
 
@@ -620,7 +620,7 @@ export default function Details() {
               {filteredMenus.map((menu) => (
                 <div
                   key={menu.id}
-                  className="flex flex-col shadow-[0_8px_24px_rgba(0,0,0,0.08)] rounded-3xl"
+                  className="flex flex-col shadow-[0_8px_24px_rgba(0,0,0,0.08)] rounded-3xl hover:scale-[1.05] transition-transform duration-200"
                 >
                   <div
                     className="h-[172.5px] rounded-tl-2xl rounded-tr-2xl inset-0 bg-cover bg-center bg-no-repeat text-xl"
