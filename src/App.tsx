@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setTheme } from "./features/theme/themeSlice";
+import { AnimatePresence, motion } from "framer-motion";
 
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
@@ -19,15 +20,22 @@ export default function App() {
     dispatch(setTheme(isHome ? "light" : "dark"));
   }, [dispatch, location.pathname]);
 
-  // useEffect(() => {
-  //   document.documentElement.classList.toggle("dark", theme === "dark");
-  // }, [theme]);
+  const topLevelKey = location.pathname.split("/")[1] || "home";
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 overflow-y-hidden">
-        <Outlet />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={topLevelKey}
+            initial={{ opacity: 1, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
       <Footer />
       {!hideCheckoutBar && <CheckoutBottomBar />}

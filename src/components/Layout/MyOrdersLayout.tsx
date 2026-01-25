@@ -1,5 +1,6 @@
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { SlLocationPin } from "react-icons/sl";
 
 import { IoDocumentTextOutline } from "react-icons/io5";
@@ -12,6 +13,7 @@ import { setTheme } from "@/features/theme/themeSlice";
 export default function MyOrdersLayout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const [profileName, setProfileName] = useState("User");
   const [profileAvatar, setProfileAvatar] = useState<string | null>(null);
 
@@ -118,7 +120,16 @@ export default function MyOrdersLayout() {
 
       {/* RIGHT CONTENT (GANTI-GANTI) */}
       <section className="w-full">
-        <Outlet />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 1, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </section>
     </main>
   );

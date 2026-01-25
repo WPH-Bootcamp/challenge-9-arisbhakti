@@ -130,7 +130,10 @@ export default function Success() {
           </div>
         </div>
 
-        <button className="mt-4 w-full h-11 rounded-full bg-[#C21E15] text-white font-bold text-base leading-7.5 -tracking-[0.02em]">
+        <button
+          className="mt-4 w-full h-11 rounded-full bg-[#C21E15] text-white font-bold text-base leading-7.5 -tracking-[0.02em] cursor-pointer"
+          onClick={() => navigate("/myorders/orders")}
+        >
           See My Orders
         </button>
       </section>
