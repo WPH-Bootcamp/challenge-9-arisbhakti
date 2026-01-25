@@ -22,14 +22,6 @@ type RestaurantItem = {
   priceRange?: { min: number; max: number };
 };
 
-type CategoryResponse = {
-  success: boolean;
-  message: string;
-  data?: {
-    restaurants?: RestaurantItem[];
-  };
-};
-
 export default function Category() {
   const navigate = useNavigate();
   const filters = useSelector((state: RootState) => state.categoryFilters);

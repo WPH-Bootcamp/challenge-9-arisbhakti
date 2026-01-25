@@ -2,7 +2,6 @@ import { useMutation } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
 export const useUpdateProfileMutation = ({
-  queryClient,
   onSuccess,
   onError,
 }: {

@@ -32,7 +32,7 @@ export const useUpdateCartMutation = ({
       const previous = queryClient.getQueryData(["cart"]);
       const previousItems = cartItems;
 
-      queryClient.setQueryData<T>(["cart"], (old: any) => {
+      queryClient.setQueryData(["cart"], (old: any) => {
         if (!old?.data?.cart) return old;
         const next = old.data.cart.map((group: any) => ({
           ...group,
@@ -54,7 +54,9 @@ export const useUpdateCartMutation = ({
         (item: any) => item.cartItemId === payload.cartItemId,
       );
       if (target) {
-        dispatch(updateQuantity({ menuId: target.menuId, qty: payload.quantity }));
+        dispatch(
+          updateQuantity({ menuId: target.menuId, qty: payload.quantity }),
+        );
       }
 
       return { previous, previousItems };
@@ -103,12 +105,14 @@ export const useDeleteCartMutation = ({
       const previous = queryClient.getQueryData(["cart"]);
       const previousItems = cartItems;
 
-      queryClient.setQueryData<T>(["cart"], (old: any) => {
+      queryClient.setQueryData(["cart"], (old: any) => {
         if (!old?.data?.cart) return old;
         const next = old.data.cart
           .map((group: any) => ({
             ...group,
-            items: group.items.filter((item: any) => item.id !== payload.cartItemId),
+            items: group.items.filter(
+              (item: any) => item.id !== payload.cartItemId,
+            ),
           }))
           .filter((group: any) => group.items.length > 0);
         return { ...old, data: { ...old.data, cart: next } };
