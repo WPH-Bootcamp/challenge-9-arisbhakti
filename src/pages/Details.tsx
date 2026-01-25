@@ -10,6 +10,8 @@ import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import React from "react";
+import dayjs from "dayjs";
+import "dayjs/locale/id";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 import {
@@ -81,13 +83,7 @@ const formatRupiah = (value: number) =>
   }).format(value);
 
 const formatDate = (iso: string) =>
-  new Intl.DateTimeFormat("id-ID", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(iso));
+  dayjs(iso).locale("id").format("DD MMMM YYYY, HH:mm");
 
 const StarRow = ({ count }: { count: number }) => {
   const stars = Math.max(0, Math.min(5, Math.round(count)));

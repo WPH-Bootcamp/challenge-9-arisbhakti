@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 import {
@@ -252,7 +253,7 @@ export default function Checkout() {
       dispatch(clearCart());
       localStorage.removeItem("cart_state");
       const successPayload = {
-        date: new Date().toISOString(),
+        date: dayjs().toISOString(),
         paymentMethod,
         totalItems,
         price: totalPrice,

@@ -1,3 +1,8 @@
+import dayjs from "dayjs";
+import "dayjs/locale/id";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+
 const formatRupiah = (value: number) =>
   new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -6,13 +11,7 @@ const formatRupiah = (value: number) =>
   }).format(value);
 
 const formatDate = (iso: string) =>
-  new Intl.DateTimeFormat("id-ID", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(iso));
+  dayjs(iso).locale("id").format("DD MMMM YYYY, HH:mm");
 
 type SuccessPayload = {
   date: string;
@@ -24,15 +23,12 @@ type SuccessPayload = {
   total: number;
 };
 
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-
 export default function Success() {
   const navigate = useNavigate();
   const raw = localStorage.getItem("checkout_success");
   const data = raw ? (JSON.parse(raw) as SuccessPayload) : null;
   const fallback: SuccessPayload = {
-    date: new Date().toISOString(),
+    date: dayjs().toISOString(),
     paymentMethod: "Bank Negara Indonesia",
     totalItems: 0,
     price: 0,
