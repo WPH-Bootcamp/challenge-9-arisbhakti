@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -21,6 +19,13 @@ import {
   setHomeCoachModalOpen,
 } from "@/features/modals/homeCoachModalSlice";
 import type { RootState } from "@/app/store";
+import {
+  useAllRestaurantsQuery,
+  useBestSellerQuery,
+  useNearbyQuery,
+  useRecommendedQuery,
+  useSearchQuery,
+} from "@/services/homeService";
 
 type RecommendedItem = {
   id: number;
@@ -101,95 +106,25 @@ const Home = () => {
     }
   };
 
-  const recommendedQuery = useQuery({
-    queryKey: ["recommended-resto"],
-    queryFn: async () => {
-      const response = await api.get<RecommendedResponse>(
-        "/api/resto/recommended",
-      );
-      return response.data;
-    },
-  });
-
-  const bestSellerQuery = useInfiniteQuery({
-    queryKey: ["best-seller-resto"],
-    queryFn: async ({ pageParam = 1 }) => {
-      const response = await api.get<RecommendedResponse>(
-        "/api/resto/best-seller",
-        {
-          params: { page: pageParam, limit: LIST_LIMIT },
-        },
-      );
-      return response.data;
-    },
-    enabled: activeList === "best-seller",
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, pages) => {
-      const pagination = lastPage.data?.pagination;
-      if (pagination?.page && pagination?.totalPages) {
-        return pagination.page < pagination.totalPages
-          ? pagination.page + 1
-          : undefined;
-      }
-      const count = lastPage.data?.restaurants?.length ?? 0;
-      return count < LIST_LIMIT ? undefined : pages.length + 1;
-    },
-  });
-
-  const searchQuery = useQuery({
-    queryKey: ["search-resto", keyword],
-    queryFn: async () => {
-      const response = await api.get<RecommendedResponse>("/api/resto/search", {
-        params: { q: keyword.trim(), page: 1, limit: LIST_LIMIT },
-      });
-      return response.data;
-    },
-    enabled: activeList === "search" && keyword.trim().length > 0,
-  });
-
-  const allRestaurantsQuery = useInfiniteQuery({
-    queryKey: ["all-restaurants"],
-    queryFn: async ({ pageParam = 1 }) => {
-      const response = await api.get<RecommendedResponse>("/api/resto", {
-        params: { page: pageParam, limit: LIST_LIMIT },
-      });
-      return response.data;
-    },
-    enabled: activeList === "all-restaurants",
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, pages) => {
-      const pagination = lastPage.data?.pagination;
-      if (pagination?.page && pagination?.totalPages) {
-        return pagination.page < pagination.totalPages
-          ? pagination.page + 1
-          : undefined;
-      }
-      const count = lastPage.data?.restaurants?.length ?? 0;
-      return count < LIST_LIMIT ? undefined : pages.length + 1;
-    },
-  });
-
-  const nearbyQuery = useInfiniteQuery({
-    queryKey: ["nearby-resto", nearbyRangeKm],
-    queryFn: async ({ pageParam = 1 }) => {
-      const response = await api.get<RecommendedResponse>("/api/resto", {
-        params: { range: nearbyRangeKm, limit: LIST_LIMIT, page: pageParam },
-      });
-      return response.data;
-    },
-    enabled: activeList === "nearby",
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, pages) => {
-      const pagination = lastPage.data?.pagination;
-      if (pagination?.page && pagination?.totalPages) {
-        return pagination.page < pagination.totalPages
-          ? pagination.page + 1
-          : undefined;
-      }
-      const count = lastPage.data?.restaurants?.length ?? 0;
-      return count < LIST_LIMIT ? undefined : pages.length + 1;
-    },
-  });
+  const recommendedQuery = useRecommendedQuery<RecommendedResponse>();
+  const bestSellerQuery = useBestSellerQuery<RecommendedResponse>(
+    LIST_LIMIT,
+    activeList === "best-seller",
+  );
+  const searchQuery = useSearchQuery<RecommendedResponse>(
+    keyword.trim(),
+    LIST_LIMIT,
+    activeList === "search",
+  );
+  const allRestaurantsQuery = useAllRestaurantsQuery<RecommendedResponse>(
+    LIST_LIMIT,
+    activeList === "all-restaurants",
+  );
+  const nearbyQuery = useNearbyQuery<RecommendedResponse>(
+    nearbyRangeKm,
+    LIST_LIMIT,
+    activeList === "nearby",
+  );
 
   const getErrorMessage = (err: unknown) => {
     if (axios.isAxiosError(err)) {
