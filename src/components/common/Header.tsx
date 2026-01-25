@@ -14,11 +14,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { SlLocationPin } from "react-icons/sl";
@@ -81,6 +79,7 @@ const Header = () => {
             name?: string;
             avatar?: string | null;
           };
+          console.log("Parsed user:", parsed);
           setProfileName(parsed.name || "User");
           setProfileAvatar(parsed.avatar ?? null);
         } catch {
@@ -278,7 +277,10 @@ const Header = () => {
                   {/* MENU ITEMS */}
 
                   <div className="pt-3 flex flex-col gap-0">
-                    <DropdownMenuItem className="gap-3 cursor-pointer rounded-xl">
+                    <DropdownMenuItem
+                      className="gap-3 cursor-pointer rounded-xl"
+                      onClick={() => navigate("/myorders/profile")}
+                    >
                       <SlLocationPin className="text-xl text-neutral-700" />
                       <span className="text-sm leading-7 font-medium">
                         Delivery Address
@@ -287,7 +289,7 @@ const Header = () => {
 
                     <DropdownMenuItem
                       className="gap-3 cursor-pointer rounded-xl"
-                      onClick={() => navigate("/myorders")}
+                      onClick={() => navigate("/myorders/orders")}
                     >
                       <IoDocumentTextOutline className="text-xl text-neutral-700" />
                       <span className="text-sm leading-7 font-medium">

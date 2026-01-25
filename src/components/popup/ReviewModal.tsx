@@ -1,10 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
@@ -52,9 +46,12 @@ export default function ReviewModal({
   const { data } = useQuery({
     queryKey: ["my-reviews"],
     queryFn: async () => {
-      const response = await api.get<ReviewsResponse>("/api/review/my-reviews", {
-        params: { page: 1, limit: 10 },
-      });
+      const response = await api.get<ReviewsResponse>(
+        "/api/review/my-reviews",
+        {
+          params: { page: 1, limit: 50 },
+        },
+      );
       return response.data;
     },
     enabled: open,
@@ -93,8 +90,8 @@ export default function ReviewModal({
       });
       return response.data as { message?: string };
     },
-    onSuccess: (data) => {
-      toast(data?.message || "Review berhasil dikirim");
+    onSuccess: () => {
+      toast("Review berhasil dikirim");
       onOpenChange(false);
     },
   });
@@ -107,8 +104,8 @@ export default function ReviewModal({
       });
       return response.data as { message?: string };
     },
-    onSuccess: (data) => {
-      toast(data?.message || "Review berhasil diperbarui");
+    onSuccess: () => {
+      toast("Review berhasil diperbarui");
       onOpenChange(false);
     },
   });

@@ -62,8 +62,9 @@ const formatRupiah = (value: number) =>
 export default function MyOrders() {
   const [openReview, setOpenReview] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<
-    "done" | "preparing" | "on_the_way" | "delivered" | "cancelled"
+    "done" | "preparing" | "on-the-way" | "delivered" | "cancelled"
   >("done");
 
   const { data, isLoading, isError, error } = useQuery({
@@ -98,7 +99,7 @@ export default function MyOrders() {
   const orders = data?.data?.orders ?? [];
   const statusOptions: { label: string; value: typeof status }[] = [
     { label: "Preparing", value: "preparing" },
-    { label: "On The Way", value: "on_the_way" },
+    { label: "On The Way", value: "on-the-way" },
     { label: "Delivered", value: "delivered" },
     { label: "Done", value: "done" },
     { label: "Canceled", value: "cancelled" },
@@ -116,7 +117,7 @@ export default function MyOrders() {
             <img
               src="/images/common/search.svg"
               alt="search"
-              className="absolute left-4 top-2.5 w-6 h-6 z-50"
+              className="absolute left-4 top-2.5 w-6 h-6 z-10"
             />
 
             <input
@@ -124,8 +125,10 @@ export default function MyOrders() {
               name="searchInput"
               type="text"
               placeholder="Search"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
               className="ring-1 ring-inset ring-neutral-300 ring-neutral w-full h-11 rounded-full pl-13 text-[14px] leading-7   bg-white text-black
-  focus:outline-none focus:ring-2 focus:ring-white placeholder:text-neutral-600 -tracking-[0.02em]"
+   focus:ring-2  placeholder:text-neutral-600 -tracking-[0.02em]"
             />
           </div>
           {/* Status */}
@@ -186,75 +189,110 @@ export default function MyOrders() {
 
           {!isLoading &&
             !isError &&
-            orders.map((order) => (
-              <div
-                key={order.id}
-                className="flex flex-col gap-3 shadow-lg p-4 rounded-3xl"
-              >
-                {order.restaurants.map((group) => (
-                  <div
-                    key={`${order.id}-${group.restaurant.id}`}
-                    className="flex flex-col gap-3 md:gap-4"
-                  >
-                    <div className="flex flex-row justify-between items-center just">
-                      <div className="flex flex-row gap-2 items-center">
-                        <img
-                          src={
-                            group.restaurant.logo ||
-                            "/images/common/icon-restaurant-dummy.svg"
-                          }
-                          className="w-8 h-8"
-                          alt={group.restaurant.name}
-                        />
-                        <span className="font-bold text-base leading-7.5 -tracking-[0.02em] md:text-lg md:leading-8 md:-tracking-[0.03em] ">
-                          {group.restaurant.name}
-                        </span>
-                      </div>
-                    </div>
-                    {group.items.map((item) => (
-                      <div key={item.menuId} className="flex flex-row gap-3">
-                        <div
-                          className="bg-cover bg-center bg-no-repeat text-xl w-16 h-16 md:h-20 md:w-20 rounded-2xl"
-                          style={{
-                            backgroundImage: `url('${item.image}')`,
-                          }}
-                        />
-                        <div className="flex flex-col justify-center">
-                          <span className="font-medium text-sm leading-7 md:text-base md:leading-7.5 -tracking-[0.03em]">
-                            {item.menuName}
-                          </span>
-                          <span className="font-extrabold text-base leading-7.5 md:text-lg md:leading-8 -tracking-[0.02em]">
-                            {formatRupiah(item.price)}
+            orders.filter((order) => {
+              if (!keyword.trim()) return true;
+              const query = keyword.toLowerCase();
+              return order.restaurants.some(
+                (group) =>
+                  group.restaurant.name.toLowerCase().includes(query) ||
+                  group.items.some((item) =>
+                    item.menuName.toLowerCase().includes(query),
+                  ),
+              );
+            }).length === 0 && (
+              <Alert>
+                <AlertTitle>Belum ada pesanan</AlertTitle>
+                <AlertDescription>
+                  Belum ada transaksi untuk status{" "}
+                  <span className="font-semibold capitalize">{status}</span>.
+                  Yuk, eksplor menu favoritmu dan lakukan pemesanan!
+                </AlertDescription>
+              </Alert>
+            )}
+
+          {!isLoading &&
+            !isError &&
+            orders
+              .filter((order) => {
+                if (!keyword.trim()) return true;
+                const query = keyword.toLowerCase();
+                return order.restaurants.some(
+                  (group) =>
+                    group.restaurant.name.toLowerCase().includes(query) ||
+                    group.items.some((item) =>
+                      item.menuName.toLowerCase().includes(query),
+                    ),
+                );
+              })
+              .map((order) => (
+                <div
+                  key={order.id}
+                  className="flex flex-col gap-3 shadow-lg p-4 rounded-3xl"
+                >
+                  {order.restaurants.map((group) => (
+                    <div
+                      key={`${order.id}-${group.restaurant.id}`}
+                      className="flex flex-col gap-3 md:gap-4"
+                    >
+                      <div className="flex flex-row justify-between items-center just">
+                        <div className="flex flex-row gap-2 items-center">
+                          <img
+                            src={
+                              group.restaurant.logo ||
+                              "/images/common/icon-restaurant-dummy.svg"
+                            }
+                            className="w-8 h-8"
+                            alt={group.restaurant.name}
+                          />
+                          <span className="font-bold text-base leading-7.5 -tracking-[0.02em] md:text-lg md:leading-8 md:-tracking-[0.03em] ">
+                            {group.restaurant.name}
                           </span>
                         </div>
                       </div>
-                    ))}
+                      {group.items.map((item) => (
+                        <div key={item.menuId} className="flex flex-row gap-3">
+                          <div
+                            className="bg-cover bg-center bg-no-repeat text-xl w-16 h-16 md:h-20 md:w-20 rounded-2xl"
+                            style={{
+                              backgroundImage: `url('${item.image}')`,
+                            }}
+                          />
+                          <div className="flex flex-col justify-center">
+                            <span className="font-medium text-sm leading-7 md:text-base md:leading-7.5 -tracking-[0.03em]">
+                              {item.menuName}
+                            </span>
+                            <span className="font-extrabold text-base leading-7.5 md:text-lg md:leading-8 -tracking-[0.02em]">
+                              {formatRupiah(item.price)}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                  <hr />
+                  <div className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center">
+                    <div className="flex flex-col gap-0">
+                      <span className="text-sm leading-7 font-medium -mb-1 md:text-base md:leading-7.5 -tracking-[0.03em]">
+                        Total
+                      </span>
+                      <span className="font-extrabold text-lg leading-8 -tracking-[0.02em] md:text-xl md:leading-8.5">
+                        {formatRupiah(order.pricing.totalPrice)}
+                      </span>
+                    </div>
+                    {order.status === "done" && (
+                      <button
+                        onClick={() => {
+                          setSelectedOrder(order);
+                          setOpenReview(true);
+                        }}
+                        className="h-11 md:h-12 w-full md:w-60 rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
+                      >
+                        Give Review
+                      </button>
+                    )}
                   </div>
-                ))}
-                <hr />
-                <div className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center">
-                  <div className="flex flex-col gap-0">
-                    <span className="text-sm leading-7 font-medium -mb-1 md:text-base md:leading-7.5 -tracking-[0.03em]">
-                      Total
-                    </span>
-                    <span className="font-extrabold text-lg leading-8 -tracking-[0.02em] md:text-xl md:leading-8.5">
-                      {formatRupiah(order.pricing.totalPrice)}
-                    </span>
-                  </div>
-                  {order.status === "done" && (
-                    <button
-                      onClick={() => {
-                        setSelectedOrder(order);
-                        setOpenReview(true);
-                      }}
-                      className="h-11 md:h-12 w-full md:w-60 rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
-                    >
-                      Give Review
-                    </button>
-                  )}
                 </div>
-              </div>
-            ))}
+              ))}
         </div>
       </article>
       <ReviewModal
