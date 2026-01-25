@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -62,6 +62,13 @@ const Home = () => {
       setActiveList("recommended");
     }
   };
+
+  useEffect(() => {
+    const token =
+      localStorage.getItem("auth_token") ||
+      sessionStorage.getItem("auth_token");
+    setActiveList(token ? "recommended" : "all-restaurants");
+  }, []);
 
   const recommendedQuery = useQuery({
     queryKey: ["recommended-resto"],
