@@ -13,8 +13,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setDistance } from "@/features/filters/categoryFilterSlice";
+import {
+  closeHomeCoachModal,
+  openHomeCoachModal,
+  setHomeCoachModalOpen,
+} from "@/features/modals/homeCoachModalSlice";
+import type { RootState } from "@/app/store";
 
 type RecommendedItem = {
   id: number;
@@ -57,7 +63,9 @@ const Home = () => {
     | "lunch"
     | "search"
   >("recommended");
-  const [showCoachModal, setShowCoachModal] = useState(false);
+  const showCoachModal = useSelector(
+    (state: RootState) => state.homeCoachModal.open,
+  );
   const LIST_LIMIT = 20;
   const nearbyRangeKm = 1;
 
@@ -81,14 +89,15 @@ const Home = () => {
   useEffect(() => {
     const seen = localStorage.getItem("wph_coach_modal_seen");
     if (!seen) {
-      setShowCoachModal(true);
+      dispatch(openHomeCoachModal());
     }
   }, []);
 
   const handleCoachModalChange = (open: boolean) => {
-    setShowCoachModal(open);
+    dispatch(setHomeCoachModalOpen(open));
     if (!open) {
       localStorage.setItem("wph_coach_modal_seen", "true");
+      dispatch(closeHomeCoachModal());
     }
   };
 

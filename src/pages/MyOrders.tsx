@@ -6,6 +6,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import ReviewModal from "@/components/popup/ReviewModal";
+import { useDispatch, useSelector } from "react-redux";
+import { openReviewModal, closeReviewModal } from "@/features/modals/reviewModalSlice";
+import type { RootState } from "@/app/store";
 
 type OrderItem = {
   menuId: number;
@@ -60,7 +63,10 @@ const formatRupiah = (value: number) =>
   }).format(value);
 
 export default function MyOrders() {
-  const [openReview, setOpenReview] = useState(false);
+  const dispatch = useDispatch();
+  const openReview = useSelector(
+    (state: RootState) => state.reviewModal.open,
+  );
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<
@@ -287,7 +293,7 @@ export default function MyOrders() {
                         variant="destructive"
                         onClick={() => {
                           setSelectedOrder(order);
-                          setOpenReview(true);
+                          dispatch(openReviewModal());
                         }}
                         className="
     h-11 md:h-12 w-full md:w-60 rounded-[100px]
@@ -307,7 +313,9 @@ export default function MyOrders() {
       </article>
       <ReviewModal
         open={openReview}
-        onOpenChange={setOpenReview}
+        onOpenChange={(open) => {
+          if (!open) dispatch(closeReviewModal());
+        }}
         order={selectedOrder}
       />
     </>
