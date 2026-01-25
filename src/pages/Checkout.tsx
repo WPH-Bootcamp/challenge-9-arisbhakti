@@ -2,7 +2,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
@@ -12,6 +18,7 @@ import {
   upsertItem,
   setItems,
 } from "@/features/cart/cartSlice";
+import { Button } from "@/components/ui/button";
 
 type CheckoutCartItem = {
   id: number;
@@ -66,7 +73,10 @@ export default function Checkout() {
     queryKey: ["cart"],
     queryFn: async () => {
       const response = await api.get<{
-        data?: { cart?: CheckoutCartGroup[]; summary?: CheckoutState["summary"] };
+        data?: {
+          cart?: CheckoutCartGroup[];
+          summary?: CheckoutState["summary"];
+        };
       }>("/api/cart");
       return response.data;
     },
@@ -75,7 +85,9 @@ export default function Checkout() {
   const cartGroups =
     cartQuery.data?.data?.cart?.filter((group) =>
       selectedRestaurantIds.includes(group.restaurant.id),
-    ) ?? state.cart ?? [];
+    ) ??
+    state.cart ??
+    [];
   const summary = cartQuery.data?.data?.summary ?? state.summary;
 
   const DELIVERY_FEE = 15000;
@@ -92,10 +104,7 @@ export default function Checkout() {
       sum + group.items.reduce((acc, item) => acc + item.quantity, 0),
     0,
   );
-  const totalPrice = cartGroups.reduce(
-    (sum, group) => sum + group.subtotal,
-    0,
-  );
+  const totalPrice = cartGroups.reduce((sum, group) => sum + group.subtotal, 0);
   const grandTotal = totalPrice + DELIVERY_FEE + SERVICE_FEE;
 
   const updateMutation = useMutation({
@@ -127,9 +136,7 @@ export default function Checkout() {
           ),
           subtotal: group.items.reduce((sum, item) => {
             const qty =
-              item.id === payload.cartItemId
-                ? payload.quantity
-                : item.quantity;
+              item.id === payload.cartItemId ? payload.quantity : item.quantity;
             return sum + item.menu.price * qty;
           }, 0),
         }));
@@ -216,12 +223,18 @@ export default function Checkout() {
       return response.data as { success: boolean };
     },
     onSuccess: async () => {
-      queryClient.setQueryData(["cart"], (prev) => {
+      queryClient.setQueryData(["cart"], (prev: any) => {
         if (!prev || typeof prev !== "object") return prev;
+
+        const prevObj = prev as { data?: unknown };
+
+        const prevData =
+          prevObj.data && typeof prevObj.data === "object" ? prevObj.data : {};
+
         return {
-          ...prev,
+          ...prevObj,
           data: {
-            ...(prev as { data?: unknown }).data,
+            ...(prevData as Record<string, unknown>),
             summary: {
               totalItems: 0,
               totalPrice: 0,
@@ -290,9 +303,9 @@ export default function Checkout() {
         <h1 className="font-extrabold text-2xl leading-9 md:text-[32px] md:leading-10.5">
           Checkout
         </h1>
-          <div className="flex flex-col gap-4 md:flex-row md:gap-5 md:items-start">
-            {/* left side */}
-            <div className="flex flex-col gap-4 md:flex-1/4">
+        <div className="flex flex-col gap-4 md:flex-row md:gap-5 md:items-start">
+          {/* left side */}
+          <div className="flex flex-col gap-4 md:flex-1/4">
             {/* Delviery Address */}
             <div className="flex flex-col gap-4 p-4 rounded-3xl shadow-sm md:gap-5.25 md:p-5">
               {/* Header & Text */}
@@ -513,13 +526,23 @@ export default function Checkout() {
                     {formatRupiah(grandTotal)}
                   </span>
                 </div>
-                <button
+                <Button
+                  variant="destructive"
                   onClick={() => checkoutMutation.mutate()}
-                  disabled={checkoutMutation.isPending || cartGroups.length === 0}
-                  className="h-11 md:h-12 w-full rounded-[100px] bg-primary-100 text-white font-bold text-base leading-7.5 -tracking-[0.02em] items-center justify-center text-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  disabled={
+                    checkoutMutation.isPending || cartGroups.length === 0
+                  }
+                  className="
+    h-11 md:h-12 w-full rounded-[100px]
+    bg-primary-100 text-white
+    font-bold text-base leading-7.5 -tracking-[0.02em]
+    items-center justify-center text-center
+    cursor-pointer
+    disabled:opacity-60 disabled:cursor-not-allowed
+  "
                 >
                   {checkoutMutation.isPending ? "Processing..." : "Buy"}
-                </button>
+                </Button>
               </div>
             </div>
           </div>

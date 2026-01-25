@@ -283,15 +283,22 @@ export default function MyOrders() {
                       </span>
                     </div>
                     {order.status === "done" && (
-                      <button
+                      <Button
+                        variant="destructive"
                         onClick={() => {
                           setSelectedOrder(order);
                           setOpenReview(true);
                         }}
-                        className="h-11 md:h-12 w-full md:w-60 rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
+                        className="
+    h-11 md:h-12 w-full md:w-60 rounded-[100px]
+    bg-primary-100 text-white
+    font-bold text-[14px] leading-7 -tracking-[0.02em]
+    md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]
+    cursor-pointer
+  "
                       >
                         Give Review
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>

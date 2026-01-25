@@ -25,6 +25,7 @@ type SuccessPayload = {
 };
 
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export default function Success() {
   const navigate = useNavigate();
@@ -130,12 +131,18 @@ export default function Success() {
           </div>
         </div>
 
-        <button
-          className="mt-4 w-full h-11 rounded-full bg-[#C21E15] text-white font-bold text-base leading-7.5 -tracking-[0.02em] cursor-pointer"
+        <Button
+          variant="destructive"
           onClick={() => navigate("/myorders/orders")}
+          className="
+    mt-4 w-full h-11 rounded-full
+    bg-[#C21E15] text-white
+    font-bold text-base leading-7.5 -tracking-[0.02em]
+    cursor-pointer
+  "
         >
           See My Orders
-        </button>
+        </Button>
       </section>
     </main>
   );

@@ -1,10 +1,16 @@
+import { useNavigate } from "react-router-dom";
+
 const Footer = () => {
+  const navigate = useNavigate();
   return (
     <footer className="bg-[#1a1d29] text-neutral-25 py-12 md:py-20 px-4 md:px-30">
       <div className="flex flex-wrap gap-y-6 md:gap-40 md:justify-around">
         {/* Left Section - Foody Info */}
         <div className="w-full md:w-90 flex flex-col gap-4">
-          <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-3 cursor-pointer"
+            onClick={() => navigate("/home")}
+          >
             <img
               src="/images/common/logo-foody.svg"
               className="w-10.5 h-10.5"

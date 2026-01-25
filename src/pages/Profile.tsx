@@ -219,12 +219,20 @@ export default function Profile() {
               </span>
             </div>
           </div>
-          <button
+          <Button
+            variant="destructive"
             onClick={() => setOpen(true)}
-            className="h-11 md:h-12 w-full  rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
+            className="
+    h-11 md:h-12 w-full rounded-[100px]
+    bg-primary-100 text-white
+    font-bold text-[14px] leading-7 -tracking-[0.02em]
+    items-center justify-center text-center
+    md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]
+    cursor-pointer
+  "
           >
             Update Profile
-          </button>
+          </Button>
         </div>
       )}
 
@@ -286,6 +294,7 @@ export default function Profile() {
               </div>
             )}
             <Button
+              variant={"destructive"}
               onClick={() => updateMutation.mutate()}
               disabled={updateMutation.isPending}
               className="h-11 rounded-[100px] bg-primary-100 text-white font-bold cursor-pointer text-[14px] leading-7 -tracking-[0.02em] md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]"

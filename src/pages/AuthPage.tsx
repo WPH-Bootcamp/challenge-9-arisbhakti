@@ -4,7 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { api } from "@/lib/api";
-
+import { Button } from "@/components/ui/button";
 type SignInForm = {
   email: string;
   password: string;
@@ -386,13 +386,23 @@ export default function AuthPage() {
                       </p>
                     ) : null}
 
-                    <button
+                    <Button
                       type="submit"
+                      variant="destructive"
                       disabled={signInLoading}
-                      className=" h-12 w-full rounded-full px-2 py-2 bg-primary-100 text-[16px] leading-7.5 -tracking-[0.02em] font-bold text-neutral-25 shadow-[0_10px_20px_rgba(184,13,13,0.18)] transition active:scale-[0.99] cursor-pointer"
+                      className="
+    h-12 w-full rounded-full px-2 py-2
+    bg-primary-100
+    text-[16px] leading-7.5 -tracking-[0.02em]
+    font-bold text-neutral-25
+    shadow-[0_10px_20px_rgba(184,13,13,0.18)]
+    transition active:scale-[0.99]
+    cursor-pointer
+    disabled:opacity-60 disabled:cursor-not-allowed
+  "
                     >
                       {signInLoading ? "Loading..." : "Login"}
-                    </button>
+                    </Button>
                   </form>
                 </TabsContent>
 
@@ -570,13 +580,23 @@ export default function AuthPage() {
                       </p>
                     ) : null}
 
-                    <button
+                    <Button
                       type="submit"
+                      variant="destructive"
                       disabled={signUpLoading}
-                      className=" h-12 w-full rounded-full px-2 py-2 bg-primary-100 text-[16px] leading-7.5 -tracking-[0.02em] font-bold text-neutral-25 shadow-[0_10px_20px_rgba(184,13,13,0.18)] transition active:scale-[0.99] cursor-pointer"
+                      className="
+    h-12 w-full rounded-full px-2 py-2
+    bg-primary-100
+    text-[16px] leading-7.5 -tracking-[0.02em]
+    font-bold text-neutral-25
+    shadow-[0_10px_20px_rgba(184,13,13,0.18)]
+    transition active:scale-[0.99]
+    cursor-pointer
+    disabled:opacity-60 disabled:cursor-not-allowed
+  "
                     >
                       {signUpLoading ? "Loading..." : "Register"}
-                    </button>
+                    </Button>
                   </form>
                 </TabsContent>
               </Tabs>

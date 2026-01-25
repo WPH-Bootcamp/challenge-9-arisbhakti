@@ -66,6 +66,7 @@ export default function CheckoutBottomBar() {
         </div>
 
         <Button
+          variant={"destructive"}
           onClick={() => navigate("/mycart")}
           className="
     h-10 md:h-11

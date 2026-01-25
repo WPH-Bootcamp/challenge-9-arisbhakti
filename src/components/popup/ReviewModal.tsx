@@ -5,6 +5,7 @@ import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { IoIosClose } from "react-icons/io";
 import { FaStar } from "react-icons/fa";
+import { Button } from "../ui/button";
 
 type ReviewModalProps = {
   open: boolean;
@@ -170,13 +171,28 @@ export default function ReviewModal({
             value={comment}
             onChange={(e) => setComment(e.target.value)}
           ></textarea>
-          <button
+          {/* <button
             onClick={handleSubmit}
             disabled={isSubmitting}
             className="h-11 md:h-12 w-full rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Sending..." : "Send"}
-          </button>
+          </button> */}
+          <Button
+            variant="destructive"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="
+    h-11 md:h-12 w-full rounded-[100px]
+    bg-primary-100 text-white font-bold
+    text-[14px] leading-7 -tracking-[0.02em]
+    md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]
+    cursor-pointer
+    disabled:opacity-60 disabled:cursor-not-allowed
+  "
+          >
+            {isSubmitting ? "Sending..." : "Send"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
