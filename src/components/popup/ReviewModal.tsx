@@ -115,6 +115,9 @@ export default function ReviewModal({
     if (rating === 0) {
       toast("Silakan pilih rating terlebih dahulu");
       return;
+    } else if (comment.trim() === "") {
+      toast("Silakan isi komentar terlebih dahulu");
+      return;
     }
     const existing = reviewMap.get(order.transactionId);
     if (existing) {

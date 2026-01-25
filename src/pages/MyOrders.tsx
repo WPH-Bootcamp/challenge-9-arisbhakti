@@ -64,7 +64,7 @@ export default function MyOrders() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<
-    "done" | "preparing" | "on-the-way" | "delivered" | "cancelled"
+    "done" | "preparing" | "on_the_way" | "delivered" | "cancelled"
   >("done");
 
   const { data, isLoading, isError, error } = useQuery({
@@ -99,11 +99,15 @@ export default function MyOrders() {
   const orders = data?.data?.orders ?? [];
   const statusOptions: { label: string; value: typeof status }[] = [
     { label: "Preparing", value: "preparing" },
-    { label: "On The Way", value: "on-the-way" },
+    { label: "On The Way", value: "on_the_way" },
     { label: "Delivered", value: "delivered" },
     { label: "Done", value: "done" },
     { label: "Canceled", value: "cancelled" },
   ];
+  const statusLabel =
+    status === "on_the_way"
+      ? "On The Way"
+      : status.charAt(0).toUpperCase() + status.slice(1);
 
   return (
     <>
@@ -203,9 +207,8 @@ export default function MyOrders() {
               <Alert>
                 <AlertTitle>Belum ada pesanan</AlertTitle>
                 <AlertDescription>
-                  Belum ada transaksi untuk status{" "}
-                  <span className="font-semibold capitalize">{status}</span>.
-                  Yuk, eksplor menu favoritmu dan lakukan pemesanan!
+                  Belum ada transaksi untuk status {statusLabel}. Yuk, eksplor
+                  menu favoritmu dan lakukan pemesanan!
                 </AlertDescription>
               </Alert>
             )}

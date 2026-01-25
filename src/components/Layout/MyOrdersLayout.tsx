@@ -1,4 +1,5 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { SlLocationPin } from "react-icons/sl";
 
 import { IoDocumentTextOutline } from "react-icons/io5";
@@ -11,18 +12,55 @@ import { setTheme } from "@/features/theme/themeSlice";
 export default function MyOrdersLayout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [profileName, setProfileName] = useState("User");
+  const [profileAvatar, setProfileAvatar] = useState<string | null>(null);
+
+  useEffect(() => {
+    const rawUser =
+      localStorage.getItem("auth_user") || sessionStorage.getItem("auth_user");
+    if (rawUser) {
+      try {
+        const parsed = JSON.parse(rawUser) as {
+          name?: string;
+          avatar?: string | null;
+        };
+        setProfileName(parsed.name || "User");
+        setProfileAvatar(parsed.avatar ?? null);
+      } catch {
+        setProfileName("User");
+        setProfileAvatar(null);
+      }
+    } else {
+      setProfileName("User");
+      setProfileAvatar(null);
+    }
+  }, []);
+
+  const getInitials = (name: string) =>
+    name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "US";
 
   return (
     //<main className="w-full px-4 md:px-30  pt-4 md:pt-0 md:mt-32 mt-16 flex flex-col gap-4 md:gap-8 text-neutral-950 md:items-center"></main>
     <main className="w-full px-4 md:px-30 mt-16 md:mt-32 flex flex-row gap-6 md:gap- text-neutral-950 ">
       {/* LEFT SIDEBAR (TETAP) */}
       <aside className="h-fit rounded-3xl bg-white shadow-lg p-5 md:flex flex-col gap-6 w-60 hidden sticky top-32">
-        <div className="flex flex-row items-center gap-2 ">
-          <img
-            src="/images/common/profile-dummy.svg"
-            className="w-10 h-10 rounded-full"
-          />
-          <div className="font-bold text-md">John Doe</div>
+        <div className="flex flex-row items-center gap-2" id="profile-header">
+          <div
+            className="w-10 h-10 rounded-full bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs font-bold text-white"
+            style={{
+              backgroundImage: `url('${
+                profileAvatar || "/images/common/profile-dummy.svg"
+              }')`,
+            }}
+          >
+            {!profileAvatar && getInitials(profileName)}
+          </div>
+          <div className="font-bold text-md">{profileName}</div>
         </div>
         <hr />
 
