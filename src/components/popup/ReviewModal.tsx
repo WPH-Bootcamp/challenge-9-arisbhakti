@@ -3,20 +3,132 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
-
-import { Button } from "@/components/ui/button";
+import { useEffect, useMemo, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 import { IoIosClose } from "react-icons/io";
 import { FaStar } from "react-icons/fa";
 
 type ReviewModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  order: {
+    id: number;
+    transactionId: string;
+    restaurants: {
+      restaurant: { id: number; name: string; logo: string };
+      items: { menuId: number }[];
+    }[];
+  } | null;
 };
 
-export default function ReviewModal({ open, onOpenChange }: ReviewModalProps) {
+type MyReview = {
+  id: number;
+  star: number;
+  comment: string;
+  transactionId: string;
+};
+
+type ReviewsResponse = {
+  success: boolean;
+  message: string;
+  data?: {
+    reviews?: MyReview[];
+  };
+};
+
+export default function ReviewModal({
+  open,
+  onOpenChange,
+  order,
+}: ReviewModalProps) {
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [comment, setComment] = useState("");
+
+  const { data } = useQuery({
+    queryKey: ["my-reviews"],
+    queryFn: async () => {
+      const response = await api.get<ReviewsResponse>("/api/review/my-reviews", {
+        params: { page: 1, limit: 10 },
+      });
+      return response.data;
+    },
+    enabled: open,
+  });
+
+  const reviewMap = useMemo(() => {
+    const reviews = data?.data?.reviews ?? [];
+    return new Map(reviews.map((review) => [review.transactionId, review]));
+  }, [data]);
+
+  useEffect(() => {
+    if (!open || !order) return;
+    const existing = reviewMap.get(order.transactionId);
+    if (existing) {
+      setRating(existing.star);
+      setComment(existing.comment);
+    } else {
+      setRating(0);
+      setComment("");
+    }
+  }, [open, order, reviewMap]);
+
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      if (!order) throw new Error("Order tidak ditemukan.");
+      const restaurant = order.restaurants[0]?.restaurant;
+      const menuIds = order.restaurants.flatMap((group) =>
+        group.items.map((item) => item.menuId),
+      );
+      const response = await api.post("/api/review", {
+        transactionId: order.transactionId,
+        restaurantId: restaurant?.id,
+        star: rating,
+        comment,
+        menuIds,
+      });
+      return response.data as { message?: string };
+    },
+    onSuccess: (data) => {
+      toast(data?.message || "Review berhasil dikirim");
+      onOpenChange(false);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (reviewId: number) => {
+      const response = await api.put(`/api/review/${reviewId}`, {
+        star: rating,
+        comment,
+      });
+      return response.data as { message?: string };
+    },
+    onSuccess: (data) => {
+      toast(data?.message || "Review berhasil diperbarui");
+      onOpenChange(false);
+    },
+  });
+
+  const handleSubmit = () => {
+    if (!order) return;
+    if (rating === 0) {
+      toast("Silakan pilih rating terlebih dahulu");
+      return;
+    }
+    const existing = reviewMap.get(order.transactionId);
+    if (existing) {
+      updateMutation.mutate(existing.id);
+    } else {
+      createMutation.mutate();
+    }
+  };
+
+  const isSubmitting = createMutation.isPending || updateMutation.isPending;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -37,19 +149,33 @@ export default function ReviewModal({ open, onOpenChange }: ReviewModalProps) {
               Give Rating
             </h2>
             <div className="flex flex-row gap-[4.08px]">
-              <FaStar className="text-[#FDB022] w-10 h-10 p-1" />
-              <FaStar className="text-[#FDB022] w-10 h-10 p-1" />
-              <FaStar className="text-[#FDB022] w-10 h-10 p-1" />
-              <FaStar className="text-[#FDB022] w-10 h-10 p-1" />
-              <FaStar className="text-neutral-400 w-10 h-10 p-1" />
+              {[1, 2, 3, 4, 5].map((star) => (
+                <FaStar
+                  key={star}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  onClick={() => setRating(star)}
+                  className={`w-10 h-10 p-1 cursor-pointer ${
+                    (hoverRating || rating) >= star
+                      ? "text-[#FDB022]"
+                      : "text-neutral-400"
+                  }`}
+                />
+              ))}
             </div>
           </div>
           <textarea
             className="h-58.75 ring-1 ring-inset ring-neutral-300 rounded-2xl p-3 resize-none placeholder:text-neutral-400 text-sm leading-7 -tracking-[0.02em] "
             placeholder="Please share your thoughts about our service!"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
           ></textarea>
-          <button className="h-11 md:h-12 w-full  rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]">
-            Send
+          <button
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="h-11 md:h-12 w-full rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? "Sending..." : "Send"}
           </button>
         </div>
       </DialogContent>

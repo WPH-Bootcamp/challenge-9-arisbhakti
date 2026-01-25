@@ -285,7 +285,10 @@ const Header = () => {
                       </span>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem className="gap-3 cursor-pointer rounded-xl">
+                    <DropdownMenuItem
+                      className="gap-3 cursor-pointer rounded-xl"
+                      onClick={() => navigate("/myorders")}
+                    >
                       <IoDocumentTextOutline className="text-xl text-neutral-700" />
                       <span className="text-sm leading-7 font-medium">
                         My Orders

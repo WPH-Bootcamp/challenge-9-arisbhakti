@@ -61,6 +61,7 @@ const formatRupiah = (value: number) =>
 
 export default function MyOrders() {
   const [openReview, setOpenReview] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [status, setStatus] = useState<
     "done" | "preparing" | "on_the_way" | "delivered" | "cancelled"
   >("done");
@@ -242,7 +243,10 @@ export default function MyOrders() {
                   </div>
                   {order.status === "done" && (
                     <button
-                      onClick={() => setOpenReview(true)}
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        setOpenReview(true);
+                      }}
                       className="h-11 md:h-12 w-full md:w-60 rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
                     >
                       Give Review
@@ -253,7 +257,11 @@ export default function MyOrders() {
             ))}
         </div>
       </article>
-      <ReviewModal open={openReview} onOpenChange={setOpenReview} />
+      <ReviewModal
+        open={openReview}
+        onOpenChange={setOpenReview}
+        order={selectedOrder}
+      />
     </>
   );
 }
