@@ -21,20 +21,23 @@ type ProfileResponse = {
 };
 
 export default function Profile() {
-  const { data, isLoading, isError, error } = useQuery({
+  type User = NonNullable<NonNullable<ProfileResponse["data"]>["user"]>;
+
+  const { data, isLoading, isError, error } = useQuery<ProfileResponse>({
     queryKey: ["profile"],
     queryFn: async () => {
       const raw =
         localStorage.getItem("auth_user") ||
         sessionStorage.getItem("auth_user");
+
       if (raw) {
         try {
-          const user = JSON.parse(raw) as ProfileResponse["data"]["user"];
+          const user = JSON.parse(raw) as User;
+
           return { success: true, message: "OK", data: { user } };
-        } catch {
-          // fallback to API
-        }
+        } catch {}
       }
+
       const response = await api.get<ProfileResponse>("/api/auth/me");
       return response.data;
     },
