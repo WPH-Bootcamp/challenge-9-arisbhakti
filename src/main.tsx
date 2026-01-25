@@ -8,7 +8,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Home from "./pages/Home";
 import ScrollToTop from "./components/common/ScrollToTop";
 
-import { TrailerModalProvider } from "./context/TrailerModalContext";
 import AuthPage from "./pages/AuthPage";
 import Details from "./pages/Details";
 import Category from "./pages/Category";
@@ -29,33 +28,31 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <TrailerModalProvider>
-            <ScrollToTop />
+          <ScrollToTop />
 
-            <Routes>
-              <Route element={<App />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/home" element={<Home />} />
-                <Route path="/details/:id" element={<Details />} />
-                <Route path="/category" element={<Category />} />
-                <Route path="/mycart" element={<MyCart />} />
-                <Route path="/checkout" element={<Checkout />} />
+          <Routes>
+            <Route element={<App />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/details/:id" element={<Details />} />
+              <Route path="/category" element={<Category />} />
+              <Route path="/mycart" element={<MyCart />} />
+              <Route path="/checkout" element={<Checkout />} />
 
-                <Route path="/myorders" element={<MyOrdersLayout />}>
-                  <Route index element={<MyOrders />} />
-                  <Route path="orders" element={<MyOrders />} />
-                  <Route path="profile" element={<Profile />} />
-                </Route>
+              <Route path="/myorders" element={<MyOrdersLayout />}>
+                <Route index element={<MyOrders />} />
+                <Route path="orders" element={<MyOrders />} />
+                <Route path="profile" element={<Profile />} />
               </Route>
+            </Route>
 
-              <Route element={<BlankLayout />}>
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/success" element={<Success />} />
-              </Route>
-            </Routes>
+            <Route element={<BlankLayout />}>
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/success" element={<Success />} />
+            </Route>
+          </Routes>
 
-            <Toaster position="top-center" />
-          </TrailerModalProvider>
+          <Toaster position="top-center" />
         </BrowserRouter>
       </QueryClientProvider>
     </Provider>
