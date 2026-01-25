@@ -18,24 +18,31 @@ export default function MyOrdersLayout() {
   const [profileAvatar, setProfileAvatar] = useState<string | null>(null);
 
   useEffect(() => {
-    const rawUser =
-      localStorage.getItem("auth_user") || sessionStorage.getItem("auth_user");
-    if (rawUser) {
-      try {
-        const parsed = JSON.parse(rawUser) as {
-          name?: string;
-          avatar?: string | null;
-        };
-        setProfileName(parsed.name || "User");
-        setProfileAvatar(parsed.avatar ?? null);
-      } catch {
+    const syncUser = () => {
+      const rawUser =
+        localStorage.getItem("auth_user") ||
+        sessionStorage.getItem("auth_user");
+      if (rawUser) {
+        try {
+          const parsed = JSON.parse(rawUser) as {
+            name?: string;
+            avatar?: string | null;
+          };
+          setProfileName(parsed.name || "User");
+          setProfileAvatar(parsed.avatar ?? null);
+        } catch {
+          setProfileName("User");
+          setProfileAvatar(null);
+        }
+      } else {
         setProfileName("User");
         setProfileAvatar(null);
       }
-    } else {
-      setProfileName("User");
-      setProfileAvatar(null);
-    }
+    };
+
+    syncUser();
+    window.addEventListener("storage", syncUser);
+    return () => window.removeEventListener("storage", syncUser);
   }, []);
 
   const getInitials = (name: string) =>

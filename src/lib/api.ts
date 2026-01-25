@@ -1,6 +1,10 @@
 import axios from "axios";
 
-const rawBaseUrl = import.meta.env.VITE_API_URL as string | undefined;
+const rawBaseUrl =
+  import.meta.env.VITE_API_URL ||
+  ("https://restaurant-be-400174736012.asia-southeast2.run.app/" as
+    | string
+    | undefined);
 const sanitizedBaseUrl = rawBaseUrl
   ? rawBaseUrl.replace(/\/api-swagger\/?$/i, "")
   : "";
