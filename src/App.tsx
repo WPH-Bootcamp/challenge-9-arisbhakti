@@ -21,6 +21,8 @@ export default function App() {
   }, [dispatch, location.pathname]);
 
   const topLevelKey = location.pathname.split("/")[1] || "home";
+  const isHomeRoute =
+    location.pathname === "/" || location.pathname === "/home";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -29,8 +31,16 @@ export default function App() {
         <AnimatePresence mode="wait">
           <motion.div
             key={topLevelKey}
-            initial={{ opacity: 1, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+            initial={
+              isHomeRoute
+                ? { opacity: 1, scale: 1.03 }
+                : { opacity: 1, y: -20, scale: 0.97 }
+            }
+            animate={
+              isHomeRoute
+                ? { opacity: 1, scale: 1 }
+                : { opacity: 1, y: 0, scale: 1 }
+            }
             transition={{ duration: 0.5, ease: "easeInOut" }}
           >
             <Outlet />
