@@ -21,7 +21,7 @@ export default function ReviewModal({ open, onOpenChange }: ReviewModalProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="rounded-3xl sm:max-w-lg md:w-[439px] overflow-y-auto no-scrollbar"
+        className="rounded-3xl sm:max-w-lg md:w-109.75 overflow-y-auto no-scrollbar"
       >
         <div className="flex flex-col md:gap-6 gap-4">
           <div className="flex flex-row justify-between items-center">
@@ -52,27 +52,6 @@ export default function ReviewModal({ open, onOpenChange }: ReviewModalProps) {
             Send
           </button>
         </div>
-        {/* <DialogHeader>
-          <DialogTitle className="text-lg font-extrabold">
-            Give Review
-          </DialogTitle>
-          <DialogDescription className="text-sm text-neutral-500">
-            Tell us about your experience
-          </DialogDescription>
-        </DialogHeader>
-
-        
-        <div className="mt-6 flex justify-end gap-3">
-          <DialogClose asChild>
-            <Button variant="secondary" className="rounded-full">
-              Cancel
-            </Button>
-          </DialogClose>
-
-          <Button className="rounded-full bg-primary-100 text-white">
-            Submit
-          </Button>
-        </div> */}
       </DialogContent>
     </Dialog>
   );
