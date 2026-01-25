@@ -93,7 +93,6 @@ export default function MyCart() {
   })();
 
   const cartGroups = data?.data?.cart ?? [];
-  const summary = data?.data?.summary;
 
   const updateMutation = useMutation({
     mutationFn: async (payload: { cartItemId: number; quantity: number }) => {

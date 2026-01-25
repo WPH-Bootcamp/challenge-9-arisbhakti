@@ -133,7 +133,7 @@ export default function Profile() {
               </span>
             </div>
           </div>
-          <button className="h-11 md:h-12 w-full  rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]">
+          <button className="h-11 md:h-12 w-full  rounded-[100px] bg-primary-100 text-white font-bold text-[14px] leading-7 -tracking-[0.02em] items-center justify-center text-center md:text-[16px] md:leading-7.5 md:-tracking-[0.02em] cursor-pointer">
             Update Profile
           </button>
         </div>
