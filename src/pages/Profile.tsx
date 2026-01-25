@@ -1,4 +1,3 @@
-import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { api } from "@/lib/api";
@@ -65,7 +64,7 @@ export default function Profile() {
   const user = data?.data?.user;
 
   return (
-    <div className="flex flex-col gap-4 md:gap-6 pt-4 md:pt-0 md:w-131 md:mb-[192px]">
+    <div className="flex flex-col gap-4 md:gap-6 pt-4 md:pt-0 md:w-131 md:mb-48">
       <h1 className=" font-extrabold text-2xl leading-9 md:text-[32px] md:leading-10.5 ">
         Profile
       </h1>

@@ -265,9 +265,13 @@ export default function Details() {
     onMutate: async (payload) => {
       await queryClient.cancelQueries({ queryKey: ["cart"] });
       const previousItems = cartItems;
-      const target = cartItems.find((item) => item.cartItemId === payload.cartItemId);
+      const target = cartItems.find(
+        (item) => item.cartItemId === payload.cartItemId,
+      );
       if (target) {
-        dispatch(updateQuantity({ menuId: target.menuId, qty: payload.quantity }));
+        dispatch(
+          updateQuantity({ menuId: target.menuId, qty: payload.quantity }),
+        );
       }
       return { previousItems };
     },
@@ -279,7 +283,9 @@ export default function Details() {
     onSuccess: (data, payload) => {
       const cartItemId = data?.data?.cartItem?.id;
       const quantity = data?.data?.cartItem?.quantity;
-      const target = cartItems.find((item) => item.cartItemId === payload.cartItemId);
+      const target = cartItems.find(
+        (item) => item.cartItemId === payload.cartItemId,
+      );
       if (cartItemId && target) {
         dispatch(setCartItemId({ menuId: target.menuId, cartItemId }));
       }
@@ -301,7 +307,9 @@ export default function Details() {
     onMutate: async (payload) => {
       await queryClient.cancelQueries({ queryKey: ["cart"] });
       const previousItems = cartItems;
-      const target = cartItems.find((item) => item.cartItemId === payload.cartItemId);
+      const target = cartItems.find(
+        (item) => item.cartItemId === payload.cartItemId,
+      );
       if (target) {
         dispatch(removeItem(target.menuId));
       }
@@ -455,7 +463,7 @@ export default function Details() {
                     <img
                       key={index}
                       src={img}
-                      className="w-[361px] h-[260.63px] rounded-3xl  inset-0 object-cover bg-no-repeat "
+                      className="w-90.25 h-[260.63px] rounded-3xl  inset-0 object-cover bg-no-repeat "
                       alt={detail.name}
                     />
                   ))}

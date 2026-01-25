@@ -47,9 +47,7 @@ const Header = () => {
       : (cartData?.data?.summary?.totalItems ?? 0);
   const theme = useSelector((state: RootState) => state.theme.mode);
 
-  useEffect(() => {
-    // const theme = useSelector((state: RootState) => state.theme.mode);
-    // console.log("Current theme mode:", theme);
+  useEffect(() => {    
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 0);
     };
@@ -59,10 +57,6 @@ const Header = () => {
     // cleanup (WAJIB)
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  useEffect(() => {
-    console.log("Current theme mode:", theme);
-  }, [theme]);
 
   useEffect(() => {
     const syncAuth = () => {
@@ -78,8 +72,7 @@ const Header = () => {
           const parsed = JSON.parse(rawUser) as {
             name?: string;
             avatar?: string | null;
-          };
-          console.log("Parsed user:", parsed);
+          };          
           setProfileName(parsed.name || "User");
           setProfileAvatar(parsed.avatar ?? null);
         } catch {

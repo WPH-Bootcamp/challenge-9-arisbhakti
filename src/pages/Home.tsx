@@ -423,7 +423,12 @@ const Home = () => {
             >
               {titleText}
             </h2>
-            <button className="text-primary-100 cursor-pointer font-extrabold text-[16px] leading-7.5 md:text-lg md:leading-8">
+            <button
+              className="text-primary-100 cursor-pointer font-extrabold text-[16px] leading-7.5 md:text-lg md:leading-8"
+              onClick={() => {
+                navigate("/category");
+              }}
+            >
               See All
             </button>
           </div>

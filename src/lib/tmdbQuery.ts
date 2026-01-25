@@ -26,7 +26,7 @@ const IMAGE_BASE_W500 = "https://image.tmdb.org/t/p/w500";
 
 export function tmdbImage(
   path: string | null,
-  size: "original" | "w500" = "original"
+  size: "original" | "w500" = "original",
 ) {
   if (!path) return "";
   return `${
@@ -36,7 +36,7 @@ export function tmdbImage(
 
 async function tmdbGet<T>(
   endpoint: string,
-  params?: Record<string, string | number>
+  params?: Record<string, string | number>,
 ) {
   const url = new URL(`${BASE_URL}${endpoint}`);
   url.searchParams.set("language", "en-US");
@@ -191,7 +191,6 @@ type ToggleFavoritePayload = {
 
 async function toggleFavorite({ movieId, favorite }: ToggleFavoritePayload) {
   const accountId = await ensureAccountId();
-  console.log("Toggling favorite for account:", accountId);
   const res = await fetch(
     `${BASE_URL}/account/${accountId}/favorite?session_id=${SESSION_ID}`,
     {
@@ -205,7 +204,7 @@ async function toggleFavorite({ movieId, favorite }: ToggleFavoritePayload) {
         media_id: movieId,
         favorite,
       }),
-    }
+    },
   );
 
   if (!res.ok) {
@@ -280,7 +279,7 @@ export function useFavoriteMovies() {
       // NOTE: endpoint favorites (movies)
       return tmdbGet<TMDBListResponse<Movie>>(
         `/account/${accountId}/favorite/movies`,
-        { page: 1, sort_by: "created_at.desc", session_id: SESSION_ID }
+        { page: 1, sort_by: "created_at.desc", session_id: SESSION_ID },
       );
     },
     staleTime: 1000 * 60 * 2,
@@ -299,7 +298,7 @@ export function useTrailersForMovies(movieIds: number[]) {
         movieIds.map(async (id) => {
           const videos = await tmdbGet<VideosResponse>(`/movie/${id}/videos`);
           const yt = (videos.results ?? []).filter(
-            (v) => v.site === "YouTube" && v.key
+            (v) => v.site === "YouTube" && v.key,
           );
           const pick =
             yt.find((v) => v.type === "Trailer" && v.official) ??
@@ -308,7 +307,7 @@ export function useTrailersForMovies(movieIds: number[]) {
             yt[0];
 
           return [id, pick?.key ?? null] as const;
-        })
+        }),
       );
 
       return Object.fromEntries(entries) as Record<number, string | null>;
