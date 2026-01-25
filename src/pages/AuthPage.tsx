@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { AnimatePresence, motion } from "framer-motion";
 type SignInForm = {
   email: string;
   password: string;
@@ -289,12 +290,20 @@ export default function AuthPage() {
                   </TabsTrigger>
                 </TabsList>
 
-                {/* SIGN IN */}
-                <TabsContent value="signin" className="mt-3">
-                  <form
-                    onSubmit={onSubmitSignIn}
-                    className="flex flex-col gap-4 md:gap-5"
-                  >
+                <AnimatePresence mode="wait">
+                  {tab === "signin" ? (
+                    <TabsContent value="signin" className="mt-3" forceMount>
+                      <motion.div
+                        key="signin"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <form
+                          onSubmit={onSubmitSignIn}
+                          className="flex flex-col gap-4 md:gap-5"
+                        >
                     <input
                       type="email"
                       placeholder="Email"
@@ -403,15 +412,22 @@ export default function AuthPage() {
                     >
                       {signInLoading ? "Loading..." : "Login"}
                     </Button>
-                  </form>
-                </TabsContent>
-
-                {/* SIGN UP */}
-                <TabsContent value="signup" className="mt-3">
-                  <form
-                    onSubmit={onSubmitSignUp}
-                    className="flex flex-col gap-4 md:gap-5"
-                  >
+                        </form>
+                      </motion.div>
+                    </TabsContent>
+                  ) : (
+                    <TabsContent value="signup" className="mt-3" forceMount>
+                      <motion.div
+                        key="signup"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <form
+                          onSubmit={onSubmitSignUp}
+                          className="flex flex-col gap-4 md:gap-5"
+                        >
                     {/* FIX: add Name + Number Phone */}
                     <input
                       type="text"
@@ -597,8 +613,11 @@ export default function AuthPage() {
                     >
                       {signUpLoading ? "Loading..." : "Register"}
                     </Button>
-                  </form>
-                </TabsContent>
+                        </form>
+                      </motion.div>
+                    </TabsContent>
+                  )}
+                </AnimatePresence>
               </Tabs>
             </div>
           </div>
