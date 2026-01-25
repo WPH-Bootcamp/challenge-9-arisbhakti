@@ -88,7 +88,6 @@ export default function Checkout() {
     ) ??
     state.cart ??
     [];
-  const summary = cartQuery.data?.data?.summary ?? state.summary;
 
   const DELIVERY_FEE = 15000;
   const SERVICE_FEE = 5000;

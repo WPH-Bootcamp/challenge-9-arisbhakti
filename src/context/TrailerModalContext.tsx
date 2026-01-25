@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import type { ReactNode } from "react";
 import TrailerModal from "../components/popup/TrailerModal";
 

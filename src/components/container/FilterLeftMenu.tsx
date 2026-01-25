@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 import {
-  clearFilters,
   setDistance,
   setPriceMax,
   setPriceMin,
