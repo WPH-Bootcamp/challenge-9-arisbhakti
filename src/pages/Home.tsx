@@ -6,6 +6,13 @@ import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useDispatch } from "react-redux";
 import { setDistance } from "@/features/filters/categoryFilterSlice";
 
@@ -50,6 +57,7 @@ const Home = () => {
     | "lunch"
     | "search"
   >("recommended");
+  const [showCoachModal, setShowCoachModal] = useState(false);
   const LIST_LIMIT = 20;
   const nearbyRangeKm = 1;
 
@@ -69,6 +77,20 @@ const Home = () => {
       sessionStorage.getItem("auth_token");
     setActiveList(token ? "recommended" : "all-restaurants");
   }, []);
+
+  useEffect(() => {
+    const seen = localStorage.getItem("wph_coach_modal_seen");
+    if (!seen) {
+      setShowCoachModal(true);
+    }
+  }, []);
+
+  const handleCoachModalChange = (open: boolean) => {
+    setShowCoachModal(open);
+    if (!open) {
+      localStorage.setItem("wph_coach_modal_seen", "true");
+    }
+  };
 
   const recommendedQuery = useQuery({
     queryKey: ["recommended-resto"],
@@ -263,6 +285,52 @@ const Home = () => {
 
   return (
     <>
+      <Dialog open={showCoachModal} onOpenChange={handleCoachModalChange}>
+        <DialogContent className="rounded-3xl sm:max-w-md">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <div className="h-14 w-14 rounded-full bg-primary-100/10 flex items-center justify-center">
+              <img
+                src="/images/common/logo-foody.svg"
+                alt="Foody"
+                className="h-8 w-8"
+              />
+            </div>
+            <DialogHeader className="items-center">
+              <DialogTitle className="text-xl font-extrabold">
+                Halo, WPH Coach! 👋
+              </DialogTitle>
+              <DialogDescription className="text-sm leading-6">
+                Kabar baik! Aplikasi Foody sudah live di Vercel. Silakan cek di
+                sini:
+              </DialogDescription>
+            </DialogHeader>
+            <div className="w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm font-semibold text-neutral-900 break-all">
+              https://restaurant-app-umber-nine.vercel.app/
+            </div>
+            <div className="flex w-full flex-col gap-2">
+              <Button
+                variant="destructive"
+                className="w-full rounded-[100px] cursor-pointer"
+                onClick={() =>
+                  window.open(
+                    "https://restaurant-app-umber-nine.vercel.app/",
+                    "_blank",
+                  )
+                }
+              >
+                Buka Aplikasi di Tab Baru
+              </Button>
+              <Button
+                variant="destructive"
+                className="w-full rounded-[100px] cursor-pointer"
+                onClick={() => handleCoachModalChange(false)}
+              >
+                Tutup
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       {/* HERO BACKGROUND */}
       <div
         id="hero-background"

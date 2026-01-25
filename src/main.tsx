@@ -7,7 +7,6 @@ import App from "./App";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Home from "./pages/Home";
 import ScrollToTop from "./components/common/ScrollToTop";
-
 import AuthPage from "./pages/AuthPage";
 import Details from "./pages/Details";
 import Category from "./pages/Category";
