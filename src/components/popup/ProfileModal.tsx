@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { RootState } from "@/app/store";
 import { closeProfileModal } from "@/features/modals/profileModalSlice";
+import { useUpdateProfileMutation } from "@/services/profileModalService";
 
 type User = {
   id: number;
@@ -71,25 +71,9 @@ export default function ProfileModal({ user }: Props) {
     return null;
   };
 
-  const updateMutation = useMutation({
-    mutationFn: async () => {
-      const errorText = validate();
-      if (errorText) throw new Error(errorText);
-      const formData = new FormData();
-      formData.append("name", name.trim());
-      formData.append("email", email.trim());
-      formData.append("phone", phone.trim());
-      if (avatarFile) formData.append("avatar", avatarFile);
-      const response = await api.put<{
-        success: boolean;
-        message: string;
-        data: User;
-      }>("/api/auth/profile", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      return response.data;
-    },
-    onSuccess: (res) => {
+  const updateMutation = useUpdateProfileMutation({
+    queryClient,
+    onSuccess: (res: any) => {
       const updatedUser = res.data;
       const storage =
         localStorage.getItem("auth_token") !== null
@@ -110,6 +94,20 @@ export default function ProfileModal({ user }: Props) {
       else setFormError("Gagal memperbarui profil.");
     },
   });
+
+  const handleSave = () => {
+    const errorText = validate();
+    if (errorText) {
+      setFormError(errorText);
+      return;
+    }
+    const formData = new FormData();
+    formData.append("name", name.trim());
+    formData.append("email", email.trim());
+    formData.append("phone", phone.trim());
+    if (avatarFile) formData.append("avatar", avatarFile);
+    updateMutation.mutate(formData);
+  };
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && dispatch(closeProfileModal())}>
@@ -165,12 +163,12 @@ export default function ProfileModal({ user }: Props) {
           {formError && (
             <div className="text-sm font-semibold text-red-600">{formError}</div>
           )}
-          <Button
-            variant="destructive"
-            onClick={() => updateMutation.mutate()}
-            disabled={updateMutation.isPending}
-            className="h-11 rounded-[100px] bg-primary-100 text-white font-bold cursor-pointer text-[14px] leading-7 -tracking-[0.02em] md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]"
-          >
+            <Button
+              variant="destructive"
+              onClick={handleSave}
+              disabled={updateMutation.isPending}
+              className="h-11 rounded-[100px] bg-primary-100 text-white font-bold cursor-pointer text-[14px] leading-7 -tracking-[0.02em] md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]"
+            >
             {updateMutation.isPending ? "Saving..." : "Save Changes"}
           </Button>
         </div>

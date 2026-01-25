@@ -54,9 +54,8 @@ export default function MyOrdersLayout() {
       .join("") || "US";
 
   return (
-    //<main className="w-full px-4 md:px-30  pt-4 md:pt-0 md:mt-32 mt-16 flex flex-col gap-4 md:gap-8 text-neutral-950 md:items-center"></main>
     <main className="w-full px-4 md:px-30 mt-16 md:mt-32 flex flex-row gap-6 md:gap- text-neutral-950 ">
-      {/* LEFT SIDEBAR (TETAP) */}
+      {/* LEFT SIDEBAR (fixed) */}
       <aside className="h-fit rounded-3xl bg-white shadow-lg p-5 md:flex flex-col gap-6 w-60 hidden sticky top-32">
         <div className="flex flex-row items-center gap-2" id="profile-header">
           <div
@@ -66,9 +65,7 @@ export default function MyOrdersLayout() {
                 profileAvatar || "/images/common/profile-dummy.svg"
               }')`,
             }}
-          >
-            {!profileAvatar && getInitials(profileName)}
-          </div>
+          ></div>
           <div className="font-bold text-md">{profileName}</div>
         </div>
         <hr />
@@ -125,7 +122,7 @@ export default function MyOrdersLayout() {
         </nav>
       </aside>
 
-      {/* RIGHT CONTENT (GANTI-GANTI) */}
+      {/* RIGHT CONTENT (CHANGING) */}
       <section className="w-full">
         <AnimatePresence mode="wait">
           <motion.div
@@ -141,5 +138,3 @@ export default function MyOrdersLayout() {
     </main>
   );
 }
-
-// shadow-[0_12px_24px_-12px_rgba(0,0,0,0.10)]

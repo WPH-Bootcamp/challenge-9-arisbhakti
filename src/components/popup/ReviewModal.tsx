@@ -1,11 +1,14 @@
 import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
 import { useEffect, useMemo, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { IoIosClose } from "react-icons/io";
 import { FaStar } from "react-icons/fa";
 import { Button } from "../ui/button";
+import {
+  useCreateReviewMutation,
+  useMyReviewsQuery,
+  useUpdateReviewMutation,
+} from "@/services/reviewModalService";
 
 type ReviewModalProps = {
   open: boolean;
@@ -44,19 +47,7 @@ export default function ReviewModal({
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
 
-  const { data } = useQuery({
-    queryKey: ["my-reviews"],
-    queryFn: async () => {
-      const response = await api.get<ReviewsResponse>(
-        "/api/review/my-reviews",
-        {
-          params: { page: 1, limit: 50 },
-        },
-      );
-      return response.data;
-    },
-    enabled: open,
-  });
+  const { data } = useMyReviewsQuery<ReviewsResponse>(open);
 
   const reviewMap = useMemo(() => {
     const reviews = data?.data?.reviews ?? [];
@@ -75,36 +66,14 @@ export default function ReviewModal({
     }
   }, [open, order, reviewMap]);
 
-  const createMutation = useMutation({
-    mutationFn: async () => {
-      if (!order) throw new Error("Order tidak ditemukan.");
-      const restaurant = order.restaurants[0]?.restaurant;
-      const menuIds = order.restaurants.flatMap((group) =>
-        group.items.map((item) => item.menuId),
-      );
-      const response = await api.post("/api/review", {
-        transactionId: order.transactionId,
-        restaurantId: restaurant?.id,
-        star: rating,
-        comment,
-        menuIds,
-      });
-      return response.data as { message?: string };
-    },
+  const createMutation = useCreateReviewMutation({
     onSuccess: () => {
       toast("Review berhasil dikirim");
       onOpenChange(false);
     },
   });
 
-  const updateMutation = useMutation({
-    mutationFn: async (reviewId: number) => {
-      const response = await api.put(`/api/review/${reviewId}`, {
-        star: rating,
-        comment,
-      });
-      return response.data as { message?: string };
-    },
+  const updateMutation = useUpdateReviewMutation({
     onSuccess: () => {
       toast("Review berhasil diperbarui");
       onOpenChange(false);
@@ -122,9 +91,23 @@ export default function ReviewModal({
     }
     const existing = reviewMap.get(order.transactionId);
     if (existing) {
-      updateMutation.mutate(existing.id);
+      updateMutation.mutate({
+        reviewId: existing.id,
+        star: rating,
+        comment,
+      });
     } else {
-      createMutation.mutate();
+      const restaurant = order.restaurants[0]?.restaurant;
+      const menuIds = order.restaurants.flatMap((group) =>
+        group.items.map((item) => item.menuId),
+      );
+      createMutation.mutate({
+        transactionId: order.transactionId,
+        restaurantId: restaurant?.id ?? 0,
+        star: rating,
+        comment,
+        menuIds,
+      });
     }
   };
 

@@ -1,7 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,6 +13,11 @@ import {
   updateQuantity,
   upsertItem,
 } from "@/features/cart/cartSlice";
+import {
+  useCartQuery,
+  useDeleteCartMutation,
+  useUpdateCartMutation,
+} from "@/services/myCartService";
 
 type CartMenu = {
   id: number;
@@ -65,13 +69,7 @@ export default function MyCart() {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const cartItems = useSelector((state: RootState) => state.cart.items);
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["cart"],
-    queryFn: async () => {
-      const response = await api.get<CartResponse>("/api/cart");
-      return response.data;
-    },
-  });
+  const { data, isLoading, isError, error } = useCartQuery<CartResponse>();
 
   const errorMessage = (() => {
     if (!isError) return "";
@@ -94,120 +92,21 @@ export default function MyCart() {
 
   const cartGroups = data?.data?.cart ?? [];
 
-  const updateMutation = useMutation({
-    mutationFn: async (payload: { cartItemId: number; quantity: number }) => {
-      const response = await api.put(`/api/cart/${payload.cartItemId}`, {
-        quantity: payload.quantity,
-      });
-      return response.data as {
-        data?: { cartItem?: { id: number; quantity: number } };
-      };
-    },
-    onMutate: async (payload) => {
-      await queryClient.cancelQueries({ queryKey: ["cart"] });
-      const previous = queryClient.getQueryData(["cart"]);
-      const previousItems = cartItems;
-
-      queryClient.setQueryData<CartResponse>(["cart"], (old) => {
-        if (!old?.data?.cart) return old;
-        const next = old.data.cart.map((group) => ({
-          ...group,
-          items: group.items.map((item) =>
-            item.id === payload.cartItemId
-              ? { ...item, quantity: payload.quantity }
-              : item,
-          ),
-          subtotal: group.items.reduce((sum, item) => {
-            const qty =
-              item.id === payload.cartItemId ? payload.quantity : item.quantity;
-            return sum + item.menu.price * qty;
-          }, 0),
-        }));
-        return { ...old, data: { ...old.data, cart: next } };
-      });
-
-      const target = cartItems.find(
-        (item) => item.cartItemId === payload.cartItemId,
-      );
-      if (target) {
-        dispatch(
-          updateQuantity({ menuId: target.menuId, qty: payload.quantity }),
-        );
-      }
-
-      return { previous, previousItems };
-    },
-    onError: (_err, _payload, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(["cart"], context.previous);
-      }
-      if (context?.previousItems) {
-        dispatch(setItems(context.previousItems));
-      }
-    },
-    onSuccess: (data, payload) => {
-      const cartItemId = data?.data?.cartItem?.id;
-      const quantity = data?.data?.cartItem?.quantity;
-      const target = cartItems.find(
-        (item) => item.cartItemId === payload.cartItemId,
-      );
-      if (cartItemId && target) {
-        dispatch(setCartItemId({ menuId: target.menuId, cartItemId }));
-      }
-      if (typeof quantity === "number" && target) {
-        dispatch(updateQuantity({ menuId: target.menuId, qty: quantity }));
-      }
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
+  const updateMutation = useUpdateCartMutation({
+    queryClient,
+    dispatch,
+    cartItems,
+    setItems,
+    setCartItemId,
+    updateQuantity,
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (payload: { cartItemId: number }) => {
-      const response = await api.delete(`/api/cart/${payload.cartItemId}`);
-      return response.data as { success: boolean };
-    },
-    onMutate: async (payload) => {
-      await queryClient.cancelQueries({ queryKey: ["cart"] });
-      const previous = queryClient.getQueryData(["cart"]);
-      const previousItems = cartItems;
-
-      queryClient.setQueryData<CartResponse>(["cart"], (old) => {
-        if (!old?.data?.cart) return old;
-        const next = old.data.cart
-          .map((group) => ({
-            ...group,
-            items: group.items.filter((item) => item.id !== payload.cartItemId),
-          }))
-          .filter((group) => group.items.length > 0);
-        return { ...old, data: { ...old.data, cart: next } };
-      });
-
-      const target = cartItems.find(
-        (item) => item.cartItemId === payload.cartItemId,
-      );
-      if (target) {
-        dispatch(removeItem(target.menuId));
-      }
-
-      return { previous, previousItems };
-    },
-    onError: (_err, _payload, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(["cart"], context.previous);
-      }
-      if (context?.previousItems) {
-        dispatch(setItems(context.previousItems));
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
+  const deleteMutation = useDeleteCartMutation({
+    queryClient,
+    dispatch,
+    cartItems,
+    removeItem,
+    setItems,
   });
 
   const handleIncrease = (item: CartItem, group: CartRestaurant) => {

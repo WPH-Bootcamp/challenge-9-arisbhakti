@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { api } from "@/lib/api";
+import { useCartSummaryQuery } from "@/services/checkoutBottomBarService";
 
 type CartResponse = {
   success: boolean;
@@ -18,13 +17,7 @@ type CartResponse = {
 
 export default function CheckoutBottomBar() {
   const navigate = useNavigate();
-  const { data, isError, error } = useQuery({
-    queryKey: ["cart"],
-    queryFn: async () => {
-      const response = await api.get<CartResponse>("/api/cart");
-      return response.data;
-    },
-  });
+  const { data, isError, error } = useCartSummaryQuery<CartResponse>();
 
   if (isError && axios.isAxiosError(error) && error.response?.status === 401) {
     return null;

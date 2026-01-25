@@ -1,12 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  keepPreviousData,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import React from "react";
@@ -29,6 +23,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  useAddToCartMutation,
+  useDeleteCartMutation,
+  useRestaurantDetailQuery,
+  useUpdateCartMutation,
+} from "@/services/detailsService";
 
 type MenuItem = {
   id: number;
@@ -122,17 +122,8 @@ export default function Details() {
   const mobileCarouselRef = React.useRef<HTMLDivElement | null>(null);
   const [isLogin, setIsLogin] = React.useState(false);
 
-  const { data, isLoading, isFetching, isError, error } = useQuery({
-    queryKey: ["restaurant-detail", id, menuLimit, reviewLimit],
-    queryFn: async () => {
-      const response = await api.get<DetailResponse>(`/api/resto/${id}`, {
-        params: { limitMenu: menuLimit, limitReview: reviewLimit },
-      });
-      return response.data;
-    },
-    enabled: Boolean(id),
-    placeholderData: keepPreviousData,
-  });
+  const { data, isLoading, isFetching, isError, error } =
+    useRestaurantDetailQuery<RestaurantDetail>(id, menuLimit, reviewLimit);
 
   const errorMessage = (() => {
     if (!isError) return "";
@@ -191,137 +182,32 @@ export default function Details() {
     return () => window.removeEventListener("storage", syncAuth);
   }, []);
 
-  const addMutation = useMutation({
-    mutationFn: async (payload: {
-      restaurantId: number;
-      menuId: number;
-      quantity: number;
-    }) => {
-      const response = await api.post("/api/cart", payload);
-      return response.data as {
-        data?: { cartItem?: { id: number; quantity: number } };
-      };
-    },
-    onMutate: async (payload) => {
-      await queryClient.cancelQueries({ queryKey: ["cart"] });
-      const previousItems = cartItems;
-      const existing = cartItems.find((item) => item.menuId === payload.menuId);
-      const nextQty = (existing?.qty ?? 0) + payload.quantity;
-
-      if (detail) {
-        const menu = detail.menus.find((m) => m.id === payload.menuId);
-        if (menu) {
-          dispatch(
-            upsertItem({
-              menuId: menu.id,
-              name: menu.foodName,
-              price: menu.price,
-              image: menu.image,
-              restaurantId: detail.id,
-              restaurantName: detail.name,
-              qty: nextQty,
-              cartItemId: existing?.cartItemId,
-            }),
-          );
-        }
-      }
-
-      return { previousItems };
-    },
-    onError: (_err, _payload, context) => {
-      if (context?.previousItems) {
-        dispatch(setItems(context.previousItems));
-      }
-    },
-    onSuccess: (data, payload) => {
-      const cartItemId = data?.data?.cartItem?.id;
-      const quantity = data?.data?.cartItem?.quantity;
-      if (cartItemId) {
-        dispatch(setCartItemId({ menuId: payload.menuId, cartItemId }));
-      }
-      if (typeof quantity === "number") {
-        dispatch(updateQuantity({ menuId: payload.menuId, qty: quantity }));
-      }
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
+  const addMutation = useAddToCartMutation({
+    queryClient,
+    dispatch,
+    cartItems,
+    detail,
+    upsertItem,
+    setItems,
+    setCartItemId,
+    updateQuantity,
   });
 
-  const updateMutation = useMutation({
-    mutationFn: async (payload: { cartItemId: number; quantity: number }) => {
-      const response = await api.put(`/api/cart/${payload.cartItemId}`, {
-        quantity: payload.quantity,
-      });
-      return response.data as {
-        data?: { cartItem?: { id: number; quantity: number } };
-      };
-    },
-    onMutate: async (payload) => {
-      await queryClient.cancelQueries({ queryKey: ["cart"] });
-      const previousItems = cartItems;
-      const target = cartItems.find(
-        (item) => item.cartItemId === payload.cartItemId,
-      );
-      if (target) {
-        dispatch(
-          updateQuantity({ menuId: target.menuId, qty: payload.quantity }),
-        );
-      }
-      return { previousItems };
-    },
-    onError: (_err, _payload, context) => {
-      if (context?.previousItems) {
-        dispatch(setItems(context.previousItems));
-      }
-    },
-    onSuccess: (data, payload) => {
-      const cartItemId = data?.data?.cartItem?.id;
-      const quantity = data?.data?.cartItem?.quantity;
-      const target = cartItems.find(
-        (item) => item.cartItemId === payload.cartItemId,
-      );
-      if (cartItemId && target) {
-        dispatch(setCartItemId({ menuId: target.menuId, cartItemId }));
-      }
-      if (typeof quantity === "number" && target) {
-        dispatch(updateQuantity({ menuId: target.menuId, qty: quantity }));
-      }
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
+  const updateMutation = useUpdateCartMutation({
+    queryClient,
+    dispatch,
+    cartItems,
+    setItems,
+    setCartItemId,
+    updateQuantity,
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (payload: { cartItemId: number }) => {
-      const response = await api.delete(`/api/cart/${payload.cartItemId}`);
-      return response.data as { success: boolean };
-    },
-    onMutate: async (payload) => {
-      await queryClient.cancelQueries({ queryKey: ["cart"] });
-      const previousItems = cartItems;
-      const target = cartItems.find(
-        (item) => item.cartItemId === payload.cartItemId,
-      );
-      if (target) {
-        dispatch(removeItem(target.menuId));
-      }
-      return { previousItems };
-    },
-    onError: (_err, _payload, context) => {
-      if (context?.previousItems) {
-        dispatch(setItems(context.previousItems));
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
+  const deleteMutation = useDeleteCartMutation({
+    queryClient,
+    dispatch,
+    cartItems,
+    removeItem,
+    setItems,
   });
 
   const handleIncrease = (menuId: number, restaurantId: number) => {
@@ -366,9 +252,7 @@ export default function Details() {
         });
         return;
       }
-    } catch {
-      // fall through to dialog
-    }
+    } catch {}
     setShareStatus("idle");
     setShareOpen(true);
   };

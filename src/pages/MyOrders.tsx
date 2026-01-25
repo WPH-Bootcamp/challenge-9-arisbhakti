@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,6 +7,7 @@ import ReviewModal from "@/components/popup/ReviewModal";
 import { useDispatch, useSelector } from "react-redux";
 import { openReviewModal, closeReviewModal } from "@/features/modals/reviewModalSlice";
 import type { RootState } from "@/app/store";
+import { useMyOrdersQuery } from "@/services/myOrdersService";
 
 type OrderItem = {
   menuId: number;
@@ -73,15 +72,8 @@ export default function MyOrders() {
     "done" | "preparing" | "on_the_way" | "delivered" | "cancelled"
   >("done");
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["my-orders", status],
-    queryFn: async () => {
-      const response = await api.get<OrdersResponse>("/api/order/my-order", {
-        params: { status, page: 1, limit: 50 },
-      });
-      return response.data;
-    },
-  });
+  const { data, isLoading, isError, error } =
+    useMyOrdersQuery<OrdersResponse>(status);
 
   const errorMessage = (() => {
     if (!isError) return "";

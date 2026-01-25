@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { api } from "@/lib/api";
 import { toast } from "sonner";
 import type { RootState } from "@/app/store";
 import { clearCart } from "@/features/cart/cartSlice";
@@ -20,6 +18,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { SlLocationPin } from "react-icons/sl";
+import { useCartSummaryQuery } from "@/services/headerService";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -32,15 +31,9 @@ const Header = () => {
     data: cartData,
     isError: cartError,
     error: cartErr,
-  } = useQuery({
-    queryKey: ["cart"],
-    queryFn: async () => {
-      const response = await api.get("/api/cart");
-      return response.data as {
-        data?: { summary?: { totalItems: number } };
-      };
-    },
-  });
+  } = useCartSummaryQuery<{
+    data?: { summary?: { totalItems: number } };
+  }>();
   const cartCount =
     cartError && axios.isAxiosError(cartErr) && cartErr.response?.status === 401
       ? 0

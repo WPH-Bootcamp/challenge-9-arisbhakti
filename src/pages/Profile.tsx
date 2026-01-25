@@ -1,12 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDispatch } from "react-redux";
 import ProfileModal from "@/components/popup/ProfileModal";
 import { openProfileModal } from "@/features/modals/profileModalSlice";
+import { useProfileQuery } from "@/services/profileService";
 
 type ProfileResponse = {
   success: boolean;
@@ -26,25 +25,20 @@ export default function Profile() {
   type User = NonNullable<NonNullable<ProfileResponse["data"]>["user"]>;
   const dispatch = useDispatch();
 
-  const { data, isLoading, isError, error } = useQuery<ProfileResponse>({
-    queryKey: ["profile"],
-    queryFn: async () => {
+  const { data, isLoading, isError, error } = useProfileQuery<ProfileResponse>(
+    () => {
       const raw =
         localStorage.getItem("auth_user") ||
         sessionStorage.getItem("auth_user");
-
-      if (raw) {
-        try {
-          const user = JSON.parse(raw) as User;
-
-          return { success: true, message: "OK", data: { user } };
-        } catch {}
+      if (!raw) return null;
+      try {
+        const user = JSON.parse(raw) as User;
+        return { success: true, message: "OK", data: { user } };
+      } catch {
+        return null;
       }
-
-      const response = await api.get<ProfileResponse>("/api/auth/me");
-      return response.data;
     },
-  });
+  );
 
   const errorMessage = (() => {
     if (!isError) return "";

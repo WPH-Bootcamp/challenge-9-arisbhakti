@@ -1,14 +1,13 @@
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import type { RootState } from "@/app/store";
-import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import FilterLeftMenu from "@/components/container/FilterLeftMenu";
+import { useCategoryQuery } from "@/services/categoryService";
 
 type RestaurantItem = {
   id: number;
@@ -54,15 +53,10 @@ export default function Category() {
     return params;
   };
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["category-resto", filters],
-    queryFn: async () => {
-      const response = await api.get<CategoryResponse>("/api/resto", {
-        params: buildParams(),
-      });
-      return response.data;
-    },
-  });
+  const { data, isLoading, isError, error } = useCategoryQuery<RestaurantItem>(
+    ["category-resto", filters],
+    buildParams(),
+  );
 
   const errorMessage = (() => {
     if (!isError) return "";
