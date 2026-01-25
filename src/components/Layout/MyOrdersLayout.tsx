@@ -45,14 +45,6 @@ export default function MyOrdersLayout() {
     return () => window.removeEventListener("storage", syncUser);
   }, []);
 
-  const getInitials = (name: string) =>
-    name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase())
-      .join("") || "US";
-
   return (
     <main className="w-full px-4 md:px-30 mt-16 md:mt-32 flex flex-row gap-6 md:gap- text-neutral-950 ">
       {/* LEFT SIDEBAR (fixed) */}

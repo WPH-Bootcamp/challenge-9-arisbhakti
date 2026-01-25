@@ -69,12 +69,6 @@ type RestaurantDetail = {
   reviews: ReviewItem[];
 };
 
-type DetailResponse = {
-  success: boolean;
-  message: string;
-  data?: RestaurantDetail;
-};
-
 const formatRupiah = (value: number) =>
   new Intl.NumberFormat("id-ID", {
     style: "currency",
