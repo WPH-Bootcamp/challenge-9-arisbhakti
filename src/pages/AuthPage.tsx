@@ -282,22 +282,27 @@ export default function AuthPage() {
                           onSubmit={onSubmitSignIn}
                           className="flex flex-col gap-4 md:gap-5"
                         >
-                          <input
-                            type="email"
-                            placeholder="Email"
-                            value={signIn.email}
-                            onChange={(e) =>
-                              setSignIn((p) => ({
-                                ...p,
-                                email: e.target.value,
-                              }))
-                            }
-                            className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
-                              signInErrors.email
-                                ? "border-red-400 focus:border-red-400"
-                                : "border-neutral-200 focus:border-neutral-300"
-                            } ${signInAnimate && signInErrors.email ? "animate-shake" : ""}`}
-                          />
+                          <div className="relative">
+                            <input
+                              type="email"
+                              placeholder=" "
+                              value={signIn.email}
+                              onChange={(e) =>
+                                setSignIn((p) => ({
+                                  ...p,
+                                  email: e.target.value,
+                                }))
+                              }
+                              className={`peer h-12 md:h-14 w-full rounded-[10px] border bg-white px-3  text-base outline-none placeholder:text-transparent placeholder:-tracking-[0.02em] ${
+                                signInErrors.email
+                                  ? "border-red-400 focus:border-red-400"
+                                  : "border-neutral-200 focus:border-neutral-300"
+                              } ${signInAnimate && signInErrors.email ? "animate-shake" : ""}`}
+                            />
+                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                              Email
+                            </label>
+                          </div>
                           {signInErrors.email ? (
                             <p
                               className={`-mt-3 text-xs text-red-600 ${
@@ -311,7 +316,7 @@ export default function AuthPage() {
                           <div className="relative">
                             <input
                               type={showPassword ? "text" : "password"}
-                              placeholder="Password"
+                              placeholder=" "
                               value={signIn.password}
                               onChange={(e) =>
                                 setSignIn((p) => ({
@@ -319,7 +324,7 @@ export default function AuthPage() {
                                   password: e.target.value,
                                 }))
                               }
-                              className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                              className={`peer h-12 md:h-14 w-full rounded-[10px] border bg-white px-3 pr-14 pt-5 text-base outline-none placeholder:text-transparent placeholder:-tracking-[0.02em] ${
                                 signInErrors.password
                                   ? "border-red-400 focus:border-red-400"
                                   : "border-neutral-200 focus:border-neutral-300"
@@ -329,6 +334,9 @@ export default function AuthPage() {
                                   : ""
                               }`}
                             />
+                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                              Password
+                            </label>
                             <button
                               type="button"
                               onClick={() => setShowPassword((s) => !s)}
@@ -413,19 +421,27 @@ export default function AuthPage() {
                           className="flex flex-col gap-4 md:gap-5"
                         >
                           {/* FIX: add Name + Number Phone */}
-                          <input
-                            type="text"
-                            placeholder="Name"
-                            value={signUp.name}
-                            onChange={(e) =>
-                              setSignUp((p) => ({ ...p, name: e.target.value }))
-                            }
-                            className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
-                              signUpErrors.name
-                                ? "border-red-400 focus:border-red-400"
-                                : "border-neutral-200 focus:border-neutral-300"
-                            } ${signUpAnimate && signUpErrors.name ? "animate-shake" : ""}`}
-                          />
+                          <div className="relative">
+                            <input
+                              type="text"
+                              placeholder=" "
+                              value={signUp.name}
+                              onChange={(e) =>
+                                setSignUp((p) => ({
+                                  ...p,
+                                  name: e.target.value,
+                                }))
+                              }
+                              className={`peer h-12 md:h-14 w-full rounded-[10px] border bg-white px-3 pt-5 text-base outline-none placeholder:text-transparent placeholder:-tracking-[0.02em] ${
+                                signUpErrors.name
+                                  ? "border-red-400 focus:border-red-400"
+                                  : "border-neutral-200 focus:border-neutral-300"
+                              } ${signUpAnimate && signUpErrors.name ? "animate-shake" : ""}`}
+                            />
+                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                              Name
+                            </label>
+                          </div>
                           {signUpErrors.name ? (
                             <p
                               className={`-mt-3 text-xs text-red-600 ${
@@ -436,22 +452,27 @@ export default function AuthPage() {
                             </p>
                           ) : null}
 
-                          <input
-                            type="email"
-                            placeholder="Email"
-                            value={signUp.email}
-                            onChange={(e) =>
-                              setSignUp((p) => ({
-                                ...p,
-                                email: e.target.value,
-                              }))
-                            }
-                            className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
-                              signUpErrors.email
-                                ? "border-red-400 focus:border-red-400"
-                                : "border-neutral-200 focus:border-neutral-300"
-                            } ${signUpAnimate && signUpErrors.email ? "animate-shake" : ""}`}
-                          />
+                          <div className="relative">
+                            <input
+                              type="email"
+                              placeholder=" "
+                              value={signUp.email}
+                              onChange={(e) =>
+                                setSignUp((p) => ({
+                                  ...p,
+                                  email: e.target.value,
+                                }))
+                              }
+                              className={`peer h-12 md:h-14 w-full rounded-[10px] border bg-white px-3 pt-5 text-base outline-none placeholder:text-transparent placeholder:-tracking-[0.02em] ${
+                                signUpErrors.email
+                                  ? "border-red-400 focus:border-red-400"
+                                  : "border-neutral-200 focus:border-neutral-300"
+                              } ${signUpAnimate && signUpErrors.email ? "animate-shake" : ""}`}
+                            />
+                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                              Email
+                            </label>
+                          </div>
                           {signUpErrors.email ? (
                             <p
                               className={`-mt-3 text-xs text-red-600 ${
@@ -462,22 +483,27 @@ export default function AuthPage() {
                             </p>
                           ) : null}
 
-                          <input
-                            type="tel"
-                            placeholder="Number Phone"
-                            value={signUp.phone}
-                            onChange={(e) =>
-                              setSignUp((p) => ({
-                                ...p,
-                                phone: e.target.value,
-                              }))
-                            }
-                            className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
-                              signUpErrors.phone
-                                ? "border-red-400 focus:border-red-400"
-                                : "border-neutral-200 focus:border-neutral-300"
-                            } ${signUpAnimate && signUpErrors.phone ? "animate-shake" : ""}`}
-                          />
+                          <div className="relative">
+                            <input
+                              type="tel"
+                              placeholder=" "
+                              value={signUp.phone}
+                              onChange={(e) =>
+                                setSignUp((p) => ({
+                                  ...p,
+                                  phone: e.target.value,
+                                }))
+                              }
+                              className={`peer h-12 md:h-14 w-full rounded-[10px] border bg-white px-3 pt-5 text-base outline-none placeholder:text-transparent placeholder:-tracking-[0.02em] ${
+                                signUpErrors.phone
+                                  ? "border-red-400 focus:border-red-400"
+                                  : "border-neutral-200 focus:border-neutral-300"
+                              } ${signUpAnimate && signUpErrors.phone ? "animate-shake" : ""}`}
+                            />
+                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                              Number Phone
+                            </label>
+                          </div>
                           {signUpErrors.phone ? (
                             <p
                               className={`-mt-3 text-xs text-red-600 ${
@@ -491,7 +517,7 @@ export default function AuthPage() {
                           <div className="relative">
                             <input
                               type={showPassword ? "text" : "password"}
-                              placeholder="Password"
+                              placeholder=" "
                               value={signUp.password}
                               onChange={(e) =>
                                 setSignUp((p) => ({
@@ -499,7 +525,7 @@ export default function AuthPage() {
                                   password: e.target.value,
                                 }))
                               }
-                              className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                              className={`peer h-12 md:h-14 w-full rounded-[10px] border bg-white px-3 pr-14 pt-5 text-base outline-none placeholder:text-transparent placeholder:-tracking-[0.02em] ${
                                 signUpErrors.password
                                   ? "border-red-400 focus:border-red-400"
                                   : "border-neutral-200 focus:border-neutral-300"
@@ -509,6 +535,9 @@ export default function AuthPage() {
                                   : ""
                               }`}
                             />
+                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                              Password
+                            </label>
                             <button
                               type="button"
                               onClick={() => setShowPassword((s) => !s)}
@@ -536,7 +565,7 @@ export default function AuthPage() {
                           <div className="relative">
                             <input
                               type={showConfirm ? "text" : "password"}
-                              placeholder="Confirm Password"
+                              placeholder=" "
                               value={signUp.confirmPassword}
                               onChange={(e) =>
                                 setSignUp((p) => ({
@@ -544,7 +573,7 @@ export default function AuthPage() {
                                   confirmPassword: e.target.value,
                                 }))
                               }
-                              className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                              className={`peer h-12 md:h-14 w-full rounded-[10px] border bg-white px-3 pr-14 pt-5 text-base outline-none placeholder:text-transparent placeholder:-tracking-[0.02em] ${
                                 signUpErrors.confirmPassword
                                   ? "border-red-400 focus:border-red-400"
                                   : "border-neutral-200 focus:border-neutral-300"
@@ -554,6 +583,9 @@ export default function AuthPage() {
                                   : ""
                               }`}
                             />
+                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                              Confirm Password
+                            </label>
                             <button
                               type="button"
                               onClick={() => setShowConfirm((s) => !s)}
