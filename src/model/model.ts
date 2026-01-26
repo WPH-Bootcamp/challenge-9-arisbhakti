@@ -213,6 +213,8 @@ export type CartSummaryResponse = {
 export type SuccessPayload = {
   date: string;
   paymentMethod: string;
+  deliveryAddress: string;
+  phone: string;
   totalItems: number;
   price: number;
   deliveryFee: number;

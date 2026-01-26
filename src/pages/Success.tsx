@@ -21,6 +21,10 @@ export default function Success() {
   const fallback: SuccessPayload = {
     date: dayjs().toISOString(),
     paymentMethod: "Bank Negara Indonesia",
+    deliveryAddress:
+      localStorage.getItem("checkout_address") ||
+      "Jl. Sudirman No. 25, Jakarta Pusat, 10220",
+    phone: localStorage.getItem("checkout_phone") || "0812-3456-7890",
     totalItems: 0,
     price: 0,
     deliveryFee: 15000,
@@ -78,6 +82,18 @@ export default function Success() {
               </span>
               <span className="font-semibold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
                 {payload.paymentMethod}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm leading-7 font-medium">Address</span>
+              <span className="font-semibold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em] text-right">
+                {payload.deliveryAddress}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm leading-7 font-medium">Phone</span>
+              <span className="font-semibold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
+                {payload.phone}
               </span>
             </div>
             <div className="flex items-center justify-between">

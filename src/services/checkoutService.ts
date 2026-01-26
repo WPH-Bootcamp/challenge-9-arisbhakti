@@ -130,6 +130,8 @@ export const useCheckoutMutation = ({
   dispatch,
   cartGroups,
   paymentMethod,
+  deliveryAddress,
+  phone,
   totalItems,
   totalPrice,
   DELIVERY_FEE,
@@ -150,8 +152,8 @@ export const useCheckoutMutation = ({
             quantity: item.quantity,
           })),
         })),
-        deliveryAddress: "Jl. Sudirman No. 25, Jakarta Pusat, 10220",
-        phone: "0812-3456-7890",
+        deliveryAddress,
+        phone,
         paymentMethod,
         notes: "Please ring the doorbell",
       };
@@ -201,6 +203,8 @@ export const useCheckoutMutation = ({
       const successPayload = {
         date: dayjs().toISOString(),
         paymentMethod,
+        deliveryAddress,
+        phone,
         totalItems,
         price: pricing?.subtotal ?? totalPrice,
         deliveryFee: pricing?.deliveryFee ?? DELIVERY_FEE,

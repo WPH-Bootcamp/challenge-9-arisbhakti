@@ -1,14 +1,7 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 import {
@@ -18,6 +11,14 @@ import {
   setItems,
 } from "@/features/cart/cartSlice";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import ChangeAddressModal from "@/components/popup/ChangeAddressModal";
 import {
   useCheckoutCartQuery,
   useCheckoutDeleteCartMutation,
@@ -65,6 +66,9 @@ export default function Checkout() {
   );
   const [errorOpen, setErrorOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("Terjadi kesalahan.");
+  const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
 
   const totalItems = cartGroups.reduce(
     (sum, group) =>
@@ -73,6 +77,13 @@ export default function Checkout() {
   );
   const totalPrice = cartGroups.reduce((sum, group) => sum + group.subtotal, 0);
   const grandTotal = totalPrice + DELIVERY_FEE + SERVICE_FEE;
+
+  React.useEffect(() => {
+    const savedAddress = localStorage.getItem("checkout_address");
+    const savedPhone = localStorage.getItem("checkout_phone");
+    setAddress(savedAddress || "Jl. Sudirman No. 25, Jakarta Pusat, 10220");
+    setPhone(savedPhone || "0812-3456-7890");
+  }, []);
 
   const updateMutation = useCheckoutUpdateCartMutation({
     queryClient,
@@ -93,6 +104,8 @@ export default function Checkout() {
     dispatch,
     cartGroups,
     paymentMethod,
+    deliveryAddress: address,
+    phone,
     totalItems,
     totalPrice,
     DELIVERY_FEE,
@@ -129,6 +142,19 @@ export default function Checkout() {
 
   return (
     <main className="text-neutral-950 w-full px-4  md:mt-32 pt-4 md:pt-0 mt-16 md:flex md:flex-col gap-4 md:gap-6 items-center z-10 mb-12 md:mb-25">
+      <ChangeAddressModal
+        open={addressModalOpen}
+        onOpenChange={setAddressModalOpen}
+        address={address}
+        phone={phone}
+        onSave={(nextAddress, nextPhone) => {
+          setAddress(nextAddress);
+          setPhone(nextPhone);
+          localStorage.setItem("checkout_address", nextAddress);
+          localStorage.setItem("checkout_phone", nextPhone);
+          setAddressModalOpen(false);
+        }}
+      />
       <div className="flex flex-col gap-4 md:gap-6 md:w-250">
         <h1 className="font-extrabold text-2xl leading-9 md:text-[32px] md:leading-10.5">
           Checkout
@@ -153,14 +179,18 @@ export default function Checkout() {
                 </div>
                 {/* Address */}
                 <span className="text-sm leading-7 font-medium md:text-base md:leading-7.5 md:-tracking-[0.03em]">
-                  Jl. Sudirman No. 25, Jakarta Pusat, 10220
+                  {address}
                 </span>
                 <span className="text-sm leading-7 font-medium md:text-base md:leading-7.5 md:-tracking-[0.03em]">
-                  0812-3456-7890
+                  {phone}
                 </span>
               </div>
               {/* button */}
-              <button className="h-9 w-30 md:h-10  rounded-full ring-1 ring-inset ring-neutral-300 flex items-center justify-center font-bold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]">
+              <button
+                id="change-address"
+                onClick={() => setAddressModalOpen(true)}
+                className="h-9 w-30 md:h-10  rounded-full ring-1 ring-inset ring-neutral-300 flex items-center justify-center font-bold text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em] cursor-pointer"
+              >
                 Change
               </button>
             </div>
