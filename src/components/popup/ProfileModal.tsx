@@ -2,34 +2,20 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { RootState } from "@/app/store";
 import { closeProfileModal } from "@/features/modals/profileModalSlice";
 import { useUpdateProfileMutation } from "@/services/profileModalService";
+import { type ProfileModalProps, type ProfileResponse } from "@/model/model";
 
-type User = {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  avatar: string | null;
-};
-
-type ProfileResponse = {
-  success: boolean;
-  message: string;
-  data?: {
-    user?: User;
-  };
-};
-
-type Props = {
-  user?: User;
-};
-
-export default function ProfileModal({ user }: Props) {
+export default function ProfileModal({ user }: ProfileModalProps) {
   const dispatch = useDispatch();
   const open = useSelector((state: RootState) => state.profileModal.open);
   const queryClient = useQueryClient();
@@ -110,7 +96,10 @@ export default function ProfileModal({ user }: Props) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={(val) => !val && dispatch(closeProfileModal())}>
+    <Dialog
+      open={open}
+      onOpenChange={(val) => !val && dispatch(closeProfileModal())}
+    >
       <DialogContent className="rounded-3xl sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Update Profile</DialogTitle>
@@ -121,7 +110,9 @@ export default function ProfileModal({ user }: Props) {
               className="h-14 w-14 rounded-full bg-cover bg-center bg-no-repeat"
               style={{
                 backgroundImage: `url('${
-                  previewUrl || user?.avatar || "/images/common/profile-dummy.svg"
+                  previewUrl ||
+                  user?.avatar ||
+                  "/images/common/profile-dummy.svg"
                 }')`,
               }}
             />
@@ -161,14 +152,16 @@ export default function ProfileModal({ user }: Props) {
             />
           </div>
           {formError && (
-            <div className="text-sm font-semibold text-red-600">{formError}</div>
+            <div className="text-sm font-semibold text-red-600">
+              {formError}
+            </div>
           )}
-            <Button
-              variant="destructive"
-              onClick={handleSave}
-              disabled={updateMutation.isPending}
-              className="h-11 rounded-[100px] bg-primary-100 text-white font-bold cursor-pointer text-[14px] leading-7 -tracking-[0.02em] md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]"
-            >
+          <Button
+            variant="destructive"
+            onClick={handleSave}
+            disabled={updateMutation.isPending}
+            className="h-11 rounded-[100px] bg-primary-100 text-white font-bold cursor-pointer text-[14px] leading-7 -tracking-[0.02em] md:text-[16px] md:leading-7.5 md:-tracking-[0.02em]"
+          >
             {updateMutation.isPending ? "Saving..." : "Save Changes"}
           </Button>
         </div>

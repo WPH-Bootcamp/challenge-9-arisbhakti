@@ -6,34 +6,12 @@ import axios from "axios";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
-type SignInForm = {
-  email: string;
-  password: string;
-  remember: boolean;
-};
-
-type SignUpForm = {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-  confirmPassword: string;
-};
-
-type SignInErrors = {
-  email?: string;
-  password?: string;
-  form?: string;
-};
-
-type SignUpErrors = {
-  name?: string;
-  email?: string;
-  phone?: string;
-  password?: string;
-  confirmPassword?: string;
-  form?: string;
-};
+import {
+  type SignInErrors,
+  type SignInForm,
+  type SignUpErrors,
+  type SignUpForm,
+} from "@/model/model";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -304,102 +282,108 @@ export default function AuthPage() {
                           onSubmit={onSubmitSignIn}
                           className="flex flex-col gap-4 md:gap-5"
                         >
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      value={signIn.email}
-                      onChange={(e) =>
-                        setSignIn((p) => ({ ...p, email: e.target.value }))
-                      }
-                      className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
-                        signInErrors.email
-                          ? "border-red-400 focus:border-red-400"
-                          : "border-neutral-200 focus:border-neutral-300"
-                      } ${signInAnimate && signInErrors.email ? "animate-shake" : ""}`}
-                    />
-                    {signInErrors.email ? (
-                      <p
-                        className={`-mt-3 text-xs text-red-600 ${
-                          signInAnimate ? "animate-shake" : ""
-                        }`}
-                      >
-                        {signInErrors.email}
-                      </p>
-                    ) : null}
+                          <input
+                            type="email"
+                            placeholder="Email"
+                            value={signIn.email}
+                            onChange={(e) =>
+                              setSignIn((p) => ({
+                                ...p,
+                                email: e.target.value,
+                              }))
+                            }
+                            className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                              signInErrors.email
+                                ? "border-red-400 focus:border-red-400"
+                                : "border-neutral-200 focus:border-neutral-300"
+                            } ${signInAnimate && signInErrors.email ? "animate-shake" : ""}`}
+                          />
+                          {signInErrors.email ? (
+                            <p
+                              className={`-mt-3 text-xs text-red-600 ${
+                                signInAnimate ? "animate-shake" : ""
+                              }`}
+                            >
+                              {signInErrors.email}
+                            </p>
+                          ) : null}
 
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Password"
-                        value={signIn.password}
-                        onChange={(e) =>
-                          setSignIn((p) => ({ ...p, password: e.target.value }))
-                        }
-                        className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
-                          signInErrors.password
-                            ? "border-red-400 focus:border-red-400"
-                            : "border-neutral-200 focus:border-neutral-300"
-                        } ${
-                          signInAnimate && signInErrors.password
-                            ? "animate-shake"
-                            : ""
-                        }`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((s) => !s)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-2 active:scale-95"
-                        aria-label="Toggle password visibility"
-                      >
-                        <img
-                          src="/images/common/eye.svg"
-                          alt="Show/Hide"
-                          className="h-4 w-4"
-                          draggable={false}
-                        />
-                      </button>
-                    </div>
-                    {signInErrors.password ? (
-                      <p
-                        className={`-mt-3 text-xs text-red-600 ${
-                          signInAnimate ? "animate-shake" : ""
-                        }`}
-                      >
-                        {signInErrors.password}
-                      </p>
-                    ) : null}
+                          <div className="relative">
+                            <input
+                              type={showPassword ? "text" : "password"}
+                              placeholder="Password"
+                              value={signIn.password}
+                              onChange={(e) =>
+                                setSignIn((p) => ({
+                                  ...p,
+                                  password: e.target.value,
+                                }))
+                              }
+                              className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                                signInErrors.password
+                                  ? "border-red-400 focus:border-red-400"
+                                  : "border-neutral-200 focus:border-neutral-300"
+                              } ${
+                                signInAnimate && signInErrors.password
+                                  ? "animate-shake"
+                                  : ""
+                              }`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword((s) => !s)}
+                              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-2 active:scale-95"
+                              aria-label="Toggle password visibility"
+                            >
+                              <img
+                                src="/images/common/eye.svg"
+                                alt="Show/Hide"
+                                className="h-4 w-4"
+                                draggable={false}
+                              />
+                            </button>
+                          </div>
+                          {signInErrors.password ? (
+                            <p
+                              className={`-mt-3 text-xs text-red-600 ${
+                                signInAnimate ? "animate-shake" : ""
+                              }`}
+                            >
+                              {signInErrors.password}
+                            </p>
+                          ) : null}
 
-                    <label className="flex cursor-pointer items-center gap-3 select-none">
-                      <Checkbox
-                        checked={signIn.remember}
-                        onCheckedChange={(checked) =>
-                          setSignIn((p) => ({
-                            ...p,
-                            remember: Boolean(checked),
-                          }))
-                        }
-                        className="h-6 w-6 rounded-md border-neutral-300 data-[state=checked]:bg-primary-100 data-[state=checked]:border-primary-100 cursor-pointer"
-                      />
-                      <span className="text-[14px] leading-7 md:text-[16px] md:leading-7.5 -tracking-[0.03em] font-medium text-neutral-900">
-                        Remember Me
-                      </span>
-                    </label>
+                          <label className="flex cursor-pointer items-center gap-3 select-none">
+                            <Checkbox
+                              checked={signIn.remember}
+                              onCheckedChange={(checked) =>
+                                setSignIn((p) => ({
+                                  ...p,
+                                  remember: Boolean(checked),
+                                }))
+                              }
+                              className="h-6 w-6 rounded-md border-neutral-300 data-[state=checked]:bg-primary-100 data-[state=checked]:border-primary-100 cursor-pointer"
+                            />
+                            <span className="text-[14px] leading-7 md:text-[16px] md:leading-7.5 -tracking-[0.03em] font-medium text-neutral-900">
+                              Remember Me
+                            </span>
+                          </label>
 
-                    {signInErrors.form ? (
-                      <p
-                        className={`-mt-2 text-sm text-red-600 ${
-                          signInAnimate ? "animate-shake" : ""
-                        }`}
-                      >
-                        {signInErrors.form}
-                      </p>
-                    ) : null}
+                          {signInErrors.form ? (
+                            <p
+                              className={`-mt-2 text-sm text-red-600 ${
+                                signInAnimate ? "animate-shake" : ""
+                              }`}
+                            >
+                              {signInErrors.form}
+                            </p>
+                          ) : null}
 
-                    <Button
-                      type="submit"
-                      variant="destructive"
-                      disabled={signInLoading}
-                      className="
+                          <Button
+                            type="submit"
+                            variant="destructive"
+                            disabled={signInLoading}
+                            className="
     h-12 w-full rounded-full px-2 py-2
     bg-primary-100
     text-[16px] leading-7.5 -tracking-[0.02em]
@@ -409,9 +393,9 @@ export default function AuthPage() {
     cursor-pointer
     disabled:opacity-60 disabled:cursor-not-allowed
   "
-                    >
-                      {signInLoading ? "Loading..." : "Login"}
-                    </Button>
+                          >
+                            {signInLoading ? "Loading..." : "Login"}
+                          </Button>
                         </form>
                       </motion.div>
                     </TabsContent>
@@ -428,179 +412,188 @@ export default function AuthPage() {
                           onSubmit={onSubmitSignUp}
                           className="flex flex-col gap-4 md:gap-5"
                         >
-                    {/* FIX: add Name + Number Phone */}
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      value={signUp.name}
-                      onChange={(e) =>
-                        setSignUp((p) => ({ ...p, name: e.target.value }))
-                      }
-                      className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
-                        signUpErrors.name
-                          ? "border-red-400 focus:border-red-400"
-                          : "border-neutral-200 focus:border-neutral-300"
-                      } ${signUpAnimate && signUpErrors.name ? "animate-shake" : ""}`}
-                    />
-                    {signUpErrors.name ? (
-                      <p
-                        className={`-mt-3 text-xs text-red-600 ${
-                          signUpAnimate ? "animate-shake" : ""
-                        }`}
-                      >
-                        {signUpErrors.name}
-                      </p>
-                    ) : null}
+                          {/* FIX: add Name + Number Phone */}
+                          <input
+                            type="text"
+                            placeholder="Name"
+                            value={signUp.name}
+                            onChange={(e) =>
+                              setSignUp((p) => ({ ...p, name: e.target.value }))
+                            }
+                            className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                              signUpErrors.name
+                                ? "border-red-400 focus:border-red-400"
+                                : "border-neutral-200 focus:border-neutral-300"
+                            } ${signUpAnimate && signUpErrors.name ? "animate-shake" : ""}`}
+                          />
+                          {signUpErrors.name ? (
+                            <p
+                              className={`-mt-3 text-xs text-red-600 ${
+                                signUpAnimate ? "animate-shake" : ""
+                              }`}
+                            >
+                              {signUpErrors.name}
+                            </p>
+                          ) : null}
 
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      value={signUp.email}
-                      onChange={(e) =>
-                        setSignUp((p) => ({ ...p, email: e.target.value }))
-                      }
-                      className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
-                        signUpErrors.email
-                          ? "border-red-400 focus:border-red-400"
-                          : "border-neutral-200 focus:border-neutral-300"
-                      } ${signUpAnimate && signUpErrors.email ? "animate-shake" : ""}`}
-                    />
-                    {signUpErrors.email ? (
-                      <p
-                        className={`-mt-3 text-xs text-red-600 ${
-                          signUpAnimate ? "animate-shake" : ""
-                        }`}
-                      >
-                        {signUpErrors.email}
-                      </p>
-                    ) : null}
+                          <input
+                            type="email"
+                            placeholder="Email"
+                            value={signUp.email}
+                            onChange={(e) =>
+                              setSignUp((p) => ({
+                                ...p,
+                                email: e.target.value,
+                              }))
+                            }
+                            className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                              signUpErrors.email
+                                ? "border-red-400 focus:border-red-400"
+                                : "border-neutral-200 focus:border-neutral-300"
+                            } ${signUpAnimate && signUpErrors.email ? "animate-shake" : ""}`}
+                          />
+                          {signUpErrors.email ? (
+                            <p
+                              className={`-mt-3 text-xs text-red-600 ${
+                                signUpAnimate ? "animate-shake" : ""
+                              }`}
+                            >
+                              {signUpErrors.email}
+                            </p>
+                          ) : null}
 
-                    <input
-                      type="tel"
-                      placeholder="Number Phone"
-                      value={signUp.phone}
-                      onChange={(e) =>
-                        setSignUp((p) => ({ ...p, phone: e.target.value }))
-                      }
-                      className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
-                        signUpErrors.phone
-                          ? "border-red-400 focus:border-red-400"
-                          : "border-neutral-200 focus:border-neutral-300"
-                      } ${signUpAnimate && signUpErrors.phone ? "animate-shake" : ""}`}
-                    />
-                    {signUpErrors.phone ? (
-                      <p
-                        className={`-mt-3 text-xs text-red-600 ${
-                          signUpAnimate ? "animate-shake" : ""
-                        }`}
-                      >
-                        {signUpErrors.phone}
-                      </p>
-                    ) : null}
+                          <input
+                            type="tel"
+                            placeholder="Number Phone"
+                            value={signUp.phone}
+                            onChange={(e) =>
+                              setSignUp((p) => ({
+                                ...p,
+                                phone: e.target.value,
+                              }))
+                            }
+                            className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                              signUpErrors.phone
+                                ? "border-red-400 focus:border-red-400"
+                                : "border-neutral-200 focus:border-neutral-300"
+                            } ${signUpAnimate && signUpErrors.phone ? "animate-shake" : ""}`}
+                          />
+                          {signUpErrors.phone ? (
+                            <p
+                              className={`-mt-3 text-xs text-red-600 ${
+                                signUpAnimate ? "animate-shake" : ""
+                              }`}
+                            >
+                              {signUpErrors.phone}
+                            </p>
+                          ) : null}
 
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Password"
-                        value={signUp.password}
-                        onChange={(e) =>
-                          setSignUp((p) => ({ ...p, password: e.target.value }))
-                        }
-                        className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
-                          signUpErrors.password
-                            ? "border-red-400 focus:border-red-400"
-                            : "border-neutral-200 focus:border-neutral-300"
-                        } ${
-                          signUpAnimate && signUpErrors.password
-                            ? "animate-shake"
-                            : ""
-                        }`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((s) => !s)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-2 active:scale-95"
-                        aria-label="Toggle password visibility"
-                      >
-                        <img
-                          src="/images/common/eye.svg"
-                          alt="Show/Hide"
-                          className="h-5 w-5 opacity-80"
-                          draggable={false}
-                        />
-                      </button>
-                    </div>
-                    {signUpErrors.password ? (
-                      <p
-                        className={`-mt-3 text-xs text-red-600 ${
-                          signUpAnimate ? "animate-shake" : ""
-                        }`}
-                      >
-                        {signUpErrors.password}
-                      </p>
-                    ) : null}
+                          <div className="relative">
+                            <input
+                              type={showPassword ? "text" : "password"}
+                              placeholder="Password"
+                              value={signUp.password}
+                              onChange={(e) =>
+                                setSignUp((p) => ({
+                                  ...p,
+                                  password: e.target.value,
+                                }))
+                              }
+                              className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                                signUpErrors.password
+                                  ? "border-red-400 focus:border-red-400"
+                                  : "border-neutral-200 focus:border-neutral-300"
+                              } ${
+                                signUpAnimate && signUpErrors.password
+                                  ? "animate-shake"
+                                  : ""
+                              }`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword((s) => !s)}
+                              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-2 active:scale-95"
+                              aria-label="Toggle password visibility"
+                            >
+                              <img
+                                src="/images/common/eye.svg"
+                                alt="Show/Hide"
+                                className="h-5 w-5 opacity-80"
+                                draggable={false}
+                              />
+                            </button>
+                          </div>
+                          {signUpErrors.password ? (
+                            <p
+                              className={`-mt-3 text-xs text-red-600 ${
+                                signUpAnimate ? "animate-shake" : ""
+                              }`}
+                            >
+                              {signUpErrors.password}
+                            </p>
+                          ) : null}
 
-                    <div className="relative">
-                      <input
-                        type={showConfirm ? "text" : "password"}
-                        placeholder="Confirm Password"
-                        value={signUp.confirmPassword}
-                        onChange={(e) =>
-                          setSignUp((p) => ({
-                            ...p,
-                            confirmPassword: e.target.value,
-                          }))
-                        }
-                        className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
-                          signUpErrors.confirmPassword
-                            ? "border-red-400 focus:border-red-400"
-                            : "border-neutral-200 focus:border-neutral-300"
-                        } ${
-                          signUpAnimate && signUpErrors.confirmPassword
-                            ? "animate-shake"
-                            : ""
-                        }`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirm((s) => !s)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-2 active:scale-95"
-                        aria-label="Toggle confirm password visibility"
-                      >
-                        <img
-                          src="/images/common/eye.svg"
-                          alt="Show/Hide"
-                          className="h-5 w-5 opacity-80"
-                          draggable={false}
-                        />
-                      </button>
-                    </div>
-                    {signUpErrors.confirmPassword ? (
-                      <p
-                        className={`-mt-3 text-xs text-red-600 ${
-                          signUpAnimate ? "animate-shake" : ""
-                        }`}
-                      >
-                        {signUpErrors.confirmPassword}
-                      </p>
-                    ) : null}
+                          <div className="relative">
+                            <input
+                              type={showConfirm ? "text" : "password"}
+                              placeholder="Confirm Password"
+                              value={signUp.confirmPassword}
+                              onChange={(e) =>
+                                setSignUp((p) => ({
+                                  ...p,
+                                  confirmPassword: e.target.value,
+                                }))
+                              }
+                              className={`h-12 md:h-14 w-full rounded-2xl border bg-white px-3 pr-14 text-base outline-none placeholder:text-neutral-500 placeholder:-tracking-[0.02em] ${
+                                signUpErrors.confirmPassword
+                                  ? "border-red-400 focus:border-red-400"
+                                  : "border-neutral-200 focus:border-neutral-300"
+                              } ${
+                                signUpAnimate && signUpErrors.confirmPassword
+                                  ? "animate-shake"
+                                  : ""
+                              }`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirm((s) => !s)}
+                              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-2 active:scale-95"
+                              aria-label="Toggle confirm password visibility"
+                            >
+                              <img
+                                src="/images/common/eye.svg"
+                                alt="Show/Hide"
+                                className="h-5 w-5 opacity-80"
+                                draggable={false}
+                              />
+                            </button>
+                          </div>
+                          {signUpErrors.confirmPassword ? (
+                            <p
+                              className={`-mt-3 text-xs text-red-600 ${
+                                signUpAnimate ? "animate-shake" : ""
+                              }`}
+                            >
+                              {signUpErrors.confirmPassword}
+                            </p>
+                          ) : null}
 
-                    {/* FIX: button label like design */}
-                    {signUpErrors.form ? (
-                      <p
-                        className={`-mt-2 text-sm text-red-600 ${
-                          signUpAnimate ? "animate-shake" : ""
-                        }`}
-                      >
-                        {signUpErrors.form}
-                      </p>
-                    ) : null}
+                          {/* FIX: button label like design */}
+                          {signUpErrors.form ? (
+                            <p
+                              className={`-mt-2 text-sm text-red-600 ${
+                                signUpAnimate ? "animate-shake" : ""
+                              }`}
+                            >
+                              {signUpErrors.form}
+                            </p>
+                          ) : null}
 
-                    <Button
-                      type="submit"
-                      variant="destructive"
-                      disabled={signUpLoading}
-                      className="
+                          <Button
+                            type="submit"
+                            variant="destructive"
+                            disabled={signUpLoading}
+                            className="
     h-12 w-full rounded-full px-2 py-2
     bg-primary-100
     text-[16px] leading-7.5 -tracking-[0.02em]
@@ -610,9 +603,9 @@ export default function AuthPage() {
     cursor-pointer
     disabled:opacity-60 disabled:cursor-not-allowed
   "
-                    >
-                      {signUpLoading ? "Loading..." : "Register"}
-                    </Button>
+                          >
+                            {signUpLoading ? "Loading..." : "Register"}
+                          </Button>
                         </form>
                       </motion.div>
                     </TabsContent>

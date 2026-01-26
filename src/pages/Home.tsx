@@ -26,33 +26,7 @@ import {
   useRecommendedQuery,
   useSearchQuery,
 } from "@/services/homeService";
-
-type RecommendedItem = {
-  id: number;
-  name: string;
-  star: number;
-  place: string;
-  logo: string;
-  images: string[];
-  category: string;
-  reviewCount: number;
-  isFrequentlyOrdered: boolean;
-};
-
-type RecommendedResponse = {
-  success: boolean;
-  message: string;
-  data?: {
-    recommendations?: RecommendedItem[];
-    restaurants?: RecommendedItem[];
-    pagination?: {
-      page?: number;
-      limit?: number;
-      total?: number;
-      totalPages?: number;
-    };
-  };
-};
+import { type RecommendedResponse } from "@/model/model";
 
 const Home = () => {
   const navigate = useNavigate();

@@ -8,19 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import FilterLeftMenu from "@/components/container/FilterLeftMenu";
 import { useCategoryQuery } from "@/services/categoryService";
-
-type RestaurantItem = {
-  id: number;
-  name: string;
-  star: number;
-  place: string;
-  logo: string;
-  images: string[];
-  category: string;
-  reviewCount: number;
-  menuCount: number;
-  priceRange?: { min: number; max: number };
-};
+import { type RestaurantItem } from "@/model/model";
 
 export default function Category() {
   const navigate = useNavigate();

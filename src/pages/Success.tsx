@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/id";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { type SuccessPayload } from "@/model/model";
 
 const formatRupiah = (value: number) =>
   new Intl.NumberFormat("id-ID", {
@@ -12,16 +13,6 @@ const formatRupiah = (value: number) =>
 
 const formatDate = (iso: string) =>
   dayjs(iso).locale("id").format("DD MMMM YYYY, HH:mm");
-
-type SuccessPayload = {
-  date: string;
-  paymentMethod: string;
-  totalItems: number;
-  price: number;
-  deliveryFee: number;
-  serviceFee: number;
-  total: number;
-};
 
 export default function Success() {
   const navigate = useNavigate();

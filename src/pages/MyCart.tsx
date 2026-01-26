@@ -18,44 +18,11 @@ import {
   useDeleteCartMutation,
   useUpdateCartMutation,
 } from "@/services/myCartService";
-
-type CartMenu = {
-  id: number;
-  foodName: string;
-  price: number;
-  type: "food" | "drink";
-  image: string;
-};
-
-type CartItem = {
-  id: number;
-  menu: CartMenu;
-  quantity: number;
-  itemTotal: number;
-};
-
-type CartRestaurant = {
-  restaurant: {
-    id: number;
-    name: string;
-    logo: string;
-  };
-  items: CartItem[];
-  subtotal: number;
-};
-
-type CartResponse = {
-  success: boolean;
-  message: string;
-  data?: {
-    cart?: CartRestaurant[];
-    summary?: {
-      totalItems: number;
-      totalPrice: number;
-      restaurantCount: number;
-    };
-  };
-};
+import {
+  type CartItem,
+  type CartResponse,
+  type CartRestaurant,
+} from "@/model/model";
 
 const formatRupiah = (value: number) =>
   new Intl.NumberFormat("id-ID", {

@@ -5,54 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import ReviewModal from "@/components/popup/ReviewModal";
 import { useDispatch, useSelector } from "react-redux";
-import { openReviewModal, closeReviewModal } from "@/features/modals/reviewModalSlice";
+import {
+  openReviewModal,
+  closeReviewModal,
+} from "@/features/modals/reviewModalSlice";
 import type { RootState } from "@/app/store";
 import { useMyOrdersQuery } from "@/services/myOrdersService";
-
-type OrderItem = {
-  menuId: number;
-  menuName: string;
-  price: number;
-  image: string;
-  quantity: number;
-  itemTotal: number;
-};
-
-type OrderRestaurant = {
-  restaurant: {
-    id: number;
-    name: string;
-    logo: string;
-  };
-  items: OrderItem[];
-  subtotal: number;
-};
-
-type Order = {
-  id: number;
-  transactionId: string;
-  status: "done" | "preparing" | "on_the_way" | "delivered" | "cancelled";
-  paymentMethod: string;
-  deliveryAddress: string;
-  phone: string;
-  pricing: {
-    subtotal: number;
-    serviceFee: number;
-    deliveryFee: number;
-    totalPrice: number;
-  };
-  restaurants: OrderRestaurant[];
-  createdAt: string;
-  updatedAt: string;
-};
-
-type OrdersResponse = {
-  success: boolean;
-  message: string;
-  data?: {
-    orders?: Order[];
-  };
-};
+import { type Order, type OrdersResponse } from "@/model/model";
 
 const formatRupiah = (value: number) =>
   new Intl.NumberFormat("id-ID", {
@@ -63,9 +22,7 @@ const formatRupiah = (value: number) =>
 
 export default function MyOrders() {
   const dispatch = useDispatch();
-  const openReview = useSelector(
-    (state: RootState) => state.reviewModal.open,
-  );
+  const openReview = useSelector((state: RootState) => state.reviewModal.open);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<

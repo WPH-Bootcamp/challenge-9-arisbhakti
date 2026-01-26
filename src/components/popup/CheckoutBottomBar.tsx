@@ -2,22 +2,11 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useCartSummaryQuery } from "@/services/checkoutBottomBarService";
-
-type CartResponse = {
-  success: boolean;
-  message: string;
-  data?: {
-    summary?: {
-      totalItems: number;
-      totalPrice: number;
-      restaurantCount: number;
-    };
-  };
-};
+import { type CartSummaryResponse } from "@/model/model";
 
 export default function CheckoutBottomBar() {
   const navigate = useNavigate();
-  const { data, isError, error } = useCartSummaryQuery<CartResponse>();
+  const { data, isError, error } = useCartSummaryQuery<CartSummaryResponse>();
 
   if (isError && axios.isAxiosError(error) && error.response?.status === 401) {
     return null;

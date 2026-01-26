@@ -24,38 +24,7 @@ import {
   useCheckoutMutation,
   useCheckoutUpdateCartMutation,
 } from "@/services/checkoutService";
-
-type CheckoutCartItem = {
-  id: number;
-  menu: {
-    id: number;
-    foodName: string;
-    price: number;
-    type: "food" | "drink";
-    image: string;
-  };
-  quantity: number;
-  itemTotal: number;
-};
-
-type CheckoutCartGroup = {
-  restaurant: {
-    id: number;
-    name: string;
-    logo: string;
-  };
-  items: CheckoutCartItem[];
-  subtotal: number;
-};
-
-type CheckoutState = {
-  cart?: CheckoutCartGroup[];
-  summary?: {
-    totalItems: number;
-    totalPrice: number;
-    restaurantCount: number;
-  };
-};
+import { type CheckoutCartGroup, type CheckoutState } from "@/model/model";
 
 const formatRupiah = (value: number) =>
   new Intl.NumberFormat("id-ID", {

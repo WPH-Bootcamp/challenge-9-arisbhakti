@@ -6,23 +6,9 @@ import { useDispatch } from "react-redux";
 import ProfileModal from "@/components/popup/ProfileModal";
 import { openProfileModal } from "@/features/modals/profileModalSlice";
 import { useProfileQuery } from "@/services/profileService";
-
-type ProfileResponse = {
-  success: boolean;
-  message: string;
-  data?: {
-    user?: {
-      id: number;
-      name: string;
-      email: string;
-      phone: string;
-      avatar: string | null;
-    };
-  };
-};
+import { type ProfileResponse, type User } from "@/model/model";
 
 export default function Profile() {
-  type User = NonNullable<NonNullable<ProfileResponse["data"]>["user"]>;
   const dispatch = useDispatch();
 
   const { data, isLoading, isError, error } = useProfileQuery<ProfileResponse>(

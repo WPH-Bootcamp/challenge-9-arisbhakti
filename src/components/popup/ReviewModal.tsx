@@ -9,34 +9,7 @@ import {
   useMyReviewsQuery,
   useUpdateReviewMutation,
 } from "@/services/reviewModalService";
-
-type ReviewModalProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  order: {
-    id: number;
-    transactionId: string;
-    restaurants: {
-      restaurant: { id: number; name: string; logo: string };
-      items: { menuId: number }[];
-    }[];
-  } | null;
-};
-
-type MyReview = {
-  id: number;
-  star: number;
-  comment: string;
-  transactionId: string;
-};
-
-type ReviewsResponse = {
-  success: boolean;
-  message: string;
-  data?: {
-    reviews?: MyReview[];
-  };
-};
+import { type ReviewModalProps, type ReviewsResponse } from "@/model/model";
 
 export default function ReviewModal({
   open,
