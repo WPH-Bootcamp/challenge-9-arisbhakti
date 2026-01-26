@@ -156,9 +156,21 @@ export const useCheckoutMutation = ({
         notes: "Please ring the doorbell",
       };
       const response = await api.post(ENDPOINTS.ORDER_CHECKOUT, payload);
-      return response.data as { success: boolean };
+      return response.data as {
+        success: boolean;
+        data?: {
+          transaction?: {
+            pricing?: {
+              subtotal?: number;
+              serviceFee?: number;
+              deliveryFee?: number;
+              totalPrice?: number;
+            };
+          };
+        };
+      };
     },
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       queryClient.setQueryData(["cart"], (prev: any) => {
         if (!prev || typeof prev !== "object") return prev;
         const prevObj = prev as { data?: unknown };
@@ -185,14 +197,15 @@ export const useCheckoutMutation = ({
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       dispatch(clearCart());
       localStorage.removeItem("cart_state");
+      const pricing = data?.data?.transaction?.pricing;
       const successPayload = {
         date: dayjs().toISOString(),
         paymentMethod,
         totalItems,
-        price: totalPrice,
-        deliveryFee: DELIVERY_FEE,
-        serviceFee: SERVICE_FEE,
-        total: grandTotal,
+        price: pricing?.subtotal ?? totalPrice,
+        deliveryFee: pricing?.deliveryFee ?? DELIVERY_FEE,
+        serviceFee: pricing?.serviceFee ?? SERVICE_FEE,
+        total: pricing?.totalPrice ?? grandTotal,
       };
       localStorage.setItem("checkout_success", JSON.stringify(successPayload));
       navigate("/success");

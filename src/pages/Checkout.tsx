@@ -57,8 +57,8 @@ export default function Checkout() {
     state.cart ??
     [];
 
-  const DELIVERY_FEE = 15000;
-  const SERVICE_FEE = 5000;
+  const DELIVERY_FEE = 10000;
+  const SERVICE_FEE = 1000;
 
   const [paymentMethod, setPaymentMethod] = useState(
     "BNI Bank Negara Indonesia",
