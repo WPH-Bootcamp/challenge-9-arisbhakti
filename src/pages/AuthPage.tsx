@@ -299,7 +299,20 @@ export default function AuthPage() {
                                   : "border-neutral-200 focus:border-neutral-300"
                               } ${signInAnimate && signInErrors.email ? "animate-shake" : ""}`}
                             />
-                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                            <label
+                              className="
+  pointer-events-none absolute left-3 top-2
+  text-xs text-neutral-500 transition-all
+  peer-placeholder-shown:top-3.5
+  md:peer-placeholder-shown:top-4  
+  peer-focus:top-2
+  md:peer-focus:top-2
+  peer-placeholder-shown:text-sm
+  peer-focus:text-xs
+  md:peer-placeholder-shown:text-base
+  md:peer-focus:text-sm
+"
+                            >
                               Email
                             </label>
                           </div>
@@ -334,7 +347,20 @@ export default function AuthPage() {
                                   : ""
                               }`}
                             />
-                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                            <label
+                              className="
+  pointer-events-none absolute left-3 top-2
+  text-xs text-neutral-500 transition-all
+  peer-placeholder-shown:top-3.5
+  md:peer-placeholder-shown:top-4  
+  peer-focus:top-2
+  md:peer-focus:top-2
+  peer-placeholder-shown:text-sm
+  peer-focus:text-xs
+  md:peer-placeholder-shown:text-base
+  md:peer-focus:text-sm
+"
+                            >
                               Password
                             </label>
                             <button
@@ -438,7 +464,20 @@ export default function AuthPage() {
                                   : "border-neutral-200 focus:border-neutral-300"
                               } ${signUpAnimate && signUpErrors.name ? "animate-shake" : ""}`}
                             />
-                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                            <label
+                              className="
+  pointer-events-none absolute left-3 top-2
+  text-xs text-neutral-500 transition-all
+  peer-placeholder-shown:top-3.5
+  md:peer-placeholder-shown:top-4  
+  peer-focus:top-2
+  md:peer-focus:top-2
+  peer-placeholder-shown:text-sm
+  peer-focus:text-xs
+  md:peer-placeholder-shown:text-base
+  md:peer-focus:text-sm
+"
+                            >
                               Name
                             </label>
                           </div>
@@ -469,7 +508,20 @@ export default function AuthPage() {
                                   : "border-neutral-200 focus:border-neutral-300"
                               } ${signUpAnimate && signUpErrors.email ? "animate-shake" : ""}`}
                             />
-                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                            <label
+                              className="
+  pointer-events-none absolute left-3 top-2
+  text-xs text-neutral-500 transition-all
+  peer-placeholder-shown:top-3.5
+  md:peer-placeholder-shown:top-4  
+  peer-focus:top-2
+  md:peer-focus:top-2
+  peer-placeholder-shown:text-sm
+  peer-focus:text-xs
+  md:peer-placeholder-shown:text-base
+  md:peer-focus:text-sm
+"
+                            >
                               Email
                             </label>
                           </div>
@@ -500,7 +552,20 @@ export default function AuthPage() {
                                   : "border-neutral-200 focus:border-neutral-300"
                               } ${signUpAnimate && signUpErrors.phone ? "animate-shake" : ""}`}
                             />
-                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                            <label
+                              className="
+  pointer-events-none absolute left-3 top-2
+  text-xs text-neutral-500 transition-all
+  peer-placeholder-shown:top-3.5
+  md:peer-placeholder-shown:top-4  
+  peer-focus:top-2
+  md:peer-focus:top-2
+  peer-placeholder-shown:text-sm
+  peer-focus:text-xs
+  md:peer-placeholder-shown:text-base
+  md:peer-focus:text-sm
+"
+                            >
                               Number Phone
                             </label>
                           </div>
@@ -535,7 +600,20 @@ export default function AuthPage() {
                                   : ""
                               }`}
                             />
-                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                            <label
+                              className="
+  pointer-events-none absolute left-3 top-2
+  text-xs text-neutral-500 transition-all
+  peer-placeholder-shown:top-3.5
+  md:peer-placeholder-shown:top-4  
+  peer-focus:top-2
+  md:peer-focus:top-2
+  peer-placeholder-shown:text-sm
+  peer-focus:text-xs
+  md:peer-placeholder-shown:text-base
+  md:peer-focus:text-sm
+"
+                            >
                               Password
                             </label>
                             <button
@@ -583,7 +661,20 @@ export default function AuthPage() {
                                   : ""
                               }`}
                             />
-                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                            <label
+                              className="
+  pointer-events-none absolute left-3 top-2
+  text-xs text-neutral-500 transition-all
+  peer-placeholder-shown:top-3.5
+  md:peer-placeholder-shown:top-4  
+  peer-focus:top-2
+  md:peer-focus:top-2
+  peer-placeholder-shown:text-sm
+  peer-focus:text-xs
+  md:peer-placeholder-shown:text-base
+  md:peer-focus:text-sm
+"
+                            >
                               Confirm Password
                             </label>
                             <button
