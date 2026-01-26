@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { api, ENDPOINTS } from "@/lib/api";
 
 export const useProfileQuery = <T>(getFromStorage: () => T | null) =>
   useQuery({
@@ -7,7 +7,7 @@ export const useProfileQuery = <T>(getFromStorage: () => T | null) =>
     queryFn: async () => {
       const local = getFromStorage();
       if (local) return local;
-      const response = await api.get<T>("/api/auth/me");
+      const response = await api.get<T>(ENDPOINTS.AUTH_ME);
       return response.data;
     },
   });

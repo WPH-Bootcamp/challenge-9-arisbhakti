@@ -129,7 +129,9 @@ export default function Details() {
 
   React.useEffect(() => {
     const syncAuth = () => {
-      const token = localStorage.getItem("auth_token");
+      const token =
+        localStorage.getItem("auth_token") ||
+        sessionStorage.getItem("auth_token");
       setIsLogin(Boolean(token));
     };
 

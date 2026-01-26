@@ -1,5 +1,5 @@
 import { useMutation, useQuery, keepPreviousData } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { api, ENDPOINTS } from "@/lib/api";
 
 export const useRestaurantDetailQuery = <T>(
   id: string | undefined,
@@ -10,7 +10,7 @@ export const useRestaurantDetailQuery = <T>(
     queryKey: ["restaurant-detail", id, menuLimit, reviewLimit],
     queryFn: async () => {
       const response = await api.get<{ success: boolean; message: string; data?: T }>(
-        `/api/resto/${id}`,
+        `${ENDPOINTS.RESTO}/${id}`,
         { params: { limitMenu: menuLimit, limitReview: reviewLimit } },
       );
       return response.data;
@@ -35,7 +35,7 @@ export const useAddToCartMutation = ({
       menuId: number;
       quantity: number;
     }) => {
-      const response = await api.post("/api/cart", payload);
+      const response = await api.post(ENDPOINTS.CART, payload);
       return response.data as {
         data?: { cartItem?: { id: number; quantity: number } };
       };
@@ -97,9 +97,12 @@ export const useUpdateCartMutation = ({
 }: any) =>
   useMutation({
     mutationFn: async (payload: { cartItemId: number; quantity: number }) => {
-      const response = await api.put(`/api/cart/${payload.cartItemId}`, {
+      const response = await api.put(
+        `${ENDPOINTS.CART}/${payload.cartItemId}`,
+        {
         quantity: payload.quantity,
-      });
+      },
+      );
       return response.data as {
         data?: { cartItem?: { id: number; quantity: number } };
       };
@@ -148,7 +151,9 @@ export const useDeleteCartMutation = ({
 }: any) =>
   useMutation({
     mutationFn: async (payload: { cartItemId: number }) => {
-      const response = await api.delete(`/api/cart/${payload.cartItemId}`);
+      const response = await api.delete(
+        `${ENDPOINTS.CART}/${payload.cartItemId}`,
+      );
       return response.data as { success: boolean };
     },
     onMutate: async (payload) => {

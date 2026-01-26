@@ -1,12 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { api, ENDPOINTS } from "@/lib/api";
 import dayjs from "dayjs";
 
 export const useCheckoutCartQuery = <T>() =>
   useQuery({
     queryKey: ["cart"],
     queryFn: async () => {
-      const response = await api.get<T>("/api/cart");
+      const response = await api.get<T>(ENDPOINTS.CART);
       return response.data;
     },
   });
@@ -19,9 +19,12 @@ export const useCheckoutUpdateCartMutation = ({
 }: any) =>
   useMutation({
     mutationFn: async (payload: { cartItemId: number; quantity: number }) => {
-      const response = await api.put(`/api/cart/${payload.cartItemId}`, {
+      const response = await api.put(
+        `${ENDPOINTS.CART}/${payload.cartItemId}`,
+        {
         quantity: payload.quantity,
-      });
+      },
+      );
       return response.data as {
         data?: { cartItem?: { id: number; quantity: number } };
       };
@@ -79,7 +82,9 @@ export const useCheckoutDeleteCartMutation = ({
 }: any) =>
   useMutation({
     mutationFn: async (payload: { cartItemId: number }) => {
-      const response = await api.delete(`/api/cart/${payload.cartItemId}`);
+      const response = await api.delete(
+        `${ENDPOINTS.CART}/${payload.cartItemId}`,
+      );
       return response.data as { success: boolean };
     },
     onMutate: async (payload) => {
@@ -150,7 +155,7 @@ export const useCheckoutMutation = ({
         paymentMethod,
         notes: "Please ring the doorbell",
       };
-      const response = await api.post("/api/order/checkout", payload);
+      const response = await api.post(ENDPOINTS.ORDER_CHECKOUT, payload);
       return response.data as { success: boolean };
     },
     onSuccess: async () => {
@@ -175,7 +180,7 @@ export const useCheckoutMutation = ({
         group.items.map((item: any) => item.id),
       );
       await Promise.allSettled(
-        cartItemIds.map((id: number) => api.delete(`/api/cart/${id}`)),
+        cartItemIds.map((id: number) => api.delete(`${ENDPOINTS.CART}/${id}`)),
       );
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       dispatch(clearCart());

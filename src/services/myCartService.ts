@@ -1,11 +1,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { api, ENDPOINTS } from "@/lib/api";
 
 export const useCartQuery = <T>() =>
   useQuery({
     queryKey: ["cart"],
     queryFn: async () => {
-      const response = await api.get<T>("/api/cart");
+      const response = await api.get<T>(ENDPOINTS.CART);
       return response.data;
     },
   });
@@ -20,9 +20,12 @@ export const useUpdateCartMutation = ({
 }: any) =>
   useMutation({
     mutationFn: async (payload: { cartItemId: number; quantity: number }) => {
-      const response = await api.put(`/api/cart/${payload.cartItemId}`, {
+      const response = await api.put(
+        `${ENDPOINTS.CART}/${payload.cartItemId}`,
+        {
         quantity: payload.quantity,
-      });
+      },
+      );
       return response.data as {
         data?: { cartItem?: { id: number; quantity: number } };
       };
@@ -97,7 +100,9 @@ export const useDeleteCartMutation = ({
 }: any) =>
   useMutation({
     mutationFn: async (payload: { cartItemId: number }) => {
-      const response = await api.delete(`/api/cart/${payload.cartItemId}`);
+      const response = await api.delete(
+        `${ENDPOINTS.CART}/${payload.cartItemId}`,
+      );
       return response.data as { success: boolean };
     },
     onMutate: async (payload) => {

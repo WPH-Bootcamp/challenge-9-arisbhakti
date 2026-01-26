@@ -1,11 +1,11 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { api, ENDPOINTS } from "@/lib/api";
 
 export const useRecommendedQuery = <TResponse>() =>
   useQuery({
     queryKey: ["recommended-resto"],
     queryFn: async () => {
-      const response = await api.get<TResponse>("/api/resto/recommended");
+      const response = await api.get<TResponse>(ENDPOINTS.RESTO_RECOMMENDED);
       return response.data;
     },
   });
@@ -14,7 +14,7 @@ export const useBestSellerQuery = <TResponse>(limit: number, enabled: boolean) =
   useInfiniteQuery({
     queryKey: ["best-seller-resto"],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await api.get<TResponse>("/api/resto/best-seller", {
+      const response = await api.get<TResponse>(ENDPOINTS.RESTO_BEST_SELLER, {
         params: { page: pageParam, limit },
       });
       return response.data;
@@ -41,7 +41,7 @@ export const useSearchQuery = <TResponse>(
   useQuery({
     queryKey: ["search-resto", keyword],
     queryFn: async () => {
-      const response = await api.get<TResponse>("/api/resto/search", {
+      const response = await api.get<TResponse>(ENDPOINTS.RESTO_SEARCH, {
         params: { q: keyword, page: 1, limit },
       });
       return response.data;
@@ -56,7 +56,7 @@ export const useAllRestaurantsQuery = <TResponse>(
   useInfiniteQuery({
     queryKey: ["all-restaurants"],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await api.get<TResponse>("/api/resto", {
+      const response = await api.get<TResponse>(ENDPOINTS.RESTO, {
         params: { page: pageParam, limit },
       });
       return response.data;
@@ -83,7 +83,7 @@ export const useNearbyQuery = <TResponse>(
   useInfiniteQuery({
     queryKey: ["nearby-resto", range],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await api.get<TResponse>("/api/resto", {
+      const response = await api.get<TResponse>(ENDPOINTS.RESTO, {
         params: { range, page: pageParam, limit },
       });
       return response.data;

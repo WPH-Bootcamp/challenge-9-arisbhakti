@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { api } from "@/lib/api";
+import { api, ENDPOINTS } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -130,7 +130,7 @@ export default function AuthPage() {
 
     try {
       setSignInLoading(true);
-      const response = await api.post("/api/auth/login", {
+      const response = await api.post(ENDPOINTS.AUTH_LOGIN, {
         email: signIn.email.trim(),
         password: signIn.password,
       });
@@ -175,7 +175,7 @@ export default function AuthPage() {
 
     try {
       setSignUpLoading(true);
-      const response = await api.post("/api/auth/register", {
+      const response = await api.post(ENDPOINTS.AUTH_REGISTER, {
         name: signUp.name.trim(),
         email: signUp.email.trim(),
         phone: signUp.phone.trim(),

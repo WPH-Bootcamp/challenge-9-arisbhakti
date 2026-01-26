@@ -220,7 +220,7 @@ export default function MyOrders() {
                               {item.menuName}
                             </span>
                             <span className="font-extrabold text-base leading-7.5 md:text-lg md:leading-8 -tracking-[0.02em]">
-                              {formatRupiah(item.price)}
+                              {item.quantity} x {formatRupiah(item.price)}
                             </span>
                           </div>
                         </div>

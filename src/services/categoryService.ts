@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { api, ENDPOINTS } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 
 export type CategoryResponse<T> = {
@@ -23,7 +23,7 @@ export const useCategoryQuery = <T>(
   useQuery({
     queryKey,
     queryFn: async () => {
-      const response = await api.get<CategoryResponse<T>>("/api/resto", {
+      const response = await api.get<CategoryResponse<T>>(ENDPOINTS.RESTO, {
         params,
       });
       return response.data;
