@@ -253,16 +253,16 @@ export default function AuthPage() {
                   setSignUpErrors({});
                 }}
               >
-                <TabsList className="h-14 w-full rounded-full bg-neutral-100 p-1 cursor-pointer">
+                <TabsList className="h-14 w-full rounded-3xl bg-neutral-100 p-1 cursor-pointer px-2 md:px-3 py-2">
                   <TabsTrigger
                     value="signin"
-                    className="h-full w-1/2 rounded-full text-base font-semibold text-neutral-600 data-[state=active]:bg-white data-[state=active]:text-neutral-900 data-[state=active]:shadow-sm cursor-pointer"
+                    className="h-full w-1/2 rounded-xl text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]  font-bold  data-[state=active]:bg-white data-[state=active]:text-neutral-900 data-[state=active]:shadow-sm cursor-pointer"
                   >
                     Sign in
                   </TabsTrigger>
                   <TabsTrigger
                     value="signup"
-                    className="h-full w-1/2 rounded-full text-base font-semibold text-neutral-600 data-[state=active]:bg-white data-[state=active]:text-neutral-900 data-[state=active]:shadow-sm cursor-pointer"
+                    className="h-full w-1/2 rounded-xl text-sm leading-7 -tracking-[0.02em] md:text-base md:leading-7.5 md:-tracking-[0.02em]  font-bold  data-[state=active]:bg-white data-[state=active]:text-neutral-900 data-[state=active]:shadow-sm cursor-pointer"
                   >
                     Sign up
                   </TabsTrigger>
@@ -293,13 +293,13 @@ export default function AuthPage() {
                                   email: e.target.value,
                                 }))
                               }
-                              className={`peer h-12 md:h-14 w-full rounded-[10px] border bg-white px-3  text-base outline-none placeholder:text-transparent placeholder:-tracking-[0.02em] ${
+                              className={`peer h-12 md:h-14 w-full rounded-[10px] border bg-white px-3 pr-14 pt-5 text-sm outline-none placeholder:text-transparent placeholder:-tracking-[0.02em] ${
                                 signInErrors.email
                                   ? "border-red-400 focus:border-red-400"
                                   : "border-neutral-200 focus:border-neutral-300"
                               } ${signInAnimate && signInErrors.email ? "animate-shake" : ""}`}
                             />
-                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
+                            <label className="pointer-events-none absolute left-3 top-2.5 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-placeholder-shown:text-neutral-500 peer-focus:top-2.5 peer-focus:text-xs peer-focus:text-neutral-600">
                               Email
                             </label>
                           </div>
